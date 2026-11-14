@@ -99,7 +99,7 @@ A scoped package is private by default; `npm publish --access public` (which the
 
 - the install lines in `README.md`, `SKILL.md` (and its two copies), `QUICK_START.md`, `HOW_TO_RUN.md` and the other guides;
 - `test/package.test.mjs`, which asserts that the name is `ihateposting-agent`;
-- the plugin manifests only if you also want their `name` to change; they name the plugin, not the npm package.
+- the plugin manifests: their `name` is the plugin's own (`ihateposting`), not the npm package's, so it stays; only the marketplaces' `name` (`ihateposting-agent`) is the install line's second half.
 
 ## Before the first publish
 

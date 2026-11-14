@@ -30,8 +30,10 @@ None of the tool-specific installs below was tried inside the real tool. The man
 
 ```bash
 /plugin marketplace add iHatePostingOrg/iHatePosting-Agent
-/plugin install ihateposting-agent@ihateposting-agent
+/plugin install ihateposting@ihateposting-agent
 ```
+
+The plugin is called `ihateposting` and the marketplace `ihateposting-agent` (the npm package and the command keep the longer name), which is why the install line reads `ihateposting@ihateposting-agent`.
 
 It carries the skill only. It registers no MCP server, so it never competes with a connector you already have.
 

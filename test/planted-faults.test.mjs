@@ -76,6 +76,11 @@ const faults = [
   ["the author's address is in a document", "SUMMARY.md", [["# ihateposting-agent in one page", "# ihateposting-agent in one page, by support@ihateposting.com"]]],
   ["the licence names the person", "LICENSE", [["Copyright (c) 2026 iHatePostingOrg", "Copyright (c) 2026 Parag Hasmukhbhai Gajera"]]],
   ["a platform the product does not have is a keyword", "plugins/dsh-ihateposting/package.json", [['    "slack",\n', '    "slack",\n    "reddit",\n']]],
+  ["a plugin manifest still carries the old plugin name", ".claude-plugin/plugin.json", [['"name": "ihateposting",', '"name": "ihateposting-agent",']]],
+  ["the Gemini extension still carries the old plugin name", "gemini-extension.json", [['"name": "ihateposting",', '"name": "ihateposting-agent",']]],
+  ["a marketplace loses its own name", ".grok-plugin/marketplace.json", [['"name": "ihateposting-agent",', '"name": "ihateposting",']]],
+  ["a marketplace entry keeps the old plugin name", ".cursor-plugin/marketplace.json", [['"name": "ihateposting",\n      "source"', '"name": "ihateposting-agent",\n      "source"']]],
+  ["the README install line names the old plugin", "README.md", [["/plugin install ihateposting@ihateposting-agent", "/plugin install ihateposting-agent@ihateposting-agent"]]],
   ["the hosted MCP server's address is another one", "mcp.json", [["https://app.ihateposting.com/api/mcp/oauth", "https://example.com/mcp"]]],
 ];
 

@@ -1,5 +1,5 @@
 {
-  "name": "ihateposting-agent",
+  "name": "ihateposting",
   "version": "0.1.0",
   "description": "iHatePosting social media automation: schedule, draft, and publish posts, manage connected channels, upload media, and track analytics across 15 platforms including X, LinkedIn, Instagram, Facebook, Threads, TikTok, YouTube, Bluesky, Mastodon, Discord, Slack, and Telegram. Bundles the hosted iHatePosting MCP server.",
   "mcpServers": {

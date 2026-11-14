@@ -155,7 +155,7 @@ The handlers, one file per group. Each one gets its configuration, makes its req
 
 All of them name the version, and all of them must carry the same one (`test/package.test.mjs` checks it).
 
-- `.claude-plugin/plugin.json` and `marketplace.json`: Claude Code. They point at `skills/ihateposting-agent`; there is no MCP entry.
+- `.claude-plugin/plugin.json` and `marketplace.json`: Claude Code. The plugin is named `ihateposting` and the marketplace `ihateposting-agent` (install: `ihateposting@ihateposting-agent`). They point at `skills/ihateposting-agent`; there is no MCP entry.
 - `.cursor-plugin/` and `.grok-plugin/`: `plugin.json` (the skill, the logo, and a pointer to the folder's own `mcp.json`) and `marketplace.json`.
 - `gemini-extension.json`: Gemini CLI. It names only the hosted MCP server, as `httpUrl`.
 - `mcp.json`: the same server for any client that reads an `mcp.json`.

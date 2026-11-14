@@ -133,7 +133,18 @@ describe("the skill", () => {
 describe("the plugin folders", () => {
   it("are valid JSON, name the package, and point at files that exist", () => {
     for (const file of [".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".cursor-plugin/mcp.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", ".grok-plugin/mcp.json", "gemini-extension.json", "mcp.json"]) assert.ok(json(file), file);
-    for (const file of [".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", ".grok-plugin/plugin.json", "gemini-extension.json"]) assert.equal(json(file).name, "ihateposting-agent", file);
+    // The plugin is "ihateposting" everywhere it is named (kebab-case, as Claude Code's documentation asks); each marketplace is "ihateposting-agent", which is why the install is
+    // `ihateposting@ihateposting-agent`; the npm package and the command keep "ihateposting-agent".
+    for (const file of [".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", ".grok-plugin/plugin.json", "gemini-extension.json"]) assert.equal(json(file).name, "ihateposting", file);
+    for (const file of [".claude-plugin/marketplace.json", ".cursor-plugin/marketplace.json", ".grok-plugin/marketplace.json"]) {
+      assert.equal(json(file).name, "ihateposting-agent", `${file}: the marketplace's own name`);
+      assert.equal(json(file).plugins[0].name, "ihateposting", `${file}: the plugin entry's name`);
+    }
+    // Claude Code installs by the entry's name, so the entry and the plugin's own manifest must agree.
+    assert.equal(json(".claude-plugin/marketplace.json").plugins[0].name, json(".claude-plugin/plugin.json").name);
+    assert.equal(json(".cursor-plugin/marketplace.json").plugins[0].name, json(".cursor-plugin/plugin.json").name);
+    assert.match(read("README.md"), /\/plugin install ihateposting@ihateposting-agent\n/);
+    assert.doesNotMatch(read("README.md"), /ihateposting-agent@ihateposting-agent/);
     for (const file of [".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", ".grok-plugin/plugin.json"]) for (const skill of json(file).skills) assert.ok(fs.existsSync(path.join(ROOT, skill, "SKILL.md")), `${file}: ${skill}`);
     for (const file of [".cursor-plugin/plugin.json", ".grok-plugin/plugin.json"]) assert.ok(fs.existsSync(path.join(ROOT, json(file).logo)), `${file}: its logo`);
     // The logo is the app's current "i" mark as a real PNG (a stale heart SVG was shipped once and the owner caught it), not a text file with a picture's name.

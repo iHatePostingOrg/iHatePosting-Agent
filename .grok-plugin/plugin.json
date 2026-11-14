@@ -1,16 +1,42 @@
 {
   "name": "ihateposting-agent",
   "version": "0.1.0",
-  "description": "iHatePosting for AI agents. Schedule posts, read each channel's rules, upload media and read analytics across fifteen social platforms.",
+  "description": "iHatePosting social media automation. Schedule posts, manage integrations, upload media, and track analytics across 15 platforms including X, LinkedIn, YouTube, TikTok, and Instagram.",
   "author": {
-    "name": "iHatePostingOrg",
+    "name": "Parag Hasmukhbhai Gajera",
+    "email": "support@ihateposting.com",
     "url": "https://github.com/iHatePostingOrg"
   },
   "homepage": "https://github.com/iHatePostingOrg/iHatePosting-Agent#readme",
   "repository": "https://github.com/iHatePostingOrg/iHatePosting-Agent",
   "license": "MIT",
   "logo": "assets/logo.png",
-  "keywords": ["ihateposting", "social-media", "scheduling", "ai-agent", "mcp"],
-  "skills": ["./skills/ihateposting-agent"],
+  "keywords": [
+    "ihateposting",
+    "ihateposting cli",
+    "social media scheduler",
+    "social media agentic scheduler",
+    "schedule social media posts",
+    "social media automation",
+    "x",
+    "twitter",
+    "linkedin",
+    "facebook",
+    "instagram",
+    "threads",
+    "youtube",
+    "tiktok",
+    "pinterest",
+    "bluesky",
+    "mastodon",
+    "telegram",
+    "discord",
+    "slack",
+    "tumblr",
+    "google-business"
+  ],
+  "skills": [
+    "./skills/ihateposting-agent"
+  ],
   "mcpServers": "./.grok-plugin/mcp.json"
 }

@@ -1,14 +1,39 @@
 {
   "name": "ihateposting-agent",
   "version": "0.1.0",
-  "description": "iHatePosting for AI agents: schedule, draft and publish posts, read each channel's rules, upload media and read analytics across X, LinkedIn, Instagram, Facebook, Threads, YouTube, TikTok, Pinterest, Bluesky, Mastodon, Telegram, Discord, Slack, Tumblr and Google Business. Bundles the ihateposting-agent skill.",
+  "description": "Social media automation skill for the iHatePosting CLI, for scheduling posts, managing integrations, uploading media, and tracking analytics across 15 platforms including X, LinkedIn (profiles and pages), Instagram, Facebook, Threads, YouTube, TikTok, Pinterest, Bluesky, Mastodon, Google Business, Discord, Slack, Telegram, and Tumblr",
   "author": {
-    "name": "iHatePostingOrg",
+    "name": "Parag Hasmukhbhai Gajera",
+    "email": "support@ihateposting.com",
     "url": "https://github.com/iHatePostingOrg"
   },
   "homepage": "https://github.com/iHatePostingOrg/iHatePosting-Agent#readme",
   "repository": "https://github.com/iHatePostingOrg/iHatePosting-Agent",
   "license": "MIT",
-  "skills": ["./skills/ihateposting-agent"],
-  "keywords": ["ihateposting", "social-media", "scheduling", "automation", "ai-agent", "cli", "mcp"]
+  "skills": [
+    "./skills/ihateposting-agent"
+  ],
+  "keywords": [
+    "ihateposting",
+    "social-media",
+    "scheduling",
+    "automation",
+    "ai-agent",
+    "x",
+    "twitter",
+    "linkedin",
+    "facebook",
+    "instagram",
+    "threads",
+    "youtube",
+    "tiktok",
+    "pinterest",
+    "bluesky",
+    "mastodon",
+    "telegram",
+    "discord",
+    "slack",
+    "tumblr",
+    "google-business"
+  ]
 }

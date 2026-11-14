@@ -78,10 +78,10 @@ function patchExpression(key) {
 }
 
 describe("package.json", () => {
-  it("is an MIT, plain-JavaScript ES module by iHatePostingOrg that a plugin manager can read as a bundle", () => {
+  it("is an MIT, plain-JavaScript ES module by its author that a plugin manager can read as a bundle", () => {
     assert.equal(pkg.name, "dsh-ihateposting");
     assert.equal(pkg.license, "MIT");
-    assert.equal(pkg.author, "iHatePostingOrg");
+    assert.deepEqual(pkg.author, { name: "Parag Hasmukhbhai Gajera", email: "support@ihateposting.com", url: "https://github.com/iHatePostingOrg" });
     assert.equal(pkg.type, "module");
     assert.deepEqual(pkg.dsh, { bundle: { patch: "./cordis.patch.yml" } });
     assert.ok(pkg.keywords.includes("dsh-plugin"));
@@ -278,7 +278,8 @@ describe("the files as a whole", () => {
   it("hold no key, no email address and no long secret-looking token", () => {
     for (const file of allFiles()) {
       const text = read(file);
-      assert.ok(!/[\w.+-]+@[\w-]+\.[a-z]{2,}/i.test(text), `${file} has an email address`);
+      // The author's one address is in package.json (the owner gave it for the public repository); no other address is anywhere.
+      assert.ok(!/[\w.+-]+@[\w-]+\.[a-z]{2,}/i.test(text.replaceAll("support@ihateposting.com", "")), `${file} has an email address`);
       assert.ok(!/Bearer\s+(?!\$\{|<)[A-Za-z0-9_-]{12,}/.test(text), `${file} has a literal bearer token`);
       assert.ok(!/\b[0-9a-f]{40,}\b/i.test(text), `${file} has a long hex token`);
       assert.ok(!/\b(sk|ihp|pk)[-_][A-Za-z0-9]{16,}/.test(text), `${file} has a key-shaped token`);

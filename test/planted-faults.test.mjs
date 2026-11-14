@@ -11,7 +11,8 @@ import { before, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
-const COPY = ["bin", "src", "test", "node_modules", "assets", ".gitignore", ".github", "package.json", "SKILL.md", "skills", ".claude-plugin", ".cursor-plugin", ".grok-plugin", "gemini-extension.json", "mcp.json", "README.md", "CHANGELOG.md", "PUBLISHING.md", "LICENSE", "plugins", "examples"];
+// Everything the repository holds except its git history (the documents and the plugin folders are read by the tests too).
+const COPY = fs.readdirSync(ROOT).filter((entry) => entry !== ".git");
 
 // [what, file, [[from, to], …]]
 const faults = [
@@ -64,6 +65,17 @@ const faults = [
   ["a plugin manifest has another version", ".cursor-plugin/plugin.json", [['"version": "0.1.0"', '"version": "0.1.1"']]],
   ["the DeepSeek plugin has another version", "plugins/dsh-ihateposting/package.json", [["\"version\": \"0.1.0\"", "\"version\": \"0.1.1\""]]],
   ["the DeepSeek plugin carries another copy of the skill", "plugins/dsh-ihateposting/skill/SKILL.md", [["ihateposting-agent", "ihateposting-agnt"]]],
+  ["a document links to a file that is not there", "README.md", [["](SUMMARY.md)", "](SUMMARY_GONE.md)"]]],
+  ["the README shows another logo file", "README.md", [["<img src=\"assets/logo.png\"", "<img src=\"assets/logo.svg\""]]],
+  ["a document names the command line it was shaped on", "SUMMARY.md", [["# ihateposting-agent in one page", "# ihateposting-agent in one page, after pos" + "tiz"]]],
+  ["a document holds a key-looking text", "SUMMARY.md", [["# ihateposting-agent in one page", "# ihateposting-agent in one page " + "0123456789abcdef".repeat(4)]]],
+  ["a document names an example file that is not there", "PROVIDER_SETTINGS.md", [["A body file for it is in [examples/tiktok-video.json](examples/tiktok-video.json).", "A body file for it is in examples/gone-video.json (see the examples folder)."]]],
+  ["a manifest loses the author's address", ".claude-plugin/plugin.json", [['    "email": "support@ihateposting.com",\n    "url"', '    "url"']]],
+  ["a platform keyword is dropped from the npm package", "package.json", [['    "tumblr",\n', ""]]],
+  ["a manifest counts another number of platforms", "gemini-extension.json", [["across 15 platforms", "across 28+ platforms"]]],
+  ["the author's address is in a document", "SUMMARY.md", [["# ihateposting-agent in one page", "# ihateposting-agent in one page, by support@ihateposting.com"]]],
+  ["the licence names the person", "LICENSE", [["Copyright (c) 2026 iHatePostingOrg", "Copyright (c) 2026 Parag Hasmukhbhai Gajera"]]],
+  ["a platform the product does not have is a keyword", "plugins/dsh-ihateposting/package.json", [['    "slack",\n', '    "slack",\n    "reddit",\n']]],
   ["the hosted MCP server's address is another one", "mcp.json", [["https://app.ihateposting.com/api/mcp/oauth", "https://example.com/mcp"]]],
 ];
 

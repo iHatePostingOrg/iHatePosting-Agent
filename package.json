@@ -1,7 +1,7 @@
 {
   "name": "ihateposting-agent",
   "version": "0.1.0",
-  "description": "The iHatePosting command line for AI agents and scripts: sign in, find channels, read each platform's rules, upload media and schedule or draft posts through iHatePosting's public API.",
+  "description": "iHatePosting CLI - Command line interface for the iHatePosting social media scheduling API",
   "keywords": [
     "ihateposting",
     "social-media",
@@ -9,8 +9,27 @@
     "cli",
     "ai-agent",
     "mcp",
-    "skill"
+    "skill",
+    "automation",
+    "command-line",
+    "x",
+    "twitter",
+    "linkedin",
+    "facebook",
+    "instagram",
+    "threads",
+    "youtube",
+    "tiktok",
+    "pinterest",
+    "bluesky",
+    "mastodon",
+    "telegram",
+    "discord",
+    "slack",
+    "tumblr",
+    "google-business"
   ],
+  "author": "Parag Hasmukhbhai Gajera <support@ihateposting.com> (https://github.com/iHatePostingOrg)",
   "homepage": "https://github.com/iHatePostingOrg/iHatePosting-Agent#readme",
   "repository": {
     "type": "git",

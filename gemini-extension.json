@@ -1,11 +1,11 @@
 {
   "name": "ihateposting-agent",
   "version": "0.1.0",
-  "description": "iHatePosting for AI agents: schedule, draft and publish posts, read each channel's rules, upload media and read analytics across fifteen social platforms. Bundles the hosted iHatePosting MCP server.",
+  "description": "iHatePosting social media automation: schedule, draft, and publish posts, manage connected channels, upload media, and track analytics across 15 platforms including X, LinkedIn, Instagram, Facebook, Threads, TikTok, YouTube, Bluesky, Mastodon, Discord, Slack, and Telegram. Bundles the hosted iHatePosting MCP server.",
   "mcpServers": {
     "ihateposting": {
       "httpUrl": "https://app.ihateposting.com/api/mcp/oauth",
-      "description": "The hosted iHatePosting MCP server (streamable HTTP). It signs you in with your browser on the first connection; no key or local install is needed."
+      "description": "Official iHatePosting MCP server (hosted, streamable HTTP). Authorizes via OAuth on first connection: Gemini CLI opens a browser to sign in to iHatePosting; no token or local install required."
     }
   }
 }

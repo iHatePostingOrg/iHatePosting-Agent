@@ -13,6 +13,13 @@ const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
 const json = (file) => JSON.parse(read(file));
 const pkg = json("package.json");
 
+// The author the owner gave for the public repository (2026-11-14), and the fifteen platforms iHatePosting connects (LinkedIn pages are a second kind of LinkedIn channel).
+const AUTHOR_NAME = "Parag Hasmukhbhai Gajera";
+const AUTHOR_EMAIL = "support@ihateposting.com";
+const AUTHOR_URL = "https://github.com/iHatePostingOrg";
+const PLATFORM_NAMES = ["X", "LinkedIn", "Instagram", "Facebook", "Threads", "YouTube", "TikTok", "Pinterest", "Bluesky", "Mastodon", "Google Business", "Discord", "Slack", "Telegram", "Tumblr"];
+const PLATFORM_KEYWORDS = ["x", "twitter", "linkedin", "facebook", "instagram", "threads", "youtube", "tiktok", "pinterest", "bluesky", "mastodon", "telegram", "discord", "slack", "tumblr", "google-business"];
+
 /** The commands the program itself lists in its help (so a command added to the program and not to the skill is found). */
 async function commandsOfTheProgram() {
   const { stdout } = await run(["--help"]);
@@ -142,8 +149,11 @@ describe("the plugin folders", () => {
     assert.equal(json("gemini-extension.json").mcpServers.ihateposting.httpUrl, "https://app.ihateposting.com/api/mcp/oauth");
   });
 
-  it("hold no key, token or email address of a person", () => {
-    for (const file of [".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", "gemini-extension.json"]) assert.ok(!/@[a-z0-9-]+\.[a-z]{2,}/i.test(read(file)), `${file} holds an email address`);
+  it("hold no key, token or email address of a person, except the author's one address in the places that name an author", () => {
+    for (const file of [".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", "gemini-extension.json", "package.json", "plugins/dsh-ihateposting/package.json", "mcp.json", ".cursor-plugin/mcp.json", ".grok-plugin/mcp.json"]) {
+      const text = read(file).replaceAll(AUTHOR_EMAIL, "");
+      assert.ok(!/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[a-z]{2,}/i.test(text), `${file} holds an email address that is not the author's`);
+    }
   });
 });
 
@@ -164,5 +174,81 @@ describe("the repository", () => {
   it("ignores a saved key, an environment file and node_modules", () => {
     const ignore = read(".gitignore");
     for (const line of ["credentials.json", ".env", "node_modules/"]) assert.ok(ignore.includes(line), line);
+  });
+});
+
+describe("who made it, and what it covers", () => {
+  it("names the author in each place that has one, in the shape of that place, with the organisation page as the link", () => {
+    assert.deepEqual(json(".claude-plugin/plugin.json").author, { name: AUTHOR_NAME, email: AUTHOR_EMAIL, url: AUTHOR_URL });
+    assert.deepEqual(json(".claude-plugin/marketplace.json").owner, { name: AUTHOR_NAME, email: AUTHOR_EMAIL });
+    assert.deepEqual(json(".cursor-plugin/plugin.json").author, { name: AUTHOR_NAME, email: AUTHOR_EMAIL });
+    assert.deepEqual(json(".cursor-plugin/marketplace.json").owner, { name: AUTHOR_NAME, email: AUTHOR_EMAIL });
+    assert.deepEqual(json(".cursor-plugin/marketplace.json").plugins[0].author, { name: AUTHOR_NAME, email: AUTHOR_EMAIL });
+    assert.deepEqual(json(".grok-plugin/plugin.json").author, { name: AUTHOR_NAME, email: AUTHOR_EMAIL, url: AUTHOR_URL });
+    assert.deepEqual(json(".grok-plugin/marketplace.json").owner, { name: AUTHOR_NAME, email: AUTHOR_EMAIL });
+    assert.deepEqual(json("plugins/dsh-ihateposting/package.json").author, { name: AUTHOR_NAME, email: AUTHOR_EMAIL, url: AUTHOR_URL });
+    // npm's own string form: "Name <email> (url)".
+    assert.equal(pkg.author, `${AUTHOR_NAME} <${AUTHOR_EMAIL}> (${AUTHOR_URL})`);
+    assert.equal(json("gemini-extension.json").author, undefined, "the Gemini extension has no author field");
+  });
+
+  it("keeps the licence lines as they were: the organisation's name, not a person's", () => {
+    for (const file of ["LICENSE", "plugins/dsh-ihateposting/LICENSE"]) {
+      assert.match(read(file), /^Copyright \(c\) 2026 iHatePostingOrg$/m, file);
+      assert.ok(!read(file).includes(AUTHOR_NAME), `${file} names the person`);
+    }
+  });
+
+  it("puts the author's name and address in no document, example, script or workflow", () => {
+    const walk = (dir) => fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true }).flatMap((e) => (e.name === "node_modules" || e.name === ".git" ? [] : e.isDirectory() ? walk(path.posix.join(dir, e.name)) : [path.posix.join(dir, e.name)]));
+    const manifests = new Set([".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", "package.json", "plugins/dsh-ihateposting/package.json"]);
+    for (const file of walk(".")) {
+      if (!/\.(md|sh|json|yml|mjs|cjs)$/.test(file) || manifests.has(file) || file === "package-lock.json" || file.startsWith("test/") || file.includes("/test/")) continue;
+      const text = read(file);
+      assert.ok(!text.includes(AUTHOR_NAME) && !text.includes(AUTHOR_EMAIL), `${file} holds the author's personal details`);
+    }
+  });
+
+  it("lists the same fifteen platforms by name in the longest descriptions, and says fifteen wherever a manifest counts", () => {
+    for (const description of [json(".claude-plugin/plugin.json").description, json(".claude-plugin/marketplace.json").plugins[0].description, json(".cursor-plugin/plugin.json").description, json(".cursor-plugin/marketplace.json").plugins[0].description]) {
+      for (const name of PLATFORM_NAMES) assert.ok(description.includes(name), `a description lacks ${name}: ${description.slice(0, 80)}`);
+      assert.match(description, /across 15 platforms including /);
+    }
+    const counted = {
+      ".claude-plugin/plugin.json": json(".claude-plugin/plugin.json").description,
+      ".claude-plugin/marketplace.json": JSON.stringify(json(".claude-plugin/marketplace.json")),
+      ".cursor-plugin/plugin.json": json(".cursor-plugin/plugin.json").description,
+      ".cursor-plugin/marketplace.json": JSON.stringify(json(".cursor-plugin/marketplace.json")),
+      ".grok-plugin/plugin.json": json(".grok-plugin/plugin.json").description,
+      ".grok-plugin/marketplace.json": JSON.stringify(json(".grok-plugin/marketplace.json")),
+      "gemini-extension.json": json("gemini-extension.json").description,
+      "plugins/dsh-ihateposting/package.json": pkg.description === undefined ? "" : json("plugins/dsh-ihateposting/package.json").description,
+      "SKILL.md": read("SKILL.md").split("\n").slice(0, 6).join("\n"),
+    };
+    for (const [file, text] of Object.entries(counted)) {
+      const numbers = [...text.matchAll(/\b(\d+)\+?\s+(?:platforms|channels)\b/g)].map((m) => m[1]);
+      assert.ok(numbers.length > 0, `${file} does not say how many platforms`);
+      assert.deepEqual([...new Set(numbers)], ["15"], `${file} counts ${numbers.join(", ")}`);
+    }
+    // The README says the same, and explains the sixteen identifiers.
+    const head = read("README.md").split("\n").slice(0, 100).join("\n");
+    assert.match(head, /Schedule posts across 15 platforms programmatically/);
+    assert.match(head, /fifteen platforms and sixteen channel identifiers/);
+  });
+
+  it("lists every platform's name as a keyword in each manifest that has keywords, and no platform iHatePosting does not have", () => {
+    const lists = {
+      ".claude-plugin/plugin.json": json(".claude-plugin/plugin.json").keywords,
+      ".cursor-plugin/plugin.json": json(".cursor-plugin/plugin.json").keywords,
+      ".cursor-plugin/marketplace.json": json(".cursor-plugin/marketplace.json").plugins[0].keywords,
+      ".grok-plugin/plugin.json": json(".grok-plugin/plugin.json").keywords,
+      "package.json": pkg.keywords,
+      "plugins/dsh-ihateposting/package.json": json("plugins/dsh-ihateposting/package.json").keywords,
+    };
+    for (const [file, keywords] of Object.entries(lists)) {
+      for (const word of PLATFORM_KEYWORDS) assert.ok(keywords.includes(word), `${file} lacks the keyword ${word}`);
+      assert.ok(!keywords.includes("reddit"), `${file} lists a platform iHatePosting does not have`);
+      assert.equal(new Set(keywords).size, keywords.length, `${file} repeats a keyword`);
+    }
   });
 });

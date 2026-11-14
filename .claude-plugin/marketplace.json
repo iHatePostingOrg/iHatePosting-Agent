@@ -1,19 +1,22 @@
 {
   "name": "ihateposting-agent",
   "owner": {
-    "name": "iHatePostingOrg"
+    "name": "Parag Hasmukhbhai Gajera",
+    "email": "support@ihateposting.com"
   },
   "metadata": {
-    "description": "iHatePosting skill for AI agents: schedule and publish posts across fifteen social platforms",
+    "description": "iHatePosting social media automation skill for scheduling posts across 15 platforms",
     "version": "0.1.0"
   },
   "plugins": [
     {
       "name": "ihateposting-agent",
-      "description": "Schedule, draft and publish posts, read each channel's rules, upload media and read analytics through the ihateposting-agent command line.",
+      "description": "Social media automation skill for the iHatePosting CLI, for scheduling posts, managing integrations, uploading media, and tracking analytics across 15 platforms including X, LinkedIn (profiles and pages), Instagram, Facebook, Threads, YouTube, TikTok, Pinterest, Bluesky, Mastodon, Google Business, Discord, Slack, Telegram, and Tumblr",
       "source": "./",
       "strict": false,
-      "skills": ["./skills/ihateposting-agent"]
+      "skills": [
+        "./skills/ihateposting-agent"
+      ]
     }
   ]
 }

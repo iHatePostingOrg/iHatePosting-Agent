@@ -1,0 +1,52 @@
+{
+  "name": "dsh-ihateposting",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness plugin that connects the agent to iHatePosting's hosted MCP server and gives it a skill for scheduling and drafting social media posts.",
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/",
+    "skill/",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "ihateposting",
+    "mcp",
+    "social-media",
+    "scheduling"
+  ],
+  "author": "iHatePostingOrg",
+  "homepage": "https://github.com/iHatePostingOrg/iHatePosting-Agent/tree/main/plugins/dsh-ihateposting#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iHatePostingOrg/iHatePosting-Agent.git",
+    "directory": "plugins/dsh-ihateposting"
+  },
+  "bugs": {
+    "url": "https://github.com/iHatePostingOrg/iHatePosting-Agent/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

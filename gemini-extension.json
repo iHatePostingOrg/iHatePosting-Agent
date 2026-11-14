@@ -1,0 +1,11 @@
+{
+  "name": "ihateposting-agent",
+  "version": "0.1.0",
+  "description": "iHatePosting for AI agents: schedule, draft and publish posts, read each channel's rules, upload media and read analytics across fifteen social platforms. Bundles the hosted iHatePosting MCP server.",
+  "mcpServers": {
+    "ihateposting": {
+      "httpUrl": "https://app.ihateposting.com/api/mcp/oauth",
+      "description": "The hosted iHatePosting MCP server (streamable HTTP). It signs you in with your browser on the first connection; no key or local install is needed."
+    }
+  }
+}

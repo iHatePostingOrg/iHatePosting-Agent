@@ -1,0 +1,16 @@
+{
+  "name": "ihateposting-agent",
+  "version": "0.1.0",
+  "description": "iHatePosting for AI agents: schedule, draft and publish posts, read each channel's rules, upload media and read analytics across fifteen social platforms. Bundles the ihateposting-agent skill and the hosted iHatePosting MCP server.",
+  "author": {
+    "name": "iHatePostingOrg",
+    "url": "https://github.com/iHatePostingOrg"
+  },
+  "homepage": "https://github.com/iHatePostingOrg/iHatePosting-Agent#readme",
+  "repository": "https://github.com/iHatePostingOrg/iHatePosting-Agent",
+  "license": "MIT",
+  "logo": "assets/logo.png",
+  "keywords": ["ihateposting", "social-media", "scheduling", "automation", "ai-agent", "mcp"],
+  "skills": ["./skills/ihateposting-agent"],
+  "mcpServers": "./.cursor-plugin/mcp.json"
+}

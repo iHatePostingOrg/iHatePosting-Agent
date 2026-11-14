@@ -1,0 +1,40 @@
+# Publishes the package to npm when a GitHub release is published. Files only: nothing here has been run, and the repository has no remote yet
+# (PUBLISHING.md says what the owner does by hand first: the npm name, the repository, the NPM_TOKEN secret).
+name: Publish to npm on release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    # A pre-release is never published to npm.
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: The release tag must be the version in package.json
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [ "v$(node -p "require('./package.json').version")" != "$RELEASE_TAG" ]; then
+            echo "The tag $RELEASE_TAG is not the version in package.json"
+            exit 1
+          fi
+
+      - name: Run the tests that need nothing but this repository
+        run: npm install && npm test
+
+      - name: Publish
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

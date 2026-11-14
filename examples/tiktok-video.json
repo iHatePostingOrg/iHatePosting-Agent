@@ -1,0 +1,30 @@
+{
+  "type": "draft",
+  "date": "2026-12-15T10:00:00Z",
+  "shortLink": true,
+  "tags": [],
+  "posts": [
+    {
+      "integration": { "id": "tiktok-123" },
+      "value": [
+        {
+          "content": "Thirty seconds on how we pack an order. #behindthescenes",
+          "image": [{ "id": "media-123", "path": "https://media.example/uploads/packing.mp4" }],
+          "delay": 0
+        }
+      ],
+      "settings": {
+        "title": "How we pack an order",
+        "content_posting_method": "DIRECT_POST",
+        "privacy_level": "SELF_ONLY",
+        "duet": false,
+        "stitch": false,
+        "comment": true,
+        "autoAddMusic": "no",
+        "brand_content_toggle": false,
+        "brand_organic_toggle": false,
+        "video_made_with_ai": false
+      }
+    }
+  ]
+}

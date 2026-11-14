@@ -1,0 +1,17 @@
+{
+  "name": "ihateposting-agent",
+  "owner": {
+    "name": "iHatePostingOrg"
+  },
+  "metadata": {
+    "description": "iHatePosting for AI agents: schedule and publish posts across fifteen social platforms"
+  },
+  "plugins": [
+    {
+      "name": "ihateposting-agent",
+      "source": "./",
+      "version": "0.1.0",
+      "description": "Schedule, draft and publish posts, read each channel's rules, upload media and read analytics, with the ihateposting-agent skill and the hosted iHatePosting MCP server."
+    }
+  ]
+}

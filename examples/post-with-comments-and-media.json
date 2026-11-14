@@ -1,0 +1,34 @@
+{
+  "type": "draft",
+  "date": "2026-12-15T10:00:00Z",
+  "shortLink": true,
+  "tags": [],
+  "posts": [
+    {
+      "integration": { "id": "x-123" },
+      "value": [
+        {
+          "content": "Launch day. Two pictures from the team.",
+          "image": [
+            { "id": "media-123", "path": "https://media.example/uploads/launch-1.png", "alt": "The team around a table" },
+            { "id": "media-124", "path": "https://media.example/uploads/launch-2.png", "alt": "A cake with a rocket on it" }
+          ],
+          "delay": 0
+        },
+        {
+          "content": "First comment, with its own picture.",
+          "image": [
+            { "id": "media-125", "path": "https://media.example/uploads/launch-3.png" }
+          ],
+          "delay": 5
+        },
+        {
+          "content": "Second comment, with no picture.",
+          "image": [],
+          "delay": 5
+        }
+      ],
+      "settings": {}
+    }
+  ]
+}

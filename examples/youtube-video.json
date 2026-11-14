@@ -1,0 +1,28 @@
+{
+  "type": "draft",
+  "date": "2026-12-15T10:00:00Z",
+  "shortLink": true,
+  "tags": [],
+  "posts": [
+    {
+      "integration": { "id": "youtube-123" },
+      "value": [
+        {
+          "content": "A ten minute walk through our new checkout flow.\n\nChapters are in the first comment.",
+          "image": [{ "id": "media-123", "path": "https://media.example/uploads/checkout-walkthrough.mp4" }],
+          "delay": 0
+        }
+      ],
+      "settings": {
+        "title": "Our new checkout flow, step by step",
+        "type": "private",
+        "selfDeclaredMadeForKids": "no",
+        "thumbnail": { "id": "media-124", "path": "https://media.example/uploads/checkout-thumbnail.png" },
+        "tags": [
+          { "value": "tutorial", "label": "Tutorial" },
+          { "value": "checkout", "label": "Checkout" }
+        ]
+      }
+    }
+  ]
+}

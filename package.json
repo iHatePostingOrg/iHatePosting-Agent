@@ -1,0 +1,46 @@
+{
+  "name": "ihateposting-agent",
+  "version": "0.1.0",
+  "description": "The iHatePosting command line for AI agents and scripts: sign in, find channels, read each platform's rules, upload media and schedule or draft posts through iHatePosting's public API.",
+  "keywords": [
+    "ihateposting",
+    "social-media",
+    "scheduling",
+    "cli",
+    "ai-agent",
+    "mcp",
+    "skill"
+  ],
+  "homepage": "https://github.com/iHatePostingOrg/iHatePosting-Agent#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iHatePostingOrg/iHatePosting-Agent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/iHatePostingOrg/iHatePosting-Agent/issues"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "ihateposting-agent": "bin/ihateposting-agent.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "SKILL.md",
+    "skills",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=1 \"test/*.test.mjs\" \"plugins/dsh-ihateposting/test/*.test.mjs\""
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "yargs": "^17.7.2"
+  }
+}

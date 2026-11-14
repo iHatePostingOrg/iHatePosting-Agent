@@ -1,0 +1,67 @@
+{
+  "type": "draft",
+  "date": "2026-12-15T10:00:00Z",
+  "shortLink": true,
+  "tags": [],
+  "posts": [
+    {
+      "integration": { "id": "x-123" },
+      "value": [
+        {
+          "content": "Our spring catalogue is out.",
+          "image": [{ "id": "media-123", "path": "https://media.example/uploads/catalogue-cover.png" }],
+          "delay": 0
+        }
+      ],
+      "settings": { "who_can_reply_post": "following" }
+    },
+    {
+      "integration": { "id": "linkedin-123" },
+      "value": [
+        {
+          "content": "Our spring catalogue is out. Three pages to start with.",
+          "image": [
+            { "id": "media-124", "path": "https://media.example/uploads/catalogue-page-1.png" },
+            { "id": "media-125", "path": "https://media.example/uploads/catalogue-page-2.png" },
+            { "id": "media-126", "path": "https://media.example/uploads/catalogue-page-3.png" }
+          ],
+          "delay": 0
+        }
+      ],
+      "settings": { "post_as_images_carousel": true, "carousel_name": "Spring catalogue" }
+    },
+    {
+      "integration": { "id": "instagram-123" },
+      "value": [
+        {
+          "content": "Our spring catalogue is out.",
+          "image": [{ "id": "media-123", "path": "https://media.example/uploads/catalogue-cover.png" }],
+          "delay": 0
+        }
+      ],
+      "settings": { "post_type": "post" }
+    },
+    {
+      "integration": { "id": "pinterest-123" },
+      "value": [
+        {
+          "content": "Spring catalogue: the cover and the first pages.",
+          "image": [{ "id": "media-123", "path": "https://media.example/uploads/catalogue-cover.png" }],
+          "delay": 0
+        }
+      ],
+      "settings": { "board": "1234567890", "title": "Spring catalogue", "link": "https://example.com/catalogue" }
+    },
+    {
+      "integration": { "id": "bluesky-123" },
+      "value": [
+        {
+          "content": "Our spring catalogue is out.",
+          "image": [{ "id": "media-123", "path": "https://media.example/uploads/catalogue-cover.png" }],
+          "delay": 0
+        }
+      ],
+      "settings": {}
+    }
+  ]
+}

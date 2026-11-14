@@ -1,0 +1,23 @@
+{
+  "type": "draft",
+  "date": "2026-12-15T10:00:00Z",
+  "shortLink": true,
+  "tags": [],
+  "posts": [
+    {
+      "integration": { "id": "pinterest-123" },
+      "value": [
+        {
+          "content": "Ten quick tips for tidy shelves, with a before and after.",
+          "image": [{ "id": "media-123", "path": "https://media.example/uploads/tidy-shelves.png" }],
+          "delay": 0
+        }
+      ],
+      "settings": {
+        "board": "1234567890",
+        "title": "Ten tips for tidy shelves",
+        "link": "https://example.com/tidy-shelves"
+      }
+    }
+  ]
+}

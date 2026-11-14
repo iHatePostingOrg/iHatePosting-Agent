@@ -1,0 +1,14 @@
+{
+  "name": "ihateposting-agent",
+  "version": "0.1.0",
+  "description": "iHatePosting for AI agents: schedule, draft and publish posts, read each channel's rules, upload media and read analytics across X, LinkedIn, Instagram, Facebook, Threads, YouTube, TikTok, Pinterest, Bluesky, Mastodon, Telegram, Discord, Slack, Tumblr and Google Business. Bundles the ihateposting-agent skill.",
+  "author": {
+    "name": "iHatePostingOrg",
+    "url": "https://github.com/iHatePostingOrg"
+  },
+  "homepage": "https://github.com/iHatePostingOrg/iHatePosting-Agent#readme",
+  "repository": "https://github.com/iHatePostingOrg/iHatePosting-Agent",
+  "license": "MIT",
+  "skills": ["./skills/ihateposting-agent"],
+  "keywords": ["ihateposting", "social-media", "scheduling", "automation", "ai-agent", "cli", "mcp"]
+}

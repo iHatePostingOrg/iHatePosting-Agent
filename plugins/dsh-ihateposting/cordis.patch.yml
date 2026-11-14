@@ -1,0 +1,20 @@
+# The layer this bundle adds to a DeepSeek Harness profile: two rows.
+#
+# 1. "ihateposting" is this package's own plugin. It refuses to load when
+#    IHATEPOSTING_API_KEY is empty, and registers the iHatePosting skill.
+# 2. "ihateposting-mcp" is one MCP client for iHatePosting's hosted server. It
+#    stays switched off while the key is empty, so a request is never made
+#    without one. The key goes into the Authorization header of this row and
+#    nowhere else. Its tools show up as mcp__ihateposting__<tool>.
+- insert:
+    - id: ihateposting
+      name: dsh-ihateposting
+    - id: ihateposting-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      disabled: !!js '(process.env.IHATEPOSTING_API_KEY ?? "").trim() === ""'
+      config:
+        transport: streamable-http
+        serverName: ihateposting
+        url: https://app.ihateposting.com/api/mcp
+        headers:
+          Authorization: !!js '`Bearer ${(process.env.IHATEPOSTING_API_KEY ?? "").trim()}`'

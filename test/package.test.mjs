@@ -43,7 +43,7 @@ describe("the package", () => {
   it("holds exactly what `npm pack` would ship: the commands, the skill, the docs, the licence; no test, key or plugin folder", () => {
     const listed = JSON.parse(execFileSync(process.platform === "win32" ? "npm.cmd" : "npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], { cwd: ROOT, encoding: "utf8", shell: process.platform === "win32" }));
     const files = listed[0].files.map((f) => f.path.replaceAll("\\", "/")).sort();
-    for (const needed of ["bin/ihateposting-agent.mjs", "src/index.mjs", "src/api.mjs", "src/config.mjs", "src/constants.mjs", "src/commands/auth.mjs", "src/commands/posts.mjs", "src/commands/integrations.mjs", "src/commands/analytics.mjs", "src/commands/upload.mjs", "SKILL.md", "skills/ihateposting-agent/SKILL.md", "README.md", "CHANGELOG.md", "LICENSE", "package.json"]) assert.ok(files.includes(needed), `${needed} is not in the package`);
+    for (const needed of ["bin/ihateposting-agent.mjs", "src/index.mjs", "src/api.mjs", "src/config.mjs", "src/constants.mjs", "src/commands/auth.mjs", "src/commands/posts.mjs", "src/commands/integrations.mjs", "src/commands/analytics.mjs", "src/commands/upload.mjs", "SKILL.md", "skills/ihateposting/SKILL.md", "README.md", "CHANGELOG.md", "LICENSE", "package.json"]) assert.ok(files.includes(needed), `${needed} is not in the package`);
     for (const file of files) assert.ok(!/^(test|\.|PUBLISHING|assets|mcp\.json|gemini|plugins|examples)/.test(file) && !/credentials|\.env/.test(file), `${file} should not be shipped`);
     assert.ok(!files.some((f) => /login-page|loopback/.test(f)), "the old loopback sign-in page is back");
   });
@@ -72,11 +72,26 @@ describe("one version everywhere", () => {
 });
 
 describe("the skill", () => {
+  it("is called like the folder it sits in, as the Agent Skills specification asks, and every manifest points at that folder", () => {
+    const name = read("SKILL.md").match(/^---\nname: (.+)\n/)[1];
+    assert.equal(name, "ihateposting");
+    assert.ok(fs.existsSync(path.join(ROOT, "skills", name, "SKILL.md")), "the skill's folder is not named like the skill");
+    assert.equal(fs.readdirSync(path.join(ROOT, "skills")).join(","), name, "the skills folder holds something else too");
+    assert.match(read("skills/ihateposting/SKILL.md"), new RegExp(`^---\\nname: ${name}\\n`));
+    assert.match(read("plugins/dsh-ihateposting/skill/SKILL.md"), new RegExp(`^---\\nname: ${name}\\n`));
+    const listed = [json(".claude-plugin/plugin.json").skills, json(".claude-plugin/marketplace.json").plugins[0].skills, json(".cursor-plugin/plugin.json").skills, json(".cursor-plugin/marketplace.json").plugins[0].skills, json(".grok-plugin/plugin.json").skills];
+    for (const skills of listed) assert.deepEqual(skills, [`./skills/${name}`]);
+    assert.match(read("README.md"), new RegExp(`skills/${name}/SKILL\\.md`));
+    assert.doesNotMatch(read("README.md"), /skills\/ihateposting-agent/);
+    // The workflow that keeps the copies identical writes to the same folder.
+    assert.match(read(".github/workflows/sync-skill.yml"), new RegExp(`cp SKILL\\.md skills/${name}/SKILL\\.md`));
+  });
+
   it("is one text in two places, with the frontmatter an installer reads", () => {
-    assert.equal(read("SKILL.md"), read("skills/ihateposting-agent/SKILL.md"));
+    assert.equal(read("SKILL.md"), read("skills/ihateposting/SKILL.md"));
     assert.equal(read("SKILL.md"), read("plugins/dsh-ihateposting/skill/SKILL.md"), "the DeepSeek Harness plugin carries another copy of the skill");
     const text = read("SKILL.md");
-    assert.match(text, /^---\nname: ihateposting-agent\ndescription: .{60,}\n/);
+    assert.match(text, /^---\nname: ihateposting\ndescription: .{60,}\n/);
     assert.match(text, /^---\n[\s\S]*?\n---\n/);
   });
 
@@ -118,7 +133,7 @@ describe("the skill", () => {
   });
 
   it("ships the two release workflows, written to run only on a published release, that check the tag, and never hold a secret", () => {
-    for (const [file, mustHave] of [[".github/workflows/publish-npm.yml", ["release:", "types: [published]", "RELEASE_TAG", "secrets.NPM_TOKEN", "npm test"]], [".github/workflows/sync-skill.yml", ["release:", "skills/ihateposting-agent/SKILL.md", "plugins/dsh-ihateposting/skill/SKILL.md", "workflow_dispatch"]]]) {
+    for (const [file, mustHave] of [[".github/workflows/publish-npm.yml", ["release:", "types: [published]", "RELEASE_TAG", "secrets.NPM_TOKEN", "npm test"]], [".github/workflows/sync-skill.yml", ["release:", "skills/ihateposting/SKILL.md", "plugins/dsh-ihateposting/skill/SKILL.md", "workflow_dispatch"]]]) {
       const text = read(file);
       for (const needle of mustHave) assert.ok(text.includes(needle), `${file} lacks ${needle}`);
       assert.doesNotMatch(text, /npm_[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}/, `${file} holds a token`);

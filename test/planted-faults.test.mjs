@@ -59,7 +59,7 @@ const faults = [
   ["the program has another name in its help", "src/index.mjs", [[".scriptName(PROGRAM)", '.scriptName("another-cli")']]],
   ["the default API address is another one", "src/constants.mjs", [["https://app.ihateposting.com/api", "https://example.com/api"]]],
   // The files around the program.
-  ["the plugin copy of the skill differs from the skill", "skills/ihateposting-agent/SKILL.md", [["ihateposting-agent", "ihateposting-agnt"]]],
+  ["the plugin copy of the skill differs from the skill", "skills/ihateposting/SKILL.md", [["ihateposting-agent", "ihateposting-agnt"]]],
   ["the README stops saying that a redirect keeps the key", "README.md", [["Redirects are followed, and the key follows them.", "Redirects are followed."]]],
   ["the CHANGELOG stops saying it is not based on the live repository", "CHANGELOG.md", [["**not based on** the `iHatePostingOrg/agent-skill` repository", "based on the `iHatePostingOrg/agent-skill` repository"]]],
   ["a plugin manifest has another version", ".cursor-plugin/plugin.json", [['"version": "0.1.0"', '"version": "0.1.1"']]],
@@ -81,6 +81,10 @@ const faults = [
   ["a marketplace loses its own name", ".grok-plugin/marketplace.json", [['"name": "ihateposting-agent",', '"name": "ihateposting",']]],
   ["a marketplace entry keeps the old plugin name", ".cursor-plugin/marketplace.json", [['"name": "ihateposting",\n      "source"', '"name": "ihateposting-agent",\n      "source"']]],
   ["the README install line names the old plugin", "README.md", [["/plugin install ihateposting@ihateposting-agent", "/plugin install ihateposting-agent@ihateposting-agent"]]],
+  ["a manifest points at the old skill folder", ".cursor-plugin/plugin.json", [['"./skills/ihateposting"', '"./skills/ihateposting-agent"']]],
+  ["the skill's name no longer matches its folder", "skills/ihateposting/SKILL.md", [["---\nname: ihateposting\n", "---\nname: ihateposting-agent\n"]]],
+  ["the sync workflow copies to the old folder", ".github/workflows/sync-skill.yml", [["cp SKILL.md skills/ihateposting/SKILL.md", "cp SKILL.md skills/ihateposting-agent/SKILL.md"]]],
+  ["the README names the old skill folder", "README.md", [["skills/ihateposting/SKILL.md", "skills/ihateposting-agent/SKILL.md"]]],
   ["the hosted MCP server's address is another one", "mcp.json", [["https://app.ihateposting.com/api/mcp/oauth", "https://example.com/mcp"]]],
 ];
 

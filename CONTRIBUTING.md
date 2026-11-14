@@ -53,7 +53,7 @@ Add or change tests together with the code.
 If a change alters what a person sees (an option, a header line, a message, a default), update in the same pull request:
 
 - `README.md` and the guide that covers it (`FEATURES.md`, `QUICK_START.md`, `SYNTAX_UPGRADE.md`, ...);
-- `SKILL.md`, and the copy in `skills/ihateposting-agent/SKILL.md`. The two files must be identical; `test/package.test.mjs` checks that, and the `sync-skill.yml` workflow copies one over the other on a release;
+- `SKILL.md`, and the copy in `skills/ihateposting/SKILL.md`. The two files must be identical; `test/package.test.mjs` checks that, and the `sync-skill.yml` workflow copies one over the other on a release;
 - `CHANGELOG.md`, under the newest entry.
 
 When you write examples, use placeholder ids (`x-123`, `post-123`, `media-123`), `example.com` addresses and drafts (`-t draft`), never a real account or key.

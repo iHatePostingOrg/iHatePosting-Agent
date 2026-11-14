@@ -1,5 +1,5 @@
 ---
-name: ihateposting-agent
+name: ihateposting
 description: iHatePosting is a tool to schedule social media and chat posts to 15 channels X, LinkedIn, Instagram, Facebook Page, Threads, YouTube, Google Business, TikTok, Pinterest, Discord, Slack, Mastodon, Bluesky, Telegram, Tumblr. Use this skill to find a workspace's channels, read each channel's rules, upload media, create or change posts and read analytics from the command line.
 homepage: https://ihateposting.com/ai-agents
 metadata: {"openclaw":{"emoji":"📬","requires":{"bins":[],"env":["IHATEPOSTING_API_URL"]}}}
@@ -25,7 +25,7 @@ official website: https://ihateposting.com
 
 | Property | Value |
 |----------|-------|
-| **name** | ihateposting-agent |
+| **name** | ihateposting |
 | **description** | A command line over iHatePosting's public API: channels and their rules, posts, media and analytics for 15 social platforms |
 | **allowed-tools** | Bash(ihateposting-agent:*) |
 

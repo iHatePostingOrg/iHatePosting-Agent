@@ -36,7 +36,7 @@ src/
   commands/                       auth, posts, integrations, analytics, upload
 test/                             tests that run the real program against fake servers
 examples/                         sample post bodies (.json) and scripts (.sh), and two guides
-skills/ihateposting-agent/        the skill as the plugin folders read it
+skills/ihateposting/        the skill as the plugin folders read it
 plugins/dsh-ihateposting/         the DeepSeek Harness plugin, a package of its own
 .claude-plugin/ .cursor-plugin/ .grok-plugin/ gemini-extension.json mcp.json
 .github/workflows/                publish-to-npm and sync-skill, both for a published release
@@ -205,7 +205,7 @@ Point it only at servers you trust.
 
 The hosted MCP server is `https://app.ihateposting.com/api/mcp/oauth` (a browser sign-in); `https://app.ihateposting.com/api/mcp` takes the workspace key as a Bearer token instead. One version number is kept in `package.json`, every manifest and the newest CHANGELOG entry, and a test checks that they agree.
 
-**The skill's copies.** `SKILL.md` is the source. `skills/ihateposting-agent/SKILL.md` is what the Claude Code, Cursor and Grok manifests point at, and `plugins/dsh-ihateposting/skill/SKILL.md` is the DeepSeek Harness plugin's own copy (the plugin puts a short note in front of it, telling the agent to do the same jobs with the MCP tools). A test checks that all three are identical, and the `sync-skill.yml` workflow copies the root file over the other two when a release is published.
+**The skill's copies.** `SKILL.md` is the source. `skills/ihateposting/SKILL.md` is what the Claude Code, Cursor and Grok manifests point at, and `plugins/dsh-ihateposting/skill/SKILL.md` is the DeepSeek Harness plugin's own copy (the plugin puts a short note in front of it, telling the agent to do the same jobs with the MCP tools). A test checks that all three are identical, and the `sync-skill.yml` workflow copies the root file over the other two when a release is published.
 
 None of these folders has been run inside the real tool (unverified). Their manifests follow the shape each tool documents.
 

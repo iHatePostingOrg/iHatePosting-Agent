@@ -20,7 +20,7 @@
 npx skills add iHatePostingOrg/iHatePosting-Agent
 ```
 
-The skill is the file [`SKILL.md`](SKILL.md); the plugin folders read the same text from `skills/ihateposting-agent/SKILL.md`. It does not contain the program. It teaches an agent how to drive `ihateposting-agent`, so install [the command line](#install-the-command-line) on the same machine. This `npx` command was not run against the published repository (unverified).
+The skill is the file [`SKILL.md`](SKILL.md); the plugin folders read the same text from `skills/ihateposting/SKILL.md`. It does not contain the program. It teaches an agent how to drive `ihateposting-agent`, so install [the command line](#install-the-command-line) on the same machine. This `npx` command was not run against the published repository (unverified).
 
 None of the tool-specific installs below was tried inside the real tool. The manifests follow the shape each tool documents for plugins; this repository's tests check that they are valid JSON, carry one version number and point at files that exist.
 
@@ -864,7 +864,7 @@ src/constants.mjs            program name, default addresses, variable names
 src/commands/                the auth, posts, integrations, analytics and upload handlers
 test/                        tests with fake servers (no network, no key)
 examples/                    sample bodies and scripts
-skills/ihateposting-agent/   the skill, as the plugin folders read it
+skills/ihateposting/   the skill, as the plugin folders read it
 plugins/dsh-ihateposting/    the DeepSeek Harness plugin, a package of its own
 .claude-plugin/  .cursor-plugin/  .grok-plugin/  gemini-extension.json  mcp.json   manifests
 ```

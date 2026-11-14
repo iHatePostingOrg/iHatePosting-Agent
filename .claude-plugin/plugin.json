@@ -11,7 +11,7 @@
   "repository": "https://github.com/iHatePostingOrg/iHatePosting-Agent",
   "license": "MIT",
   "skills": [
-    "./skills/ihateposting-agent"
+    "./skills/ihateposting"
   ],
   "keywords": [
     "ihateposting",

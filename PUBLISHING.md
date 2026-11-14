@@ -34,7 +34,7 @@ README.md
 SKILL.md
 bin/ihateposting-agent.mjs
 package.json
-skills/ihateposting-agent/SKILL.md
+skills/ihateposting/SKILL.md
 src/api.mjs
 src/commands/analytics.mjs
 src/commands/auth.mjs
@@ -123,7 +123,7 @@ Work down this list. Every item is something you can see for yourself.
 
   The program itself prints the version from `package.json`.
 - [ ] **`CHANGELOG.md` has an entry for the version**, as its newest heading: `## 0.1.0`. The heading now reads `## 0.1.0 (unreleased)`; the test still accepts it, but take "(unreleased)" out when you release.
-- [ ] **The three copies of the skill are identical**: `SKILL.md`, `skills/ihateposting-agent/SKILL.md` and `plugins/dsh-ihateposting/skill/SKILL.md`. The tests fail otherwise, and so does a release, because the workflow runs the tests.
+- [ ] **The three copies of the skill are identical**: `SKILL.md`, `skills/ihateposting/SKILL.md` and `plugins/dsh-ihateposting/skill/SKILL.md`. The tests fail otherwise, and so does a release, because the workflow runs the tests.
 - [ ] **The tests pass**: `npm test`. Do not skip the planted-faults file; it is the one that proves the other tests would notice a mistake.
 - [ ] **`npm pack --dry-run` lists what you expect**, and no key, `.env` or test file.
 - [ ] **Nothing secret is in the tree.** `test/package.test.mjs` and `test/docs.test.mjs` look for key-like text, token-like text, private paths and email addresses. A last look at `git status` and `git diff` is still worth a minute.
@@ -184,7 +184,7 @@ Two files in `.github/workflows` run when a release is published on GitHub:
 | Workflow | When it runs | What it does |
 | --- | --- | --- |
 | `publish-npm.yml` ("Publish to npm on release") | A release is published, and it is not a pre-release | Checks out the code, sets up Node 20 with the npm registry, checks that the release tag is `v` plus the version in `package.json`, runs `npm install && npm test`, then runs `npm publish --access public` with `NODE_AUTH_TOKEN` taken from the `NPM_TOKEN` secret. |
-| `sync-skill.yml` ("Sync the plugin skill on release") | A release is published, or someone starts it by hand (`workflow_dispatch`) | Checks out `main`, copies `SKILL.md` over `skills/ihateposting-agent/SKILL.md` and `plugins/dsh-ihateposting/skill/SKILL.md`, and if that changed anything commits and pushes it to `main`. |
+| `sync-skill.yml` ("Sync the plugin skill on release") | A release is published, or someone starts it by hand (`workflow_dispatch`) | Checks out `main`, copies `SKILL.md` over `skills/ihateposting/SKILL.md` and `plugins/dsh-ihateposting/skill/SKILL.md`, and if that changed anything commits and pushes it to `main`. |
 
 Neither runs on a push or a pull request. They have never run, so the first release is also their first test.
 
@@ -296,7 +296,7 @@ node --test --test-force-exit test/package.test.mjs
 | `npm error code ENEEDAUTH` or a 401 in the workflow | The `NPM_TOKEN` secret is missing, expired or not allowed to publish this package. Make a new token and update the secret. |
 | The workflow stops at "The release tag must be the version in package.json" | The tag is not `v` plus the version. Delete the release and the tag, fix the version or the tag, and publish a new release. |
 | The workflow stops at the tests | Run `npm test` locally on a clean clone and fix what fails. A test that fails only on GitHub's computers should be reported as a bug in the test, not skipped. |
-| The skill copies differ and `package.test.mjs` fails | Copy the root file over the other two: `cp SKILL.md skills/ihateposting-agent/SKILL.md` and `cp SKILL.md plugins/dsh-ihateposting/skill/SKILL.md` (in PowerShell, `Copy-Item SKILL.md skills/ihateposting-agent/SKILL.md`, and the same for the second). |
+| The skill copies differ and `package.test.mjs` fails | Copy the root file over the other two: `cp SKILL.md skills/ihateposting/SKILL.md` and `cp SKILL.md plugins/dsh-ihateposting/skill/SKILL.md` (in PowerShell, `Copy-Item SKILL.md skills/ihateposting/SKILL.md`, and the same for the second). |
 | `sync-skill.yml` fails when it pushes | `main` is protected or the workflow lacks write access. The job asks for `contents: write`; check the repository's Actions settings. |
 | A file is missing from the package | Compare `npm pack --dry-run` with the `files` list. A path in `files` that does not exist is silently left out. |
 | `ihateposting-agent: command not found` after a global install | npm's global folder is not on your `PATH`. `npm prefix -g` shows it. |

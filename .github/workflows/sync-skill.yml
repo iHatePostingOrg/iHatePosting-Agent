@@ -1,4 +1,4 @@
-# Keeps the plugin folders' copy of the skill (skills/ihateposting-agent/SKILL.md) the same as the root SKILL.md whenever a release is published (or
+# Keeps the plugin folders' copy of the skill (skills/ihateposting/SKILL.md) the same as the root SKILL.md whenever a release is published (or
 # by hand), so the plugin manifests always point at a real file and never at a link. Files only: nothing here has been run.
 name: Sync the plugin skill on release
 
@@ -20,20 +20,20 @@ jobs:
 
       - name: Copy SKILL.md into the plugin skill folders
         run: |
-          mkdir -p skills/ihateposting-agent plugins/dsh-ihateposting/skill
-          cp SKILL.md skills/ihateposting-agent/SKILL.md
+          mkdir -p skills/ihateposting plugins/dsh-ihateposting/skill
+          cp SKILL.md skills/ihateposting/SKILL.md
           cp SKILL.md plugins/dsh-ihateposting/skill/SKILL.md
 
       - name: Commit and push when it changed
         env:
           WHICH: ${{ github.event.release.tag_name || 'a manual run' }}
         run: |
-          if git diff --quiet -- skills/ihateposting-agent/SKILL.md plugins/dsh-ihateposting/skill/SKILL.md; then
+          if git diff --quiet -- skills/ihateposting/SKILL.md plugins/dsh-ihateposting/skill/SKILL.md; then
             echo "the plugin skill copies are already up to date"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add skills/ihateposting-agent/SKILL.md plugins/dsh-ihateposting/skill/SKILL.md
+          git add skills/ihateposting/SKILL.md plugins/dsh-ihateposting/skill/SKILL.md
           git commit -m "chore: sync the plugin skill for ${WHICH}"
           git push origin main

@@ -37,7 +37,22 @@ export async function startFakeApi(handler) {
   };
 }
 
-export const tempDir = () => fs.mkdtempSync(path.join(os.tmpdir(), "ihp-agent-test-"));
+// Every folder a test makes is removed when the test file's process ends (a full run used to leave tens of thousands of them, and some hold files of 50 MB: it filled a disk).
+const madeFolders = [];
+process.on("exit", () => {
+  for (const folder of madeFolders) {
+    try {
+      fs.rmSync(folder, { recursive: true, force: true });
+    } catch {
+      // a folder that cannot be removed now is left, never an error of the test
+    }
+  }
+});
+export const tempDir = () => {
+  const folder = fs.mkdtempSync(path.join(os.tmpdir(), "ihp-agent-test-"));
+  madeFolders.push(folder);
+  return folder;
+};
 
 /** What a person's computer holds for the program: a home folder of its own (the sign-in is kept in `<home>/.ihateposting`). */
 export const credentialsFile = (home) => path.join(home, ".ihateposting", "credentials.json");

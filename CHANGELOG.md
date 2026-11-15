@@ -40,6 +40,8 @@ The options: `posts:create` takes `-c` (repeat it for comments or the parts of a
 
 **Names.** The npm package and the command are `ihateposting-agent`. The plugin is called `ihateposting` in every manifest (Claude Code, Cursor, Grok Build and the Gemini extension) and each marketplace is called `ihateposting-agent`, so Claude Code installs it with `ihateposting@ihateposting-agent`. The skill is called `ihateposting` as well, and so is its folder (`skills/ihateposting`), because an Agent Skills name has to match the folder it sits in.
 
+**Qwen Code.** The README has an install line for Qwen Code (`qwen extensions install iHatePostingOrg/iHatePosting-Agent:ihateposting`). It needs no file of its own: Qwen Code reads the Claude Code marketplace. The line follows Qwen Code's documentation and was not run inside Qwen Code (unverified).
+
 **The skill.** `SKILL.md` teaches an AI agent the order that works (sign in, discover, upload, post, analyse) with four rules, patterns and common mistakes. It exists in three places that a test keeps identical: the root, `skills/ihateposting/` and `plugins/dsh-ihateposting/skill/`.
 
 **Plugin folders.** `.claude-plugin` (Claude Code, skill only), `.cursor-plugin` and `.grok-plugin` (skill and the hosted MCP server), `gemini-extension.json` (Gemini CLI, the hosted MCP server), `plugins/dsh-ihateposting` (DeepSeek Harness, a package of its own) and `mcp.json` (an entry for any MCP client).

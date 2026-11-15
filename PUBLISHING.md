@@ -56,20 +56,35 @@ The numbers move a little whenever a document changes; the list should not. Left
 
 ## The package name
 
-The package is `ihateposting-agent`, and so is the command it installs. That is decided. Two fields in `package.json` are separate things:
+The package and the command are both `ihateposting-agent` (the owner's choice, 2026-11-14). The live iHatePosting app already has a command line of its own on npm, called `ihateposting`, and this package does not replace it: the two keep different names. Two fields in `package.json` carry the name, and they are separate things:
 
 | Field | What it decides | Value now |
 | --- | --- | --- |
 | `name` | What people type after `npm install` | `ihateposting-agent` |
 | `bin` | What people type to run the program | `ihateposting-agent` (pointing at `bin/ihateposting-agent.mjs`) |
 
-Before the first publish, check that nobody has the name:
+### Check the name before you publish
 
 ```bash
 npm view ihateposting-agent
 ```
 
-A "404 Not Found" error means it is free. Anything else prints the package that already has it. This was not checked while writing this page (nothing here touches the registry), so run it yourself.
+On 2026-11-14 this answered `E404` ("404 Not Found - GET https://registry.npmjs.org/ihateposting-agent - Not found"), which is what npm answers for a name nobody has published (read only; npm's own page about that answer was not read, unverified). A name can be taken at any time, so **run it again right before you publish**. The version stays 0.1.0.
+
+### The live app's two npm packages are not touched
+
+Both were read only, on 2026-11-14, with `npm view`:
+
+- `ihateposting` is the command line of the live app (versions 0.1.0 to 0.6.0, `latest` is 0.6.0; "Post to 14 social platforms from your terminal, your CI, or your AI agent."; its `bin` is `ihateposting`; MIT; published by the owner's npm account).
+- `ihateposting-mcp` is a second package of the live app (latest 0.12.9 then; "MCP server for iHatePosting"; its `bin` is `ihateposting-mcp`). **This repository has no such package and does not publish one**: its MCP server is the hosted one at `https://app.ihateposting.com/api/mcp/oauth`, so there is nothing here to install or run locally.
+
+Publishing this repository never writes to either of them: the name is `ihateposting-agent`. Where the two command lines meet on one computer (read from the source of `ihateposting` 0.6.0, packed and unpacked, never run or installed):
+
+- **Both can be installed together.** The commands have different names (`ihateposting` and `ihateposting-agent`), so npm links two different files. This was not tried here (unverified); the case that would clash, two packages offering one command name, is the one this naming avoids (with two stand-in packages in a throwaway prefix, npm 11.19.1 on Windows, the second `npm install -g` stopped with "EEXIST", and `--force` overwrote the command).
+- **The same folder, different files.** `ihateposting` keeps its key and address in `~/.ihateposting/config.json` (the folder is created with mode 0700 and the file with 0600; its `logout` removes only that file). This tool keeps `~/.ihateposting/credentials.json`. Neither reads or removes the other's file.
+- **The same variables.** Both read `IHATEPOSTING_API_KEY` and `IHATEPOSTING_API_URL`; this tool also reads `IHATEPOSTING_AUTH_SERVER`. A variable exported for one is seen by the other.
+- **Different addresses.** `ihateposting` talks to `https://ihateposting.com` unless told otherwise; this tool talks to `https://app.ihateposting.com/api`. A value of `IHATEPOSTING_API_URL` meant for one is therefore the wrong address for the other.
+- **Different Node.** `ihateposting` asks for Node 18 or newer; this tool asks for 20 or newer.
 
 ### If the name were taken
 
@@ -106,7 +121,7 @@ A scoped package is private by default; `npm publish --access public` (which the
 Work down this list. Every item is something you can see for yourself.
 
 - [ ] **The code is on GitHub.** `package.json` points at `https://github.com/iHatePostingOrg/iHatePosting-Agent`. The repository must exist there, with this code pushed to `main`, before you publish a release.
-- [ ] **You own the name on npm**, or can publish under the scope you chose, and your npm account is set up for publishing (npm's own pages say what its two-factor and token rules are today; they have been changing, so read them rather than this page).
+- [ ] **The name is free, and you can publish it.** Run `npm view ihateposting-agent` again (it answered 404 on 2026-11-14; a name can be taken in the meantime), or publish under the scope you chose (see "The package name"). Your npm account must be set up for publishing (npm's own pages say what its two-factor and token rules are today; they have been changing, so read them rather than this page).
 - [ ] **The version is the same in nine places.** `test/package.test.mjs` fails if any differ:
 
   | File | Field |
@@ -145,9 +160,11 @@ The box at the top right of the repository's page on github.com (the description
 
 | Field | Suggested value |
 | --- | --- |
-| Description | The one in `package.json`: "The iHatePosting command line for AI agents and scripts: sign in, find channels, read each platform's rules, upload media and schedule or draft posts through iHatePosting's public API." (or shorter) |
+| Description | "iHatePosting command line, skill and plugins for AI agents: connect Claude, Cursor, Gemini and more to schedule, draft and publish social media posts, upload media and read analytics across 15 platforms." (about 200 characters; GitHub's limit is 350, unverified) |
 | Website | `https://ihateposting.com` |
-| Topics | `ihateposting`, `social-media`, `scheduling`, `cli`, `ai-agent`, `mcp`, `skill` (the package's keywords; GitHub topics are lowercase) |
+| Topics | `ihateposting`, `social-media`, `social-media-scheduler`, `scheduling`, `automation`, `cli`, `ai-agent`, `agent-skills`, `claude-code`, `mcp`, `deepseek-harness`, `dsh-plugin`, `gemini-cli-extension`, `cursor`, `grok`, `linkedin`, `instagram`, `tiktok`, `bluesky`, `mastodon` (20 topics, all lowercase; GitHub's cap of 20 is unverified) |
+
+The package's own keywords in `package.json` list every platform by name; the topics above are a shorter set because GitHub caps how many topics a repository can have.
 
 ## Publishing by hand
 
@@ -318,4 +335,4 @@ node --test --test-force-exit test/package.test.mjs
 | By workflow | A GitHub release tagged `v<version>`, with the `NPM_TOKEN` secret set |
 | What the owner sets on github.com | The repository, the `NPM_TOKEN` secret and the About box |
 | What must be live for `auth:login` | The app's `/device/code` and `/device/token` routes and its `/device` and `/oauth/authorize` pages |
-| Not checked while writing this page | That the name is free, that the workflows work, any npm command that contacts the registry |
+| Not checked while writing this page | That the workflows work, and any `npm` command that publishes (the name was read once with `npm view`, on 2026-11-14, and must be read again before publishing) |

@@ -40,6 +40,27 @@ describe("the package", () => {
     assert.ok(read("LICENSE").includes("MIT License"));
   });
 
+  it("is called ihateposting-agent everywhere a person installs or runs it, never by the name of the live app's own command line, and no guide promises a local ihateposting-mcp package", () => {
+    // Owner, 2026-11-14: "Both ihateposting-agent". The live app's own packages on npm, `ihateposting` and `ihateposting-mcp`, are not replaced and not offered here.
+    const guides = fs.readdirSync(ROOT).filter((f) => f.endsWith(".md")).concat(fs.readdirSync(path.join(ROOT, "examples")).map((f) => `examples/${f}`), ["skills/ihateposting/SKILL.md", "plugins/dsh-ihateposting/skill/SKILL.md"]);
+    for (const file of guides) {
+      const text = read(file);
+      assert.doesNotMatch(text, /(?:npm|pnpm|yarn) (?:install|add|i)(?: -g| --global)? ihateposting(?![-\w])/, `${file} installs the live app's own package`);
+      assert.doesNotMatch(text, /npx ihateposting(?![-\w])/, `${file} runs the live app's own package`);
+      assert.doesNotMatch(text, /bin\/ihateposting\.mjs/, `${file} names a file that is not there`);
+      if (file !== "PUBLISHING.md") assert.doesNotMatch(text, /ihateposting-mcp/, `${file} names a package of the live app that this repository does not have`);
+    }
+    assert.match(read("README.md"), /npm install -g ihateposting-agent\n/);
+    assert.match(read("QUICK_START.md"), /npm install -g ihateposting-agent\n/);
+    const publishing = read("PUBLISHING.md");
+    assert.match(publishing, /^# Publishing ihateposting-agent to npm$/m);
+    assert.match(publishing, /^\| `name` \| What people type after `npm install` \| `ihateposting-agent` \|$/m);
+    assert.match(publishing, /^\| `bin` \| What people type to run the program \| `ihateposting-agent` \(pointing at `bin\/ihateposting-agent\.mjs`\) \|$/m);
+    assert.match(publishing, /npm view ihateposting-agent/);
+    assert.match(publishing, /this package does not replace it/);
+    assert.match(publishing, /This repository has no such package and does not publish one/);
+  });
+
   it("holds exactly what `npm pack` would ship: the commands, the skill, the docs, the licence; no test, key or plugin folder", () => {
     const listed = JSON.parse(execFileSync(process.platform === "win32" ? "npm.cmd" : "npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], { cwd: ROOT, encoding: "utf8", shell: process.platform === "win32" }));
     const files = listed[0].files.map((f) => f.path.replaceAll("\\", "/")).sort();
@@ -81,8 +102,9 @@ describe("the skill", () => {
     assert.match(read("plugins/dsh-ihateposting/skill/SKILL.md"), new RegExp(`^---\\nname: ${name}\\n`));
     const listed = [json(".claude-plugin/plugin.json").skills, json(".claude-plugin/marketplace.json").plugins[0].skills, json(".cursor-plugin/plugin.json").skills, json(".cursor-plugin/marketplace.json").plugins[0].skills, json(".grok-plugin/plugin.json").skills];
     for (const skills of listed) assert.deepEqual(skills, [`./skills/${name}`]);
-    assert.match(read("README.md"), new RegExp(`skills/${name}/SKILL\\.md`));
-    assert.doesNotMatch(read("README.md"), /skills\/ihateposting-agent/);
+    assert.match(read("SUMMARY.md"), new RegExp(`skills/${name}/SKILL\\.md`));
+    assert.doesNotMatch(read("SUMMARY.md"), /skills\/ihateposting-agent/);
+    assert.match(read("README.md"), /npx skills add iHatePostingOrg\/iHatePosting-Agent\n/);
     // The workflow that keeps the copies identical writes to the same folder.
     assert.match(read(".github/workflows/sync-skill.yml"), new RegExp(`cp SKILL\\.md skills/${name}/SKILL\\.md`));
   });
@@ -115,9 +137,10 @@ describe("the skill", () => {
   });
 
   it("says plainly, where a person reads before pointing the program at a server, what following the other command line costs", () => {
-    assert.match(read("README.md"), /plain `http:\/\/` address is accepted for any host/);
-    assert.match(read("README.md"), /Redirects are followed, and the key follows them/);
-    assert.match(read("README.md"), /A request waits for ever/);
+    // The section that says it moved from the README to HOW_TO_RUN.md (the README follows the reference page's headings).
+    assert.match(read("HOW_TO_RUN.md"), /plain `http:\/\/` address is accepted for any host/);
+    assert.match(read("HOW_TO_RUN.md"), /Redirects are followed, and the key follows them/);
+    assert.match(read("HOW_TO_RUN.md"), /A request waits for ever/);
     assert.match(read("CHANGELOG.md"), /keeps the `Authorization` header/);
     assert.match(read("CHANGELOG.md"), /plain `http:\/\/`/);
   });
@@ -125,7 +148,7 @@ describe("the skill", () => {
   it("says it was not made from the live agent-skill repository, and nothing else in the repository leans on it", () => {
     assert.match(read("CHANGELOG.md"), /\*\*not based on\*\* the `iHatePostingOrg\/agent-skill` repository/);
     for (const file of ["README.md", "SKILL.md", "PUBLISHING.md", "package.json", "src/index.mjs", "src/api.mjs", "src/config.mjs", "src/constants.mjs", "src/commands/auth.mjs", "src/commands/posts.mjs", "src/commands/integrations.mjs", "src/commands/analytics.mjs", "src/commands/upload.mjs"]) {
-      assert.doesNotMatch(read(file), /agent-skill|iHatePostingOrg\/iHatePosting-Skill|@ihateposting\//i, `${file} names the live agent-skill repository or its npm packages`);
+      assert.doesNotMatch(read(file), /iHatePostingOrg\/agent-skill\b|github\.com\/iHatePostingOrg\/agent-skill|iHatePostingOrg\/iHatePosting-Skill|@ihateposting\//i, `${file} names the live agent-skill repository or its npm packages`);
     }
     // The commands are the ones the program has; the live packages' commands are not here.
     const text = read("SKILL.md");
@@ -149,7 +172,7 @@ describe("the plugin folders", () => {
   it("are valid JSON, name the package, and point at files that exist", () => {
     for (const file of [".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".cursor-plugin/mcp.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", ".grok-plugin/mcp.json", "gemini-extension.json", "mcp.json"]) assert.ok(json(file), file);
     // The plugin is "ihateposting" everywhere it is named (kebab-case, as Claude Code's documentation asks); each marketplace is "ihateposting-agent", which is why the install is
-    // `ihateposting@ihateposting-agent`; the npm package and the command keep "ihateposting-agent".
+    // `ihateposting@ihateposting-agent`; the npm package and the command are "ihateposting-agent".
     for (const file of [".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", ".grok-plugin/plugin.json", "gemini-extension.json"]) assert.equal(json(file).name, "ihateposting", file);
     for (const file of [".claude-plugin/marketplace.json", ".cursor-plugin/marketplace.json", ".grok-plugin/marketplace.json"]) {
       assert.equal(json(file).name, "ihateposting-agent", `${file}: the marketplace's own name`);
@@ -159,7 +182,7 @@ describe("the plugin folders", () => {
     assert.equal(json(".claude-plugin/marketplace.json").plugins[0].name, json(".claude-plugin/plugin.json").name);
     assert.equal(json(".cursor-plugin/marketplace.json").plugins[0].name, json(".cursor-plugin/plugin.json").name);
     assert.match(read("README.md"), /\/plugin install ihateposting@ihateposting-agent\n/);
-    assert.doesNotMatch(read("README.md"), /ihateposting-agent@ihateposting-agent/);
+    assert.doesNotMatch(read("README.md"), /\/plugin install ihateposting-agent@/);
     for (const file of [".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", ".grok-plugin/plugin.json"]) for (const skill of json(file).skills) assert.ok(fs.existsSync(path.join(ROOT, skill, "SKILL.md")), `${file}: ${skill}`);
     for (const file of [".cursor-plugin/plugin.json", ".grok-plugin/plugin.json"]) assert.ok(fs.existsSync(path.join(ROOT, json(file).logo)), `${file}: its logo`);
     // The logo is the app's current "i" mark as a real PNG (a stale heart SVG was shipped once and the owner caught it), not a text file with a picture's name.
@@ -218,6 +241,15 @@ describe("who made it, and what it covers", () => {
     assert.equal(json("gemini-extension.json").author, undefined, "the Gemini extension has no author field");
   });
 
+  it("points the Cursor and Grok manifests' homepage at the website, which has a page for them, and the others at the repository", () => {
+    assert.equal(json(".cursor-plugin/plugin.json").homepage, "https://ihateposting.com");
+    assert.equal(json(".cursor-plugin/marketplace.json").plugins[0].homepage, "https://ihateposting.com");
+    assert.equal(json(".grok-plugin/plugin.json").homepage, "https://ihateposting.com");
+    assert.equal(json(".grok-plugin/marketplace.json").plugins[0].homepage, "https://ihateposting.com");
+    assert.match(read("SKILL.md"), /^homepage: https:\/\/ihateposting\.com\/ai-agents$/m);
+    assert.equal(json("package.json").homepage, "https://github.com/iHatePostingOrg/iHatePosting-Agent#readme");
+  });
+
   it("keeps the licence lines as they were: the organisation's name, not a person's", () => {
     for (const file of ["LICENSE", "plugins/dsh-ihateposting/LICENSE"]) {
       assert.match(read(file), /^Copyright \(c\) 2026 iHatePostingOrg$/m, file);
@@ -256,10 +288,11 @@ describe("who made it, and what it covers", () => {
       assert.ok(numbers.length > 0, `${file} does not say how many platforms`);
       assert.deepEqual([...new Set(numbers)], ["15"], `${file} counts ${numbers.join(", ")}`);
     }
-    // The README says the same, and explains the sixteen identifiers.
+    // The README says the same; the sixteen identifiers are explained in the section that moved to HOW_TO_RUN.md.
     const head = read("README.md").split("\n").slice(0, 100).join("\n");
     assert.match(head, /Schedule posts across 15 platforms programmatically/);
-    assert.match(head, /fifteen platforms and sixteen channel identifiers/);
+    assert.match(read("README.md"), /15 platforms including:/);
+    assert.match(read("HOW_TO_RUN.md"), /Fifteen platforms, sixteen identifiers: LinkedIn Page is a second kind of LinkedIn channel/);
   });
 
   it("lists every platform's name as a keyword in each manifest that has keywords, and no platform iHatePosting does not have", () => {

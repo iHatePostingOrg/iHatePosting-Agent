@@ -156,15 +156,15 @@ Those routes and pages must be live on `app.ihateposting.com` before `auth:login
 
 ## The repository's About box
 
-The box at the top right of the repository's page on github.com (the description, the website and the topics) is not part of the code and no file in this repository can set it. You set it, once, on github.com: open the repository, click the gear beside "About", and fill in the three fields. Reasonable values:
+The box at the top right of the repository's page on github.com (the description, the website and the topics) is not part of the code and no file in this repository can set it. The owner set it on github.com on 2026-11-15 (the gear beside "About"), and GitHub's API answered with the values below when they were read back. If the box is ever emptied or changed, these are the values to put back.
 
-| Field | Suggested value |
+| Field | Value set on github.com |
 | --- | --- |
-| Description | "iHatePosting command line, skill and plugins for AI agents: connect Claude, Cursor, Gemini and more to schedule, draft and publish social media posts, upload media and read analytics across 15 platforms." (about 200 characters; GitHub's limit is 350, unverified) |
+| Description | "iHatePosting for AI agents a CLI, skill, and plugins that connect Claude, Cursor, Gemini, Grok and more to your social accounts on autopilot. Draft, schedule, and publish posts, upload media, and read analytics across 15 platforms, straight from your agent or the command line." (277 characters; GitHub's limit of 350 is unverified) |
 | Website | `https://ihateposting.com` |
-| Topics | `ihateposting`, `social-media`, `social-media-scheduler`, `scheduling`, `automation`, `cli`, `ai-agent`, `agent-skills`, `claude-code`, `mcp`, `deepseek-harness`, `dsh-plugin`, `gemini-cli-extension`, `cursor`, `grok`, `linkedin`, `instagram`, `tiktok`, `bluesky`, `mastodon` (20 topics, all lowercase; GitHub's cap of 20 is unverified) |
+| Topics (20) | `agent-skills`, `ai-agents-automation`, `ai-post-generator`, `automation`, `claude`, `cursor`, `deepseek-harness`, `facebook`, `gemini`, `grok`, `instagram`, `linkedin`, `mcp`, `plugins`, `scheduling`, `social-media-automation`, `social-media-scheduler`, `tiktok-auto-post-scheduler`, `twitter-x`, `youtube` (GitHub lists them alphabetically; its cap of 20 topics is unverified) |
 
-The package's own keywords in `package.json` list every platform by name; the topics above are a shorter set because GitHub caps how many topics a repository can have.
+The package's own keywords in `package.json` list every platform by name; the topics above are the owner's own choice and differ from them.
 
 ## Publishing by hand
 

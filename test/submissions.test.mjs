@@ -465,7 +465,10 @@ describe("PUBLISHING.md's section on submissions", () => {
     assert.match(section, /a \*\*draft\*\* for a new version, `0\.13\.0`, of the existing registry entry `com\.ihateposting\/mcp`.{0,160}the entry's versions went up to 0\.12\.9 on 2026-11-15/);
     assert.match(section, /`0\.13\.0` is above `0\.12\.9`: the registry's versioning page \(read on 2026-11-16\) says a published version is immutable and that the latest version is chosen by semantic-version order/);
     assert.equal(json("server.json").version, "0.13.0");
-    assert.match(section, /Whether the registry accepts a new version of an existing name with another repository is \*\*unverified\*\*/);
+    assert.match(section, /The registry accepted a new version of the existing name with another repository \(see below\)/);
+    assert.match(section, /\*\*Published \(the owner, 2026-11-16, 10:27 UTC\)\.\*\* `mcp-publisher publish` answered "Successfully published" for `com\.ihateposting\/mcp` version 0\.13\.0/);
+    assert.match(section, /with 0\.13\.0 as the latest \(`isLatest` true; 0\.12\.9, published 2026-11-13, no longer is\)/);
+    assert.match(section, /The proof was a \*\*DNS TXT record\*\* on `ihateposting\.com`/);
   });
 
   it("gives the npm token and two-factor facts with their sources: the January 2027 target, Node 22.14.0, the 48 hours, and what that means for publish-npm.yml", () => {

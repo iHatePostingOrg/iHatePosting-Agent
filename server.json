@@ -1,9 +1,9 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "com.ihateposting/agent",
+  "name": "com.ihateposting/mcp",
   "title": "iHatePosting",
   "description": "Draft, schedule and publish social posts, upload media and list posts across 15 platforms.",
-  "version": "0.1.0",
+  "version": "0.13.0",
   "websiteUrl": "https://ihateposting.com",
   "repository": {
     "url": "https://github.com/iHatePostingOrg/iHatePosting-Agent",

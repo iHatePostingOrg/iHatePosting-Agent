@@ -2,7 +2,7 @@
 //   display name  iHatePosting   (the same as the live app's listings: owner, 2026-11-15, "Display name : iHatePosting")
 //   the NEW Claude connector's slug  ihateposting-agent   (the live app's connector holds ihateposting)
 //   the plugin, the skill and the Gemini extension keep the name ihateposting; the marketplaces and the npm package are ihateposting-agent (owner, 2026-11-15: "Back to ihateposting")
-//   MCP Registry name  com.ihateposting/agent
+//   MCP Registry entry  com.ihateposting/mcp (the old name kept for a new version, 0.13.0: owner, 2026-11-16)
 // and no short description tells the new listing from the live app's (owner, 2026-11-15: "dont want this wording, make old one"): the descriptions are the old wording.
 // Offline: it reads files only.
 import assert from "node:assert/strict";
@@ -18,7 +18,7 @@ const json = (file) => JSON.parse(read(file));
 const DISPLAY = "iHatePosting";
 const SLUG = "ihateposting-agent"; // the marketplaces, the npm package and the new Claude connector's slug
 const PLUGIN = "ihateposting"; // the plugin, the skill and the Gemini extension
-const REGISTRY_NAME = "com.ihateposting/agent";
+const REGISTRY_NAME = "com.ihateposting/mcp";
 const FORBIDDEN = /new iHatePosting app|\bnew app\b|\(app\.ihateposting\.com\)/i;
 
 const CLAUDE_PLUGIN = "plugins/claude-ihateposting/.claude-plugin/plugin.json";
@@ -54,10 +54,11 @@ describe("the name of the new listings", () => {
     assert.match(read("README.md"), new RegExp(`qwen extensions install iHatePostingOrg/iHatePosting-Agent:${PLUGIN}\\n`));
   });
 
-  it("is `com.ihateposting/agent` in the registry draft, beside the old app's `com.ihateposting/mcp`, which the draft does not take over", () => {
+  it("is the old app's `com.ihateposting/mcp` in the registry draft (the name is kept for a new version, owner 2026-11-16), and the version is above the old entry's latest, 0.12.9", () => {
     assert.equal(json("server.json").name, REGISTRY_NAME);
-    assert.notEqual(json("server.json").name, "com.ihateposting/mcp");
     assert.match(json("server.json").name, /^[a-zA-Z0-9.-]+\/[a-zA-Z0-9._-]+$/);
+    const [major, minor, patch] = json("server.json").version.split(".").map(Number);
+    assert.ok(major > 0 || minor > 12 || (minor === 12 && patch > 9), `${json("server.json").version} is not above 0.12.9`);
   });
 
   it("is in the old words everywhere: no short description tells the new listing from the live app's, and the lengths the places allow hold", () => {

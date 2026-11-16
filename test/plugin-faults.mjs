@@ -66,7 +66,7 @@ export const pluginFaults = [
   ["the Cursor plugin is called like the marketplace", ".cursor-plugin/plugin.json", [['{\n  "name": "ihateposting",', '{\n  "name": "ihateposting-agent",']]],
   ["the Grok plugin is called like the marketplace", ".grok-plugin/plugin.json", [['{\n  "name": "ihateposting",', '{\n  "name": "ihateposting-agent",']]],
   ["the Claude marketplace entry is called like the marketplace", ".claude-plugin/marketplace.json", [['      "name": "ihateposting",\n      "description"', '      "name": "ihateposting-agent",\n      "description"']]],
-  ["the registry draft takes the old app's entry", "server.json", [['"name": "com.ihateposting/agent"', '"name": "com.ihateposting/mcp"']]],
+  ["the registry draft leaves the old app's entry for a new name", "server.json", [['"name": "com.ihateposting/mcp"', '"name": "com.ihateposting/agent"']]],
   ["the registry title drifts", "server.json", [['"title": "iHatePosting"', '"title": "iHatePosting Agent"']]],
   ["the Claude plugin's description tells the new listing from the live app's", "plugins/claude-ihateposting/.claude-plugin/plugin.json", [["\"description\": \"Social media automation skill for the iHatePosting CLI", "\"description\": \"The agent connection to the new iHatePosting app: a social media automation skill for the iHatePosting CLI"]]],
   ["the Claude marketplace's metadata tells the new listing from the live app's", ".claude-plugin/marketplace.json", [["\"description\": \"iHatePosting social media automation skill for scheduling", "\"description\": \"iHatePosting, the agent connection to the new iHatePosting app: a skill for scheduling"]]],

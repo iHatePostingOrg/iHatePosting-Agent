@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - The Claude Code plugin's copy of the skill (`plugins/claude-ihateposting/skills/ihateposting/SKILL.md`) differs from the other two copies in two places, so that the Claude directory's check can read it (the owner's decision of 2026-11-16): the front matter's one-line JSON `metadata` is written as plain indented lines, and the line that links the npm page is left out. Not in the npm package (its `skills/` folder keeps the one-line JSON).
+- The draft entry for the official MCP Registry, `server.json`, is a new version `0.13.0` of the existing entry `com.ihateposting/mcp` (the owner's decision of 2026-11-16: one entry, the name kept; the first draft used a new name, `com.ihateposting/agent`). Not in the npm package.
 - The Cursor plugin's manifest, `.cursor-plugin/plugin.json`, no longer has an `mcpServers` field, as the reference project's has none (the owner's decision of 2026-11-16): Cursor finds the root `mcp.json` by itself. Both `mcp.json` files stay flat. Not in the npm package.
 - The Grok Build plugin's MCP file, `.grok-plugin/mcp.json`, is wrapped in `mcpServers`, the form of the standard `.mcp.json` (the owner's decision of 2026-11-16). xAI's marketplace tool that lists what a plugin contains reads only that form, so the flat file showed the plugin without its MCP server. Not in the npm package.
 

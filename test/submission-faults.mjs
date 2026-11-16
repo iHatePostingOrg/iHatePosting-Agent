@@ -38,9 +38,10 @@ export const submissionFaults = [
   ["the package has no script for the ZIP", "package.json", [['"chatgpt-plugin:zip": "node scripts/chatgpt-plugin-zip.mjs"', '"chatgpt-plugin:zip": "node scripts/other.mjs"']]],
   // The Registry draft.
   ["the Registry description is over 100 characters", "server.json", [['"description": "Draft, schedule and publish social posts, upload media and list posts across 15 platforms."', '"description": "Draft, schedule and publish social posts, upload media and list posts across 15 platforms, from ChatGPT, Claude, Cursor, Gemini or Grok."']]],
-  ["the Registry version is a range", "server.json", [['"version": "0.1.0"', '"version": "^0.1.0"']]],
-  ["the Registry name has no namespace", "server.json", [['"name": "com.ihateposting/agent"', '"name": "ihateposting-agent"']]],
-  ["the Registry name is the old app's entry", "server.json", [['"name": "com.ihateposting/agent"', '"name": "com.ihateposting/mcp"']]],
+  ["the Registry version is a range", "server.json", [['"version": "0.13.0"', '"version": "^0.13.0"']]],
+  ["the Registry version is not above the old entry's latest", "server.json", [['"version": "0.13.0"', '"version": "0.1.1"']]],
+  ["the Registry name has no namespace", "server.json", [['"name": "com.ihateposting/mcp"', '"name": "ihateposting-mcp"']]],
+  ["the Registry name is a new entry instead of the old app's", "server.json", [['"name": "com.ihateposting/mcp"', '"name": "com.ihateposting/agent"']]],
   ["a Registry remote is plain http", "server.json", [['"url": "https://app.ihateposting.com/api/mcp",', '"url": "http://app.ihateposting.com/api/mcp",']]],
   ["the Registry's header is not secret", "server.json", [['"isSecret": true', '"isSecret": false']]],
   // The owner's guide.

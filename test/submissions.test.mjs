@@ -385,7 +385,7 @@ describe("server.json (a draft for the official MCP Registry)", () => {
   it("follows the registry's schema fields: name in reverse-DNS form, a description of at most 100 characters, a plain version", () => {
     assert.equal(server.$schema, "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json");
     assert.match(server.name, /^[a-zA-Z0-9.-]+\/[a-zA-Z0-9._-]+$/);
-    assert.equal(server.name, "com.ihateposting/agent");
+    assert.equal(server.name, "com.ihateposting/mcp");
     assert.equal(server.title, "iHatePosting");
     assert.ok(server.name.length >= 3 && server.name.length <= 200);
     assert.ok(server.description.length >= 1 && server.description.length <= 100, `the description is ${server.description.length} characters`);
@@ -462,9 +462,10 @@ describe("PUBLISHING.md's section on submissions", () => {
     assert.match(section, /not the form xAI wants/);
     assert.match(section, /do not replace it \(OpenAI: use a parent origin or a distinct host instead\)/);
     assert.match(section, /`requires\.env` as `IHATEPOSTING_API_URL` only/);
-    assert.match(section, /a \*\*draft\*\* for a new registry entry, `com\.ihateposting\/agent`.{0,80}beside the old app's entry `com\.ihateposting\/mcp`, which this repository leaves alone \(versions up to 0\.12\.9 on 2026-11-15/);
-    assert.match(section, /first version `0\.1\.0` is only a placeholder/);
-    assert.match(section, /inferred from the wording, not tried/);
+    assert.match(section, /a \*\*draft\*\* for a new version, `0\.13\.0`, of the existing registry entry `com\.ihateposting\/mcp`.{0,160}the entry's versions went up to 0\.12\.9 on 2026-11-15/);
+    assert.match(section, /`0\.13\.0` is above `0\.12\.9`: the registry's versioning page \(read on 2026-11-16\) says a published version is immutable and that the latest version is chosen by semantic-version order/);
+    assert.equal(json("server.json").version, "0.13.0");
+    assert.match(section, /Whether the registry accepts a new version of an existing name with another repository is \*\*unverified\*\*/);
   });
 
   it("gives the npm token and two-factor facts with their sources: the January 2027 target, Node 22.14.0, the 48 hours, and what that means for publish-npm.yml", () => {

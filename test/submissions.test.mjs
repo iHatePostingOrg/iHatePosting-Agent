@@ -468,8 +468,12 @@ describe("PUBLISHING.md's section on submissions", () => {
     assert.match(section, /so the owner chose version 1\.0\.1 with `SKILL\.md` only, which ClawHub marked clean/);
     assert.match(section, /\*\*The ClawHub plugin \(a bundle plugin; the owner's decision of 2026-11-16\)\.\*\*/);
     assert.match(section, /as `ihateposting-agent` \(ClawHub's skills and plugins share one name space and `ihateposting` is the skill/);
-    assert.match(section, /`--version` is required because ClawHub does not read it from a bundle's manifest, and `clawhub package validate` only covers code plugins/);
-    assert.match(section, /the manifest has a `skills` field \(`\.\/skills\/`\) and the version `0\.1\.2`/);
+    assert.match(section, /`--version` is required because ClawHub does not read it from a bundle's manifest\./);
+    assert.match(section, /`clawhub package validate` refused the first folder, which had no `package\.json`, and passed the 0\.1\.3 folder \(`Plugin Inspector: PASS`, 0 breakages, 0 warnings\); it writes a `reports\/` folder into the package folder, which must be deleted before publishing/);
+    assert.match(section, /the manifest has a `skills` field \(`\.\/skills\/`\) and the version `0\.1\.3`, and two files are added: a `package\.json` \(`name`, `version`, `description`, `type`, `license`, `repository` and `homepage`, with no `openclaw` block/);
+    assert.match(section, /Version 0\.1\.3, which adds the `package\.json` and the icon, was public about 10 minutes after its submission/);
+    assert.match(section, /the listing summary taken from the `package\.json` `description` \(for 0\.1\.1 and 0\.1\.2 it came from the README\)/);
+    assert.match(section, /whether OpenClaw then loads the bundled skill is unverified/);
     assert.match(section, /with no `primaryEnv`, no `envVars` and no `install` entry/);
     assert.match(section, /ClawHub publishes every skill under \*\*MIT-0\*\*, which differs from this repository's MIT/);
     assert.match(section, /a \*\*draft\*\* for a new version, `0\.13\.0`, of the existing registry entry `com\.ihateposting\/mcp`.{0,160}the entry's versions went up to 0\.12\.9 on 2026-11-15/);

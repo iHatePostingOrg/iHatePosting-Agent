@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- The Claude Code plugin's copy of the skill (`plugins/claude-ihateposting/skills/ihateposting/SKILL.md`) differs from the other two copies in two places, so that the Claude directory's check can read it (the owner's decision of 2026-11-16): the front matter's one-line JSON `metadata` is written as plain indented lines, and the line that links the npm page is left out. Not in the npm package (its `skills/` folder keeps the one-line JSON).
+
 ## [0.1.1] - 2026-11-16
 
 Changes made after 0.1.0 was published to npm on 2026-11-15. What changed in the npm package is printed text (three help texts and one message), the skill, the README and this file; the commands behave as in 0.1.0. The plugin folders, the scripts and the submission files below are in the GitHub repository only: the `files` list holds none of them.

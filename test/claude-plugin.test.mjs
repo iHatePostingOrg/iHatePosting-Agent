@@ -57,7 +57,11 @@ describe("the Claude Code plugin folder", () => {
     for (const key of ["skills", "commands", "agents", "hooks", "outputStyles", "themes", "mcpServers", "lspServers"]) assert.equal(manifest[key], undefined, `the manifest declares ${key}`);
     assert.equal(manifest.license, "MIT");
     assert.ok(files.includes(`${FOLDER}/skills/ihateposting/SKILL.md`));
-    assert.equal(read(`${FOLDER}/skills/ihateposting/SKILL.md`), read("SKILL.md"));
+    // The skill with the two changes the Claude directory's check needs (owner, 2026-11-16; test/package.test.mjs says why): plain indented `metadata` lines, and no line linking the npm page.
+    const forTheClaudeDirectory = read("SKILL.md")
+      .replace('metadata: {"openclaw":{"emoji":"📬","requires":{"bins":[],"env":["IHATEPOSTING_API_URL"]}}}', 'metadata:\n  openclaw:\n    emoji: "📬"\n    requires:\n      env:\n        - IHATEPOSTING_API_URL')
+      .replace("npm release: https://www.npmjs.com/package/ihateposting-agent\n", "");
+    assert.equal(read(`${FOLDER}/skills/ihateposting/SKILL.md`), forTheClaudeDirectory);
   });
 
   it("holds nothing that claude.ai or Cowork refuse: no bin/ folder, no hooks, no package.json or lock file, no script, no server", () => {

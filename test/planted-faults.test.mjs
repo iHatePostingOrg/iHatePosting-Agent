@@ -92,7 +92,7 @@ const faults = [
   ["the publish workflow starts on a release again", ".github/workflows/publish-npm.yml", [["on:\n  workflow_dispatch:", "on:\n  release:\n    types: [published]\n  workflow_dispatch:"]]],
   ["the publish workflow no longer checks the version asked for", ".github/workflows/publish-npm.yml", [["WANTED_VERSION", "WANTED_VERSIN"]]],
   ["the DeepSeek skill copy is back", "plugins/dsh-ihateposting/package.json", [['"README.md",', '"README.md",\n    "skill/",']]],
-  ["a guide says four copies of the skill again", "PUBLISHING.md", [["The three copies of the skill are identical", "The four copies of the skill are identical"]]],
+  ["a guide says four copies of the skill again", "PUBLISHING.md", [["The three copies of the skill are the same text", "The four copies of the skill are the same text"]]],
   ["a guide says the workflows run on a release again", "PUBLISHING.md", [["run only when started by hand", "run when a release is published on GitHub"]]],
   ["a document names the old skill folder", "SUMMARY.md", [["`skills/ihateposting/SKILL.md` is what", "`skills/ihateposting-agent/SKILL.md` is what"]]],
   ["the Qwen Code install line is gone", "README.md", [["qwen extensions install iHatePostingOrg/iHatePosting-Agent:ihateposting\n", "\n"]]],

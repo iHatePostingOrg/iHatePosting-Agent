@@ -2,7 +2,12 @@
 name: ihateposting
 description: iHatePosting is a tool to schedule social media and chat posts to 15 channels X, LinkedIn, Instagram, Facebook Page, Threads, YouTube, Google Business, TikTok, Pinterest, Discord, Slack, Mastodon, Bluesky, Telegram, Tumblr. Use this skill to find a workspace's channels, read each channel's rules, upload media, create posts, change a post's status or settings and read analytics from the command line.
 homepage: https://ihateposting.com/ai-agents
-metadata: {"openclaw":{"emoji":"📬","requires":{"bins":[],"env":["IHATEPOSTING_API_URL"]}}}
+metadata:
+  openclaw:
+    emoji: "📬"
+    requires:
+      env:
+        - IHATEPOSTING_API_URL
 ---
 
 ## Install iHatePosting if it doesn't exist
@@ -13,7 +18,6 @@ npm install -g ihateposting-agent
 pnpm install -g ihateposting-agent
 ```
 
-npm release: https://www.npmjs.com/package/ihateposting-agent
 ihateposting cli github: https://github.com/iHatePostingOrg/iHatePosting-Agent
 official website: https://ihateposting.com
 

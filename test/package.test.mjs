@@ -117,7 +117,17 @@ describe("the skill", () => {
 
   it("is one text in three places, with the frontmatter an installer reads", () => {
     assert.equal(read("SKILL.md"), read("skills/ihateposting/SKILL.md"));
-    assert.equal(read("SKILL.md"), read("plugins/claude-ihateposting/skills/ihateposting/SKILL.md"), "the Claude Code plugin carries another copy of the skill (sync-skill.yml does not write to it)");
+    // The Claude plugin's copy differs in two places so that the Claude directory's check can read it (owner, 2026-11-16): the front matter's one-line JSON `metadata` is written as plain
+    // indented lines, and the line that links the npm page is left out (a remote host beside the key variable made a policy hold). The root and skills/ copies keep the one-line JSON.
+    const root = read("SKILL.md");
+    const forTheClaudeDirectory = root
+      .replace('metadata: {"openclaw":{"emoji":"📬","requires":{"bins":[],"env":["IHATEPOSTING_API_URL"]}}}', 'metadata:\n  openclaw:\n    emoji: "📬"\n    requires:\n      env:\n        - IHATEPOSTING_API_URL')
+      .replace("npm release: https://www.npmjs.com/package/ihateposting-agent\n", "");
+    assert.notEqual(forTheClaudeDirectory, root, "the two replacements found nothing to change in the skill");
+    assert.equal(read("plugins/claude-ihateposting/skills/ihateposting/SKILL.md"), forTheClaudeDirectory, "the Claude Code plugin's copy of the skill is not the skill with its two changes (sync-skill.yml does not write to it)");
+    const frontMatter = read("plugins/claude-ihateposting/skills/ihateposting/SKILL.md").match(/^---\n([\s\S]*?)\n---\n/)[1];
+    assert.doesNotMatch(frontMatter, /[{}[\]]/, "the Claude plugin's front matter has a { } or [ ] mapping the directory reads differently from Claude Code");
+    assert.doesNotMatch(read("plugins/claude-ihateposting/skills/ihateposting/SKILL.md"), /npmjs\.com/, "the Claude plugin's skill links the npm page again");
     assert.equal(fs.existsSync(path.join(ROOT, "plugins", "dsh-ihateposting", "skill")), false, "the DeepSeek plugin has no copy of the skill any more (it carries a short one of its own in lib/skill.js)");
     const text = read("SKILL.md");
     assert.match(text, /^---\nname: ihateposting\ndescription: .{60,}\n/);
@@ -180,7 +190,7 @@ describe("the skill", () => {
     assert.match(publishing, /run only when started by hand/);
     assert.match(publishing, /^### The two workflows \(in the repository, run only by hand\)$/m);
     assert.match(publishing, /A manual run of `publish-npm\.yml` makes no sense/);
-    assert.match(publishing, /The three copies of the skill are identical/);
+    assert.match(publishing, /The three copies of the skill are the same text, apart from two spots in the Claude plugin's copy/);
     assert.match(read("CONTRIBUTING.md"), /it runs only when started by hand/);
     assert.match(read("CHANGELOG.md"), /The two GitHub workflows run only when started by hand/);
     assert.match(read("SUMMARY.md"), /both run only when started by hand/);

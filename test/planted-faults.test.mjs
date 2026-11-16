@@ -1,7 +1,7 @@
 // The break-it check for the command line itself: each fault below is put into a COPY of this repository's code (nothing here changes), the other tests are run against the
 // copy, and they must fail. A fault whose text is no longer in its file fails this check instead of passing it. A run that has to be killed is a hang, not a test that failed,
 // and is not "seen" either (each copy runs with a time limit for every test).
-// Run: node --test test/planted-faults.test.mjs   (about ten minutes; it copies the repository to a temporary folder for each fault)
+// Run: node --test test/planted-faults.test.mjs   (about an hour and a half on the owner's PC, measured 2026-11-16 for 220 runs; it copies the repository to a temporary folder for each fault)
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import fs from "node:fs";

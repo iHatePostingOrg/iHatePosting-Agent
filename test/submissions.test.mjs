@@ -462,9 +462,14 @@ describe("PUBLISHING.md's section on submissions", () => {
     assert.match(section, /not the form xAI wants/);
     assert.match(section, /do not replace it \(OpenAI: use a parent origin or a distinct host instead\)/);
     assert.match(section, /`requires\.env` as `IHATEPOSTING_API_URL` only/);
-    assert.match(section, /\*\*The ClawHub copy \(the owner's decisions of 2026-11-16: his own GitHub account, and the same as the reference project's published skill/);
+    assert.match(section, /\*\*The ClawHub skill \(the owner's decisions of 2026-11-16: his own GitHub account, and the same front matter as the reference project's published skill/);
     assert.match(section, /`requires\.env` lists both `IHATEPOSTING_API_URL` and `IHATEPOSTING_API_KEY` \(\*\*required\*\*, as in the reference project's published copy/);
-    assert.match(section, /holds `SKILL\.md` and 13 of this repository's guides \(`README\.md`/);
+    assert.match(section, /Version 1\.0\.0 also held 13 of this repository's guides next to `SKILL\.md`/);
+    assert.match(section, /so the owner chose version 1\.0\.1 with `SKILL\.md` only, which ClawHub marked clean/);
+    assert.match(section, /\*\*The ClawHub plugin \(a bundle plugin; the owner's decision of 2026-11-16\)\.\*\*/);
+    assert.match(section, /as `ihateposting-agent` \(ClawHub's skills and plugins share one name space and `ihateposting` is the skill/);
+    assert.match(section, /`--version` is required because ClawHub does not read it from a bundle's manifest, and `clawhub package validate` only covers code plugins/);
+    assert.match(section, /the manifest has a `skills` field \(`\.\/skills\/`\) and the version `0\.1\.2`/);
     assert.match(section, /with no `primaryEnv`, no `envVars` and no `install` entry/);
     assert.match(section, /ClawHub publishes every skill under \*\*MIT-0\*\*, which differs from this repository's MIT/);
     assert.match(section, /a \*\*draft\*\* for a new version, `0\.13\.0`, of the existing registry entry `com\.ihateposting\/mcp`.{0,160}the entry's versions went up to 0\.12\.9 on 2026-11-15/);

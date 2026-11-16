@@ -139,7 +139,7 @@ describe("pack 3: DeepSeek Harness", () => {
     assert.equal(shipped.length, 6);
     for (const file of shipped) assert.ok(text.includes(`\`${file}\``), `${file} is not named in the dry-run list`);
     assert.match(text, /type it yourself/);
-    assert.match(text, /0\.1\.0 can never be changed once published/);
+    assert.match(text, new RegExp(`${pkg.version.replaceAll(".", "\\.")} can never be changed once published`));
     assert.match(text, /\*\*No real DeepSeek Harness has loaded this plugin\*\*/);
   });
 

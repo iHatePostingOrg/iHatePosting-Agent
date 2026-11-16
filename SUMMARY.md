@@ -23,7 +23,7 @@ The repository holds four things:
 - **Dependencies:** `yargs` (the command line parser) and `node-fetch` (requests); nothing else
 - **Default API address:** `https://app.ihateposting.com/api`
 - **Lines of Code:** 1,249 lines in `src/` (plus the two-line entry point in `bin/`)
-- **Package Size:** about 22 kB packed (16 files, the 0.1.0 dry run)
+- **Package Size:** about 50 kB packed (16 files, 49.7 kB when 0.1.0 was published)
 - **License:** MIT
 
 ## 📦 Package Structure
@@ -355,7 +355,7 @@ The owner publishes by hand, with two-factor authentication; [PUBLISHING.md](PUB
 - **Documentation Files:** 17 at the root, and 3 in `examples/`
 - **Example Files:** 10 (4 scripts and 6 sample post bodies)
 - **Total Lines of Code:** 1,249 in `src/`
-- **Package Size:** about 22 kB packed (16 files, the 0.1.0 dry run)
+- **Package Size:** about 50 kB packed (16 files, 49.7 kB when 0.1.0 was published)
 
 ## 🎉 Summary
 

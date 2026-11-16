@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Changes made after 0.1.0 was published to npm on 2026-11-15. None of this is in the published 0.1.0 package. The plugin folders, the scripts and the submission files are not part of the npm package at all (the `files` list holds none); the changes to `src/`, the README, the skill and this file reach npm only with the next release.
+## [0.1.1] - 2026-11-16
+
+Changes made after 0.1.0 was published to npm on 2026-11-15. What changed in the npm package is printed text (three help texts and one message), the skill, the README and this file; the commands behave as in 0.1.0. The plugin folders, the scripts and the submission files below are in the GitHub repository only: the `files` list holds none of them.
 
 ### Added
 - The Claude Code plugin has a folder of its own, `plugins/claude-ihateposting/` (the owner's decision of 2026-11-15). claude.ai and Cowork refuse a plugin whose root holds a `bin/` folder, and the repository root holds the program's. The marketplace at `.claude-plugin/marketplace.json` now points its entry at `./plugins/claude-ihateposting`, the root `.claude-plugin/plugin.json` is gone, and the plugin has a README, the licence, a logo and its own copy of the skill. The Cursor, Grok and Gemini layouts were not touched by this change.
@@ -17,6 +19,7 @@ Changes made after 0.1.0 was published to npm on 2026-11-15. None of this is in 
 ### Changed
 - Names of the listings (the owner's decisions of 2026-11-15): display name `iHatePosting`; the plugin, the skill and the Gemini extension are called `ihateposting`; the Claude marketplace, the npm package and the command are called `ihateposting-agent`; Claude Code installs the plugin with `/plugin install ihateposting@ihateposting-agent`. The descriptions keep the old wording; no sentence tells the new listing from the live app's (the owner's decision of 2026-11-15).
 - Releases are published by hand with two-factor authentication (the owner's decision of 2026-11-15). The two GitHub workflows run only when started by hand.
+- The skill (`SKILL.md`, the same text under `skills/ihateposting/` and in the Claude Code plugin) was rewritten and enlarged: every command and option in it was read against the program's own help and the tests, and it says what an agent needs to know about iHatePosting (15 platforms, `-s` required for a post that is not sent from a `--json` file, a header line before the JSON that most commands print, the three `auth:` commands that need no sign-in). The README's line about the DeepSeek plugin says that without a key the plugin loads, warns once and shows no tools.
 - Help texts that were false for iHatePosting are true now (printed text only, no behaviour change): the `integrations:trigger` example shows `linkedin-123 mention -d '{"query":"acme"}'` instead of a YouTube call that has no helper here; the `upload --adjust` help says the option is accepted for compatibility but nothing is adjusted and `media:status` answers ready at once; and the `media:status` description says the same.
 - The message printed when nobody is signed in now says `1. OAuth2: ihateposting-agent auth:login` (the same line `auth:status` prints) instead of `auth:login --client-id <id> --client-secret <secret>`: `auth:login` has no such options. A deliberate difference from the other posting command lines (the owner's decision of 2026-11-16); the text on standard error changes, the exit code `1` and everything else do not.
 

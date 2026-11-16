@@ -36,7 +36,7 @@ Edit `package.json`:
 ```json
 {
   "name": "your-other-name",  // ← Changed package name
-  "version": "0.1.0",
+  "version": "0.1.1",
   "bin": {
     "ihateposting-agent": "bin/ihateposting-agent.mjs"  // ← Keep command name!
   }
@@ -127,7 +127,7 @@ Work down this list. Every item is something you can see for yourself.
 
 - [ ] Update version if needed
   ```json
-  "version": "0.1.0"
+  "version": "0.1.1"
   ```
   The version is the same in nine places. `test/package.test.mjs` fails if any differ:
 
@@ -457,7 +457,7 @@ ihateposting-agent posts:create -c "Hello!" -s "2030-01-01T09:00:00Z" -t draft -
 
 ### What the package contains
 
-`package.json` decides it with a `files` list: `bin`, `src`, `SKILL.md`, `skills`, `README.md`, `CHANGELOG.md` and `LICENSE`. npm adds `package.json` itself. `npm pack --dry-run` prints the result without writing a file or publishing anything; for version 0.1.0 it listed 16 files, about 22 kB packed and 98 kB unpacked:
+`package.json` decides it with a `files` list: `bin`, `src`, `SKILL.md`, `skills`, `README.md`, `CHANGELOG.md` and `LICENSE`. npm adds `package.json` itself. `npm pack --dry-run` prints the result without writing a file or publishing anything; the published 0.1.0 was 16 files, 49.7 kB packed and 170.9 kB unpacked (npm's own output when it was published), and the dry run for 0.1.1 lists the same 16 files, 58.2 kB packed and 210.6 kB unpacked (the skill grew from 42.6 kB to 60.5 kB and is in the package twice):
 
 ```text
 CHANGELOG.md
@@ -767,7 +767,7 @@ Sources: https://docs.npmjs.com/about-access-tokens, https://docs.npmjs.com/trus
 - What that means here: releases are published by hand (the owner's decision of 2026-11-15), which npm says is not affected. `publish-npm.yml`, which runs only when started by hand and is not used, publishes with the `NPM_TOKEN` secret: it would keep working until the change, if the token is a granular one with Bypass 2FA ticked, and then needs one of the two replacements.
 - Trusted publishing needs npm CLI 11.5.1 or later and Node 22.14.0 or later, and `id-token: write` in the workflow. **The workflow here uses Node 20**, so it would need a newer Node. For a public repository, npm then adds provenance on its own. The settings are on npmjs.com under the package: organisation or user `iHatePostingOrg`, repository `iHatePosting-Agent`, workflow file `publish-npm.yml`, no environment, and which actions to allow (staged publishing is always allowed; ticking direct `npm publish` is a choice). A new configuration that has not had a successful publish after 48 hours expires, so create it when a release is ready.
 - Publishing by hand, as 0.1.0 was, is not affected: an interactive `npm publish` with 2FA is what npm says stays.
-- The two workflows have never run. A release made now (the tag must match `package.json`, 0.1.0) would try to publish 0.1.0 again and fail, because it is already on npm: make the next release a new version, or a pre-release (see "Publishing by hand", step 5).
+- The two workflows have never run. They publish the version `package.json` holds (the tag must match it), and npm refuses a version that is already on npm, so after a hand publish a release of the same number would fail: make the next release a new version, or a pre-release (see "Publishing by hand", step 5).
 
 ### More common issues
 

@@ -11,7 +11,7 @@ export const pluginFaults = [
   ["the Claude marketplace entry has a version", ".claude-plugin/marketplace.json", [['"source": "./plugins/claude-ihateposting"', '"source": "./plugins/claude-ihateposting",\n      "version": "0.1.0"']]],
   ["the Claude marketplace entry is switched to strict false", ".claude-plugin/marketplace.json", [['"source": "./plugins/claude-ihateposting"', '"source": "./plugins/claude-ihateposting",\n      "strict": false']]],
   ["the Claude plugin manifest declares its skills", `${CLAUDE}/.claude-plugin/plugin.json`, [['"license": "MIT",', '"license": "MIT",\n  "skills": ["./skills/ihateposting"],']]],
-  ["the Claude plugin manifest has another version", `${CLAUDE}/.claude-plugin/plugin.json`, [['"version": "0.1.0"', '"version": "0.1.1"']]],
+  ["the Claude plugin manifest has another version", `${CLAUDE}/.claude-plugin/plugin.json`, [['"version": "0.1.1"', '"version": "0.1.2"']]],
   ["the Claude plugin icon is a file that is not there", `${CLAUDE}/.claude-plugin/plugin.json`, [['"icon": "./logo.png"', '"icon": "./logo.svg"']]],
   ["the Claude plugin support address is plain http", `${CLAUDE}/.claude-plugin/plugin.json`, [['"supportUrl": "https://ihateposting.com/contact"', '"supportUrl": "http://ihateposting.com/contact"']]],
   ["the Claude plugin carries another copy of the skill", `${CLAUDE}/skills/ihateposting/SKILL.md`, [["ihateposting-agent", "ihateposting-agnt"]]],

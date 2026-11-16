@@ -19,7 +19,7 @@ A suggestion, with the reason for each step; every step is the owner's call.
 1. **Commit and push the changes** (the owner). Steps 5 and 7 read GitHub, and the xAI pin is a commit of this repository.
 2. **Change the repository's topics on GitHub** (the owner): add `gemini-cli-extension`, `dsh-plugin`, `claude-code`, `openclaw-skills`; remove `facebook`, `instagram`, `linkedin`, `tiktok-auto-post-scheduler` (the owner's decision; the limit of 20 topics is unverified). The DeepSeek list requires the `dsh-plugin` topic.
 3. **Try the plugin yourself once.** Where the `claude` command is installed, `claude plugin validate ./plugins/claude-ihateposting` (it was not installed here, so nothing in this repository has been validated by it). Then a real `ihateposting-agent auth:login` against the live app, to see what a reviewer will see.
-4. **DeepSeek: publish `dsh-ihateposting` by hand, then open the list's pull request** (pack 3). npm comes first because 0.1.0 cannot be changed afterwards, and the list entry should point at something that installs.
+4. **DeepSeek: publish `dsh-ihateposting` by hand, then open the list's pull request** (pack 3). npm comes first because a published version cannot be changed afterwards, and the list entry should point at something that installs.
 5. **Claude plugin portal** (pack 2). It needs the pushed layout and takes days; start it early.
 6. **Cursor Marketplace** (pack 1). Only a repository link; review time is not stated.
 7. **xAI marketplace pull request last** (pack 4): it pins a commit, so it must follow the final push; it is a pull request on another organisation's repository, and its merge time ranged from hours to six weeks in the ten merged requests read.
@@ -94,7 +94,7 @@ A suggestion, with the reason for each step; every step is the owner's call.
 | A file that is not an image or font stays under 256 KiB | The largest is `SKILL.md`, about 61 KB |
 | Folder names on the path use letters, digits, dots, hyphens, underscores | `plugins/claude-ihateposting` |
 | A `name` of lowercase letters, digits and hyphens that no other organization uses and that is not a reserved word | `ihateposting`; whether another organization uses it is checked by the portal's Validate |
-| `description`, `author` and `version` set; `version` raised with every release | Set (0.1.0); raise it in `plugin.json` when a release changes the plugin |
+| `description`, `author` and `version` set; `version` raised with every release | Set (0.1.1); raise it in `plugin.json` when a release changes the plugin |
 | No hooks, no MCP server, no package launcher, no credential in any file | None; the plugin is one skill |
 | The README describes everything the plugin runs, sends or fetches | It does: the command, the API address, the key variable and the saved-credentials file |
 
@@ -106,7 +106,7 @@ A suggestion, with the reason for each step; every step is the owner's call.
 
 ## Pack 3: DeepSeek Harness (npm and the community list)
 
-**Part A: publish `dsh-ihateposting` to npm by hand** (the owner's decision; version 0.1.0 can never be changed once published). From the repository root, in a terminal where `npm whoami` names the owner's account (PowerShell: `npm.cmd`):
+**Part A: publish `dsh-ihateposting` to npm by hand** (the owner's decision; version 0.1.1 can never be changed once published). From the repository root, in a terminal where `npm whoami` names the owner's account (PowerShell: `npm.cmd`):
 
 ```bash
 cd plugins/dsh-ihateposting
@@ -118,7 +118,7 @@ npm publish --access public
 
 - The dry run must list six files: `LICENSE`, `README.md`, `cordis.patch.yml`, `lib/index.js`, `lib/skill.js` and `package.json`, about 9 kB packed. If `skill/`, `test/` or `lib/key.js` appears, stop.
 - npm asks for a one-time code from the authenticator when it needs one: type it yourself.
-- Afterwards: `npm view dsh-ihateposting version` should answer `0.1.0`.
+- Afterwards: `npm view dsh-ihateposting version` should answer `0.1.1`.
 - The plugin asks the host for two peer packages, `@deepseek-ai/cordis` (`^4.0.1`) and `@deepseek-ai/schemastery` (`^3.18.1`); both exist on npm and the ranges include the versions DeepSeek Harness pins (4.0.2 and 3.18.2). **No real DeepSeek Harness has loaded this plugin**: the plugin's README says so and so should any listing text.
 
 **Part B: the community list's pull request.** The list is the repository `awesome-dsh-plugin/awesome-dsh-plugin`; its contributing guide (https://raw.githubusercontent.com/awesome-dsh-plugin/awesome-dsh-plugin/main/contributing.md, read 2026-11-15) asks for one new file in a pull request. The pull request is on another organisation's repository: only with the owner's yes.
@@ -154,7 +154,7 @@ Only `description.en` is required; the guide says a maintainer adds a Chinese on
 
 **What a reviewer who installs it meets.** `dsh plugin --profile web add dsh-ihateposting` (after Part A), a key made under Settings > Agents / Dev in iHatePosting, and `IHATEPOSTING_API_KEY` exported. With no key the plugin loads and warns once, the MCP row connects without credentials, iHatePosting answers 401 (a plain request to `https://app.ihateposting.com/api/mcp` answered 401 at 08:17 UTC) and no tools appear; dsh keeps starting. With a key, the connection itself was not tried.
 
-**Not blocked by anything.** The plugin's code and README are final for 0.1.0 unless the owner wants a change before publishing.
+**Not blocked by anything.** The plugin's code and README are final for 0.1.1 unless the owner wants a change before publishing.
 
 ## Pack 4: xAI marketplace pull request
 

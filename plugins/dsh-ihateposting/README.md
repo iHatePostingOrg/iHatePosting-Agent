@@ -119,7 +119,7 @@ MIT, same as the rest of this repository.
 
 ### Status
 
-Status: **0.1.0, never run inside a real `dsh`** (see "Unverified" below).
+Status: **0.1.1, never run inside a real `dsh`** (see "Unverified" below).
 
 ### The profile name and the PowerShell form of the install
 

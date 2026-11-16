@@ -210,7 +210,7 @@ iHatePosting-Agent/
 
 #### `package.json`
 - Package name: `ihateposting-agent`
-- Version: `0.1.0`
+- Version: `0.1.1`
 - Executable bin: `ihateposting-agent` → `bin/ihateposting-agent.mjs`
 - Scripts: `test`, `chatgpt-plugin:zip`
 - Files that are published: `bin`, `src`, `SKILL.md`, `skills`, `README.md`, `CHANGELOG.md` and `LICENSE`
@@ -322,7 +322,7 @@ There is none:
 
 - No `dist/` folder, no bundle and no source map are made
 - The program that runs is the program you wrote: `bin/ihateposting-agent.mjs` and the nine files of `src/`
-- The package packed for npm: 16 files, 22.0 kB in the 0.1.0 dry run
+- The package packed for npm: 16 files, 49.7 kB for the published 0.1.0, 58.2 kB in the 0.1.1 dry run
 
 ## Commands Architecture
 
@@ -558,7 +558,7 @@ The owner runs it by hand, from their own computer, signed in to npm with two-fa
 - `plugins/`, `.claude-plugin/`, `.cursor-plugin/`, `.grok-plugin/`, `gemini-extension.json`, `mcp.json`, `server.json`, `assets/` and `scripts/` - Plugin folders, manifests and helper files
 - The guides (`PROJECT_STRUCTURE.md` and the other Markdown files) and `.github/`
 
-In the 0.1.0 dry run that is 16 files, 22.0 kB packed. `plugins/dsh-ihateposting/` is a separate package with its own `files` list that this package's release does not publish.
+The published 0.1.0 was 16 files, 49.7 kB packed and 170.9 kB unpacked (npm's own output when it was published); the 0.1.1 dry run gives 16 files, 58.2 kB packed and 210.6 kB unpacked. `plugins/dsh-ihateposting/` is a separate package with its own `files` list that this package's release does not publish.
 
 ## Testing
 

@@ -1,6 +1,6 @@
 {
   "name": "ihateposting",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Social media automation skill and MCP server for scheduling posts, managing integrations, uploading media, and tracking analytics across 15 platforms including X, LinkedIn (profiles and pages), Instagram, Facebook, Threads, YouTube, TikTok, Pinterest, Bluesky, Mastodon, Google Business, Discord, Slack, Telegram, and Tumblr",
   "author": {
     "name": "Parag Hasmukhbhai Gajera",

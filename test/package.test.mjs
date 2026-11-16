@@ -222,7 +222,9 @@ describe("the plugin folders", () => {
     const logo = fs.readFileSync(path.join(ROOT, "assets", "logo.png"));
     assert.deepEqual([...logo.subarray(0, 8)], [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a], "assets/logo.png is not a PNG");
     assert.equal(fs.existsSync(path.join(ROOT, "assets", "logo.svg")), false, "the old logo.svg is back");
-    assert.ok(fs.existsSync(path.join(ROOT, json(".cursor-plugin/plugin.json").mcpServers)));
+    // The Cursor manifest has no `mcpServers` field, as the reference project's has none: Cursor finds the root `mcp.json` by itself (owner, 2026-11-16: "do the same as the reference project").
+    assert.equal(json(".cursor-plugin/plugin.json").mcpServers, undefined, "the Cursor manifest names an MCP file again");
+    assert.ok(fs.existsSync(path.join(ROOT, "mcp.json")), "the root mcp.json, which Cursor finds by itself, is missing");
     assert.ok(fs.existsSync(path.join(ROOT, json(".grok-plugin/plugin.json").mcpServers)));
   });
 

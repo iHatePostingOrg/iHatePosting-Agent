@@ -634,7 +634,7 @@ None of these is scheduled. They are today's behaviour, kept on purpose to match
 All of them name the version, and all of them must carry the same one (`test/package.test.mjs` checks it).
 
 - `.claude-plugin/marketplace.json` and `plugins/claude-ihateposting/`: Claude Code. The marketplace is named `ihateposting-agent` and the plugin `ihateposting` (install: `ihateposting@ihateposting-agent`). The entry's source is the relative path `./plugins/claude-ihateposting`, a folder of its own that holds the plugin's manifest, a README, the licence, the logo and the skill (a copy); it has no `bin/`, because claude.ai and Cowork refuse a plugin that has one. There is no MCP entry.
-- `.cursor-plugin/` and `.grok-plugin/`: `plugin.json` (the skill, the logo, and a pointer to the folder's own `mcp.json`) and `marketplace.json`.
+- `.cursor-plugin/` and `.grok-plugin/`: `plugin.json` (the skill and the logo; the Grok one also points at its folder's own `mcp.json`, while Cursor finds the root `mcp.json` by itself) and `marketplace.json`.
 - `gemini-extension.json`: Gemini CLI. It names only the hosted MCP server, as `httpUrl`.
 - `mcp.json`: the same server for any client that reads an `mcp.json`.
 - `plugins/chatgpt-ihateposting/`: the package for OpenAI's plugin directory (ChatGPT and Codex). It talks to the hosted server only, so its skills never use the command line. `npm run chatgpt-plugin:zip` checks it and builds the ZIP the owner uploads; `PUBLISHING.md` ("Submissions") has the steps.

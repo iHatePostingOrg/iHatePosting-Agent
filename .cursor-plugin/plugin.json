@@ -38,6 +38,5 @@
   ],
   "skills": [
     "./skills/ihateposting"
-  ],
-  "mcpServers": "./.cursor-plugin/mcp.json"
+  ]
 }

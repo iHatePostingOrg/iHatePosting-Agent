@@ -63,13 +63,13 @@ describe("pack 1: Cursor Marketplace", () => {
   });
 
   it("states manifest facts that are true: the logo exists and is a square PNG, the paths are relative with no .., the skill has front matter, the README has the section it names", () => {
-    for (const value of [manifest.logo, ...manifest.skills, manifest.mcpServers]) {
+    for (const value of [manifest.logo, ...manifest.skills]) {
       assert.ok(!value.includes("..") && !path.isAbsolute(value) && !value.includes("\\"), value);
       assert.ok(fs.existsSync(path.join(ROOT, value)), `${value} is not there`);
     }
     const logo = fs.readFileSync(path.join(ROOT, manifest.logo));
     assert.deepEqual([logo.readUInt32BE(16), logo.readUInt32BE(20)], [198, 198]);
-    assert.ok(text.includes("a 198 by 198 PNG") && text.includes("`assets/logo.png`") && text.includes("`./skills/ihateposting`") && text.includes("`./.cursor-plugin/mcp.json`"));
+    assert.ok(text.includes("a 198 by 198 PNG") && text.includes("`assets/logo.png`") && text.includes("`./skills/ihateposting`"));
     assert.match(read("skills/ihateposting/SKILL.md"), /^---\nname: ihateposting\ndescription: .+\n/);
     assert.match(read("README.md"), /^### Cursor plugin$/m);
     assert.ok(text.includes("`#cursor-plugin`"));

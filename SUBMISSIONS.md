@@ -40,7 +40,7 @@ A suggestion, with the reason for each step; every step is the owner's call.
 | Valid files and front matter for every component | The one component is `skills/ihateposting/SKILL.md`, whose front matter holds `name` and `description` (a test checks it) |
 | The logo committed and referenced by a relative path | `assets/logo.png`, a 198 by 198 PNG, named as `logo` in the manifest |
 | A `README.md` that documents usage | The repository's `README.md`; its section "Cursor plugin" is at `#cursor-plugin` |
-| Relative, valid paths: no `..`, no absolute path | `assets/logo.png`, `./skills/ihateposting` and `./.cursor-plugin/mcp.json` (a test checks them) |
+| Relative, valid paths: no `..`, no absolute path | `assets/logo.png` and `./skills/ihateposting` (a test checks them) |
 | A marketplace file at the root for a multi-plugin repository | `.cursor-plugin/marketplace.json`, one plugin, `ihateposting` |
 | The plugin has been tested locally | **Not done**: Cursor is not installed here (unverified) |
 | Agent Plugins conformance, variables declared | Not applicable: this is a Cursor plugin without variables |
@@ -49,8 +49,8 @@ A suggestion, with the reason for each step; every step is the owner's call.
 
 **Open points** (the owner told us not to touch the Cursor layout, so they are listed, not changed):
 
-- `.cursor-plugin/mcp.json` is a flat object, `{ "ihateposting": { "type": "http", "url": "..." } }`. Cursor's reference shows an `mcp.json` that wraps its servers in `mcpServers`, with `url` and optional `headers` and no `type`. A helper found another plugin with a flat file listed in the marketplace (second-hand), so the flat form may be accepted; it is unverified.
-- The manifest names that file with a path (`"mcpServers": "./.cursor-plugin/mcp.json"`) while the reference describes picking up the root `mcp.json` by default: unverified.
+- `mcp.json` (at the root, and the same in `.cursor-plugin/`) is a flat object, `{ "ihateposting": { "type": "http", "url": "..." } }`, exactly as the reference project's files are (the owner's decision of 2026-11-16: "do the same as the reference project"). Cursor's own reference shows an `mcp.json` that wraps its servers in `mcpServers`; whether Cursor also accepts the flat form is unverified (the reference project's plugin is listed with the flat form).
+- The manifest has no `mcpServers` field (as the reference project's has none), so Cursor picks up the root `mcp.json` by default, which its reference describes.
 
 **Not blocked by anything**: the form needs only the public repository. **After approval** the listing pins a commit, so a later change needs a new request (second-hand).
 

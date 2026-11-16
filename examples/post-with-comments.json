@@ -1,0 +1,53 @@
+{
+  "type": "draft",
+  "date": "2026-12-15T10:00:00Z",
+  "shortLink": true,
+  "tags": [],
+  "posts": [
+    {
+      "integration": {
+        "id": "x-123"
+      },
+      "value": [
+        {
+          "content": "This is the main post content 🚀",
+          "image": [
+            {
+              "id": "media-123",
+              "path": "https://media.example/uploads/main-image.jpg"
+            },
+            {
+              "id": "media-124",
+              "path": "https://media.example/uploads/secondary-image.jpg"
+            }
+          ]
+        },
+        {
+          "content": "This is the first comment with its own media 📸",
+          "image": [
+            {
+              "id": "media-125",
+              "path": "https://media.example/uploads/comment1-image.jpg"
+            }
+          ],
+          "delay": 5
+        },
+        {
+          "content": "This is the second comment with different media 🎨",
+          "image": [
+            {
+              "id": "media-126",
+              "path": "https://media.example/uploads/comment2-image1.jpg"
+            },
+            {
+              "id": "media-127",
+              "path": "https://media.example/uploads/comment2-image2.jpg"
+            }
+          ],
+          "delay": 10
+        }
+      ],
+      "settings": {}
+    }
+  ]
+}

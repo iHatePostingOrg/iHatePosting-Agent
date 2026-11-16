@@ -21,7 +21,9 @@ export function getConfig() {
   if (!apiKey) {
     console.error("❌ Error: No authentication found.");
     console.error("Options:");
-    console.error(`  1. OAuth2: ${PROGRAM} auth:login --client-id <id> --client-secret <secret>`);
+    // The reference prints "auth:login --client-id <id> --client-secret <secret>" here, options that neither program has; the true line is
+    // the one `auth:status` prints (owner's decision, 2026-11-16).
+    console.error(`  1. OAuth2: ${PROGRAM} auth:login`);
     console.error(`  2. API Key: export ${API_KEY_VARIABLE}=your_api_key`);
     process.exit(1);
   }

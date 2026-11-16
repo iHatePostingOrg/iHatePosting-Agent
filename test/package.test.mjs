@@ -14,6 +14,8 @@ const json = (file) => JSON.parse(read(file));
 const pkg = json("package.json");
 
 // The author the owner gave for the public repository (2026-11-14), and the fifteen platforms iHatePosting connects (LinkedIn pages are a second kind of LinkedIn channel).
+// The Claude Code plugin is in a folder of its own, without the program's bin/ (claude.ai and Cowork refuse a plugin with a top-level bin/).
+const CLAUDE_PLUGIN = "plugins/claude-ihateposting/.claude-plugin/plugin.json";
 const AUTHOR_NAME = "Parag Hasmukhbhai Gajera";
 const AUTHOR_EMAIL = "support@ihateposting.com";
 const AUTHOR_URL = "https://github.com/iHatePostingOrg";
@@ -42,7 +44,7 @@ describe("the package", () => {
 
   it("is called ihateposting-agent everywhere a person installs or runs it, never by the name of the live app's own command line, and no guide promises a local ihateposting-mcp package", () => {
     // Owner, 2026-11-14: "Both ihateposting-agent". The live app's own packages on npm, `ihateposting` and `ihateposting-mcp`, are not replaced and not offered here.
-    const guides = fs.readdirSync(ROOT).filter((f) => f.endsWith(".md")).concat(fs.readdirSync(path.join(ROOT, "examples")).map((f) => `examples/${f}`), ["skills/ihateposting/SKILL.md", "plugins/dsh-ihateposting/skill/SKILL.md"]);
+    const guides = fs.readdirSync(ROOT).filter((f) => f.endsWith(".md")).concat(fs.readdirSync(path.join(ROOT, "examples")).map((f) => `examples/${f}`), ["skills/ihateposting/SKILL.md"]);
     for (const file of guides) {
       const text = read(file);
       assert.doesNotMatch(text, /(?:npm|pnpm|yarn) (?:install|add|i)(?: -g| --global)? ihateposting(?![-\w])/, `${file} installs the live app's own package`);
@@ -53,7 +55,7 @@ describe("the package", () => {
     assert.match(read("README.md"), /npm install -g ihateposting-agent\n/);
     assert.match(read("QUICK_START.md"), /npm install -g ihateposting-agent\n/);
     const publishing = read("PUBLISHING.md");
-    assert.match(publishing, /^# Publishing ihateposting-agent to npm$/m);
+    assert.match(publishing, /^# Publishing the iHatePosting CLI to npm$/m);
     assert.match(publishing, /^\| `name` \| What people type after `npm install` \| `ihateposting-agent` \|$/m);
     assert.match(publishing, /^\| `bin` \| What people type to run the program \| `ihateposting-agent` \(pointing at `bin\/ihateposting-agent\.mjs`\) \|$/m);
     assert.match(publishing, /npm view ihateposting-agent/);
@@ -74,8 +76,8 @@ describe("one version everywhere", () => {
   it("is the same in the package, the CHANGELOG's newest entry and every plugin manifest", () => {
     const v = pkg.version;
     assert.match(v, /^\d+\.\d+\.\d+$/);
-    assert.match(read("CHANGELOG.md"), new RegExp(`^## ${v.replaceAll(".", "\\.")}`, "m"));
-    assert.equal(json(".claude-plugin/plugin.json").version, v);
+    assert.match(read("CHANGELOG.md"), new RegExp(`^## \\[${v.replaceAll(".", "\\.")}\\]`, "m"));
+    assert.equal(json(CLAUDE_PLUGIN).version, v);
     assert.equal(json(".cursor-plugin/plugin.json").version, v);
     assert.equal(json(".grok-plugin/plugin.json").version, v);
     assert.equal(json("gemini-extension.json").version, v);
@@ -99,9 +101,13 @@ describe("the skill", () => {
     assert.ok(fs.existsSync(path.join(ROOT, "skills", name, "SKILL.md")), "the skill's folder is not named like the skill");
     assert.equal(fs.readdirSync(path.join(ROOT, "skills")).join(","), name, "the skills folder holds something else too");
     assert.match(read("skills/ihateposting/SKILL.md"), new RegExp(`^---\\nname: ${name}\\n`));
-    assert.match(read("plugins/dsh-ihateposting/skill/SKILL.md"), new RegExp(`^---\\nname: ${name}\\n`));
-    const listed = [json(".claude-plugin/plugin.json").skills, json(".claude-plugin/marketplace.json").plugins[0].skills, json(".cursor-plugin/plugin.json").skills, json(".cursor-plugin/marketplace.json").plugins[0].skills, json(".grok-plugin/plugin.json").skills];
+    const listed = [json(".cursor-plugin/plugin.json").skills, json(".cursor-plugin/marketplace.json").plugins[0].skills, json(".grok-plugin/plugin.json").skills];
     for (const skills of listed) assert.deepEqual(skills, [`./skills/${name}`]);
+    // The Claude Code plugin finds its skill by the default `skills/` folder inside its own folder: neither its manifest nor the marketplace entry lists one (a manifest and an entry that both
+    // declare components are a conflict when the entry says `strict: false`).
+    assert.equal(json(CLAUDE_PLUGIN).skills, undefined);
+    assert.equal(json(".claude-plugin/marketplace.json").plugins[0].skills, undefined);
+    assert.match(read("plugins/claude-ihateposting/skills/ihateposting/SKILL.md"), new RegExp(`^---\\nname: ${name}\\n`));
     assert.match(read("SUMMARY.md"), new RegExp(`skills/${name}/SKILL\\.md`));
     assert.doesNotMatch(read("SUMMARY.md"), /skills\/ihateposting-agent/);
     assert.match(read("README.md"), /npx skills add iHatePostingOrg\/iHatePosting-Agent\n/);
@@ -109,9 +115,10 @@ describe("the skill", () => {
     assert.match(read(".github/workflows/sync-skill.yml"), new RegExp(`cp SKILL\\.md skills/${name}/SKILL\\.md`));
   });
 
-  it("is one text in two places, with the frontmatter an installer reads", () => {
+  it("is one text in three places, with the frontmatter an installer reads", () => {
     assert.equal(read("SKILL.md"), read("skills/ihateposting/SKILL.md"));
-    assert.equal(read("SKILL.md"), read("plugins/dsh-ihateposting/skill/SKILL.md"), "the DeepSeek Harness plugin carries another copy of the skill");
+    assert.equal(read("SKILL.md"), read("plugins/claude-ihateposting/skills/ihateposting/SKILL.md"), "the Claude Code plugin carries another copy of the skill (sync-skill.yml does not write to it)");
+    assert.equal(fs.existsSync(path.join(ROOT, "plugins", "dsh-ihateposting", "skill")), false, "the DeepSeek plugin has no copy of the skill any more (it carries a short one of its own in lib/skill.js)");
     const text = read("SKILL.md");
     assert.match(text, /^---\nname: ihateposting\ndescription: .{60,}\n/);
     assert.match(text, /^---\n[\s\S]*?\n---\n/);
@@ -155,35 +162,51 @@ describe("the skill", () => {
     for (const foreign of ["whoami", "upload:url", "notifications:", "groups:list", "login <key>"]) assert.ok(!text.includes(`ihateposting-agent ${foreign}`) && !text.includes(`ihateposting ${foreign}`), `the skill names "${foreign}"`);
   });
 
-  it("ships the two release workflows, written to run only on a published release, that check the tag, and never hold a secret", () => {
-    for (const [file, mustHave] of [[".github/workflows/publish-npm.yml", ["release:", "types: [published]", "RELEASE_TAG", "secrets.NPM_TOKEN", "npm test"]], [".github/workflows/sync-skill.yml", ["release:", "skills/ihateposting/SKILL.md", "plugins/dsh-ihateposting/skill/SKILL.md", "workflow_dispatch"]]]) {
+  it("ships the two workflows, written to run only when started by hand (never on a release, a push or a pull request), that check the version asked for, and never hold a secret", () => {
+    for (const [file, mustHave] of [[".github/workflows/publish-npm.yml", ["workflow_dispatch:", "WANTED_VERSION", "secrets.NPM_TOKEN", "npm test"]], [".github/workflows/sync-skill.yml", ["workflow_dispatch:", "skills/ihateposting/SKILL.md"]]]) {
       const text = read(file);
       for (const needle of mustHave) assert.ok(text.includes(needle), `${file} lacks ${needle}`);
       assert.doesNotMatch(text, /npm_[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}/, `${file} holds a token`);
-      assert.doesNotMatch(text, /\bon:\s*\n\s*push/, `${file} runs on every push`);
+      assert.doesNotMatch(text, /^\s*(?:release|push|pull_request|pull_request_target|schedule|workflow_run):/m, `${file} starts on something other than a hand`);
+      assert.doesNotMatch(text, /github\.event\.release/, `${file} still reads a release`);
     }
-    assert.match(read(".github/workflows/publish-npm.yml"), /prerelease/);
+    assert.doesNotMatch(read(".github/workflows/sync-skill.yml"), /dsh-ihateposting/, "the sync workflow still writes the DeepSeek copy of the skill");
     // The workflow runs the repository's own test script, not a list of files that can drift from the files that exist.
     for (const named of read(".github/workflows/publish-npm.yml").matchAll(/test\/([\w.-]+\.test\.mjs)/g)) assert.ok(fs.existsSync(path.join(ROOT, "test", named[1])), `the workflow runs ${named[1]}, which is not here`);
+  });
+
+  it("says in the guides that both workflows run only by hand and that releases are published by hand, and names three copies of the skill, never the deleted one", () => {
+    const publishing = read("PUBLISHING.md");
+    assert.match(publishing, /run only when started by hand/);
+    assert.match(publishing, /^### The two workflows \(in the repository, run only by hand\)$/m);
+    assert.match(publishing, /A manual run of `publish-npm\.yml` makes no sense/);
+    assert.match(publishing, /The three copies of the skill are identical/);
+    assert.match(read("CONTRIBUTING.md"), /it runs only when started by hand/);
+    assert.match(read("CHANGELOG.md"), /The two GitHub workflows run only when started by hand/);
+    assert.match(read("SUMMARY.md"), /both run only when started by hand/);
+    assert.match(read("PROJECT_STRUCTURE.md"), /only when started by hand/);
+    // Nothing writes, checks or names the deleted copy (the changelog's older entries are history and may name its folder).
+    const files = [...fs.readdirSync(ROOT).filter((f) => f.endsWith(".md") && f !== "CHANGELOG.md"), ".github/workflows/sync-skill.yml", ".github/workflows/publish-npm.yml", "test/package.test.mjs"];
+    for (const file of files) assert.doesNotMatch(read(file), /dsh-ihateposting\/skill\//, `${file} names the deleted copy of the skill`);
   });
 });
 
 describe("the plugin folders", () => {
   it("are valid JSON, name the package, and point at files that exist", () => {
-    for (const file of [".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".cursor-plugin/mcp.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", ".grok-plugin/mcp.json", "gemini-extension.json", "mcp.json"]) assert.ok(json(file), file);
-    // The plugin is "ihateposting" everywhere it is named (kebab-case, as Claude Code's documentation asks); each marketplace is "ihateposting-agent", which is why the install is
-    // `ihateposting@ihateposting-agent`; the npm package and the command are "ihateposting-agent".
-    for (const file of [".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", ".grok-plugin/plugin.json", "gemini-extension.json"]) assert.equal(json(file).name, "ihateposting", file);
+    for (const file of [CLAUDE_PLUGIN, ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".cursor-plugin/mcp.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", ".grok-plugin/mcp.json", "gemini-extension.json", "mcp.json"]) assert.ok(json(file), file);
+    // The plugin and the Gemini extension keep the name "ihateposting" (the owner's answer of 2026-11-15, "Back to ihateposting"); the marketplaces, the npm package and the command are
+    // "ihateposting-agent", so the install is `ihateposting@ihateposting-agent`. (The skill keeps its own name, `ihateposting`, and so does its folder.)
+    for (const file of [CLAUDE_PLUGIN, ".cursor-plugin/plugin.json", ".grok-plugin/plugin.json", "gemini-extension.json"]) assert.equal(json(file).name, "ihateposting", file);
     for (const file of [".claude-plugin/marketplace.json", ".cursor-plugin/marketplace.json", ".grok-plugin/marketplace.json"]) {
       assert.equal(json(file).name, "ihateposting-agent", `${file}: the marketplace's own name`);
       assert.equal(json(file).plugins[0].name, "ihateposting", `${file}: the plugin entry's name`);
     }
     // Claude Code installs by the entry's name, so the entry and the plugin's own manifest must agree.
-    assert.equal(json(".claude-plugin/marketplace.json").plugins[0].name, json(".claude-plugin/plugin.json").name);
+    assert.equal(json(".claude-plugin/marketplace.json").plugins[0].name, json(CLAUDE_PLUGIN).name);
     assert.equal(json(".cursor-plugin/marketplace.json").plugins[0].name, json(".cursor-plugin/plugin.json").name);
     assert.match(read("README.md"), /\/plugin install ihateposting@ihateposting-agent\n/);
     assert.doesNotMatch(read("README.md"), /\/plugin install ihateposting-agent@/);
-    for (const file of [".claude-plugin/plugin.json", ".cursor-plugin/plugin.json", ".grok-plugin/plugin.json"]) for (const skill of json(file).skills) assert.ok(fs.existsSync(path.join(ROOT, skill, "SKILL.md")), `${file}: ${skill}`);
+    for (const file of [".cursor-plugin/plugin.json", ".grok-plugin/plugin.json"]) for (const skill of json(file).skills) assert.ok(fs.existsSync(path.join(ROOT, skill, "SKILL.md")), `${file}: ${skill}`);
     for (const file of [".cursor-plugin/plugin.json", ".grok-plugin/plugin.json"]) assert.ok(fs.existsSync(path.join(ROOT, json(file).logo)), `${file}: its logo`);
     // The logo is the app's current "i" mark as a real PNG (a stale heart SVG was shipped once and the owner caught it), not a text file with a picture's name.
     const logo = fs.readFileSync(path.join(ROOT, "assets", "logo.png"));
@@ -199,7 +222,7 @@ describe("the plugin folders", () => {
   });
 
   it("hold no key, token or email address of a person, except the author's one address in the places that name an author", () => {
-    for (const file of [".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", "gemini-extension.json", "package.json", "plugins/dsh-ihateposting/package.json", "mcp.json", ".cursor-plugin/mcp.json", ".grok-plugin/mcp.json"]) {
+    for (const file of [CLAUDE_PLUGIN, ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", "gemini-extension.json", "package.json", "plugins/dsh-ihateposting/package.json", "mcp.json", ".cursor-plugin/mcp.json", ".grok-plugin/mcp.json"]) {
       const text = read(file).replaceAll(AUTHOR_EMAIL, "");
       assert.ok(!/[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[a-z]{2,}/i.test(text), `${file} holds an email address that is not the author's`);
     }
@@ -228,7 +251,7 @@ describe("the repository", () => {
 
 describe("who made it, and what it covers", () => {
   it("names the author in each place that has one, in the shape of that place, with the organisation page as the link", () => {
-    assert.deepEqual(json(".claude-plugin/plugin.json").author, { name: AUTHOR_NAME, email: AUTHOR_EMAIL, url: AUTHOR_URL });
+    assert.deepEqual(json(CLAUDE_PLUGIN).author, { name: AUTHOR_NAME, email: AUTHOR_EMAIL, url: AUTHOR_URL });
     assert.deepEqual(json(".claude-plugin/marketplace.json").owner, { name: AUTHOR_NAME, email: AUTHOR_EMAIL });
     assert.deepEqual(json(".cursor-plugin/plugin.json").author, { name: AUTHOR_NAME, email: AUTHOR_EMAIL });
     assert.deepEqual(json(".cursor-plugin/marketplace.json").owner, { name: AUTHOR_NAME, email: AUTHOR_EMAIL });
@@ -259,7 +282,7 @@ describe("who made it, and what it covers", () => {
 
   it("puts the author's name and address in no document, example, script or workflow", () => {
     const walk = (dir) => fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true }).flatMap((e) => (e.name === "node_modules" || e.name === ".git" ? [] : e.isDirectory() ? walk(path.posix.join(dir, e.name)) : [path.posix.join(dir, e.name)]));
-    const manifests = new Set([".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", "package.json", "plugins/dsh-ihateposting/package.json"]);
+    const manifests = new Set([CLAUDE_PLUGIN, ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", "package.json", "plugins/dsh-ihateposting/package.json"]);
     for (const file of walk(".")) {
       if (!/\.(md|sh|json|yml|mjs|cjs)$/.test(file) || manifests.has(file) || file === "package-lock.json" || file.startsWith("test/") || file.includes("/test/")) continue;
       const text = read(file);
@@ -268,12 +291,12 @@ describe("who made it, and what it covers", () => {
   });
 
   it("lists the same fifteen platforms by name in the longest descriptions, and says fifteen wherever a manifest counts", () => {
-    for (const description of [json(".claude-plugin/plugin.json").description, json(".claude-plugin/marketplace.json").plugins[0].description, json(".cursor-plugin/plugin.json").description, json(".cursor-plugin/marketplace.json").plugins[0].description]) {
+    for (const description of [json(CLAUDE_PLUGIN).description, json(".claude-plugin/marketplace.json").plugins[0].description, json(".cursor-plugin/plugin.json").description, json(".cursor-plugin/marketplace.json").plugins[0].description]) {
       for (const name of PLATFORM_NAMES) assert.ok(description.includes(name), `a description lacks ${name}: ${description.slice(0, 80)}`);
       assert.match(description, /across 15 platforms including /);
     }
     const counted = {
-      ".claude-plugin/plugin.json": json(".claude-plugin/plugin.json").description,
+      [CLAUDE_PLUGIN]: json(CLAUDE_PLUGIN).description,
       ".claude-plugin/marketplace.json": JSON.stringify(json(".claude-plugin/marketplace.json")),
       ".cursor-plugin/plugin.json": json(".cursor-plugin/plugin.json").description,
       ".cursor-plugin/marketplace.json": JSON.stringify(json(".cursor-plugin/marketplace.json")),
@@ -297,7 +320,7 @@ describe("who made it, and what it covers", () => {
 
   it("lists every platform's name as a keyword in each manifest that has keywords, and no platform iHatePosting does not have", () => {
     const lists = {
-      ".claude-plugin/plugin.json": json(".claude-plugin/plugin.json").keywords,
+      [CLAUDE_PLUGIN]: json(CLAUDE_PLUGIN).keywords,
       ".cursor-plugin/plugin.json": json(".cursor-plugin/plugin.json").keywords,
       ".cursor-plugin/marketplace.json": json(".cursor-plugin/marketplace.json").plugins[0].keywords,
       ".grok-plugin/plugin.json": json(".grok-plugin/plugin.json").keywords,

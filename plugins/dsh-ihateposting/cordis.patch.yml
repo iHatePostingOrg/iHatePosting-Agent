@@ -1,20 +1,41 @@
 # The layer this bundle adds to a DeepSeek Harness profile: two rows.
 #
-# 1. "ihateposting" is this package's own plugin. It refuses to load when
-#    IHATEPOSTING_API_KEY is empty, and registers the iHatePosting skill.
-# 2. "ihateposting-mcp" is one MCP client for iHatePosting's hosted server. It
-#    stays switched off while the key is empty, so a request is never made
-#    without one. The key goes into the Authorization header of this row and
-#    nowhere else. Its tools show up as mcp__ihateposting__<tool>.
+#   1. "ihateposting" is this package's own plugin. It reads the key (the variable
+#      IHATEPOSTING_API_KEY unless you name another), provides the service
+#      `ihateposting` (the MCP address and the Authorization header) and registers
+#      the iHatePosting skill.
+#   2. "ihateposting-mcp" is one MCP client of DeepSeek Harness itself. It reads
+#      the address and the header from that service and connects to iHatePosting's
+#      hosted server over streamable HTTP. Its tools show up as
+#      mcp__ihateposting__<tool>.
+#
+# Settings of the first row (override it in your profile's own patch file):
+#   apiKeyEnv  the variable that holds the key (default IHATEPOSTING_API_KEY); the
+#              key is made under Settings > Agents / Dev in iHatePosting
+#   apiKey     the key itself, for an override in a patch file; prefer the variable
+#   baseUrl    the API address (default https://app.ihateposting.com/api); the MCP
+#              endpoint is this address followed by /mcp
+#   skill      register the iHatePosting skill (default true)
+#
+# With no key the first row still loads and writes one warning; the second row then
+# connects without credentials, iHatePosting refuses it, and no tools appear.
 - insert:
     - id: ihateposting
       name: dsh-ihateposting
+      config:
+        apiKeyEnv: IHATEPOSTING_API_KEY
+        baseUrl: https://app.ihateposting.com/api
     - id: ihateposting-mcp
       name: '@deepseek-ai/dsh-mcp-client'
-      disabled: !!js '(process.env.IHATEPOSTING_API_KEY ?? "").trim() === ""'
+      inject: [ihateposting]
       config:
         transport: streamable-http
         serverName: ihateposting
-        url: https://app.ihateposting.com/api/mcp
-        headers:
-          Authorization: !!js '`Bearer ${(process.env.IHATEPOSTING_API_KEY ?? "").trim()}`'
+        url: !!js ctx.ihateposting.url
+        headers: !!js ctx.ihateposting.headers
+        failOnStartupError: false
+        reconnect:
+          enabled: true
+          initialDelayMs: 2000
+          maxDelayMs: 30000
+          maxAttempts: 10

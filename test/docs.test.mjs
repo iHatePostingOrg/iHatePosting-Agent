@@ -83,6 +83,11 @@ describe("the Markdown documents", () => {
     assert.match(readme, /Skip the header line with `tail -n \+2`/);
   });
 
+  it("never shows auth:login with options it does not have: the missing-sign-in message says plain auth:login and no document names a client id or a client secret (the CHANGELOG, which records the change, excepted)", () => {
+    assert.deepEqual(markdown.filter((f) => f !== "CHANGELOG.md" && /--client-(?:id|secret)/.test(read(f))), []);
+    assert.match(read("CHANGELOG.md"), /OAuth2: ihateposting-agent auth:login`.*instead of `auth:login --client-id <id> --client-secret <secret>`/);
+  });
+
   it("lists the documents in the README's documentation section, as the reference page does, and every one is there", () => {
     const readme = read("README.md");
     for (const name of ["SKILL.md", "HOW_TO_RUN.md", "examples/COMMAND_LINE_GUIDE.md", "PROVIDER_SETTINGS.md", "INTEGRATION_TOOLS_WORKFLOW.md", "INTEGRATION_SETTINGS_DISCOVERY.md", "SUPPORTED_FILE_TYPES.md", "PROJECT_STRUCTURE.md", "PUBLISHING.md", "examples/EXAMPLES.md"]) {

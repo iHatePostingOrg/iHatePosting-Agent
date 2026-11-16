@@ -56,7 +56,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test --test-concurrency=1 \"test/*.test.mjs\" \"plugins/dsh-ihateposting/test/*.test.mjs\""
+    "test": "node --test --test-concurrency=1 \"test/*.test.mjs\" \"plugins/dsh-ihateposting/test/*.test.mjs\"",
+    "chatgpt-plugin:zip": "node scripts/chatgpt-plugin-zip.mjs"
   },
   "dependencies": {
     "node-fetch": "^3.3.2",

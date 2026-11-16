@@ -1,20 +1,315 @@
-# Command line syntax and moving scripts
+# iHatePosting CLI - Improved Syntax! 🎉
 
-How a post is written on the command line, how options are spelled, what the program prints, and what to change when you move an existing script to `ihateposting-agent`. Every point is something the program does today; where a result depends on the server, the page says so.
+## What Changed
 
-## The core idea: one `-c` for each part, one `-m` for its media
+The CLI supports a **much better** command-line syntax for creating posts with comments that have their own media.
 
-A post is a list of **parts**. The first part is the post itself; the parts after it are comments (the rest of a thread). Instead of packing everything into one string, give one `-c` per part and, if the part has pictures or a video, a `-m` right after it:
+## New Syntax: Multiple `-c` and `-m` Flags
+
+Instead of using semicolon-separated strings (which break when you need semicolons in your content), you can use multiple `-c` and `-m` flags:
 
 ```bash
 ihateposting-agent posts:create \
-  -i x-123 -s 2026-12-15T10:00:00Z -t draft \
-  -c "Main post" -m "<path1>,<path2>" \
-  -c "First comment" -m "<path3>" \
-  -c "Second comment; with a semicolon, and a comma"
+  -c "main post content" -m "media1.png,media2.png" \
+  -c "first comment" -m "media3.png" \
+  -c "second comment; with semicolon!" -m "media4.png,media5.png" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
 ```
 
-The program has no special characters of its own to escape: a semicolon, a comma or a line break in a `-c` is just text.
+In the examples down to the Summary, a media name such as `media1.png` stands for the address (`path`) that `ihateposting-agent upload` printed: `-m` never uploads a file (see "Pictures and videos are addresses, never local files" at the end of this page). Each of those examples is a draft (`-t draft`) with a date (`-s`), because `posts:create` needs a date.
+
+## The Problem We Solved
+
+### ❌ Old Approach (Problematic)
+
+```bash
+ihateposting-agent posts:create \
+  -c "Main post" \
+  --comments "Comment 1;Comment 2;Comment 3" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+This program has no `--comments` option. It ignores an option it does not know, so a script written this way runs and posts only the main text.
+
+**Issues:**
+1. ❌ Can't use semicolons in comment text
+2. ❌ Comments can't have their own media
+3. ❌ Less intuitive syntax
+4. ❌ Limited flexibility
+
+### ✅ New Approach (Better!)
+
+```bash
+ihateposting-agent posts:create \
+  -c "Main post" -m "main.jpg" \
+  -c "Comment 1; with semicolon!" -m "comment1.jpg" \
+  -c "Comment 2" -m "comment2.jpg" \
+  -c "Comment 3" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+**Benefits:**
+1. ✅ Semicolons work fine in content
+2. ✅ Each comment can have different media
+3. ✅ More readable and intuitive
+4. ✅ Fully flexible
+
+## How It Works
+
+### Pairing Logic
+
+The CLI pairs `-c` and `-m` flags in order:
+
+```bash
+ihateposting-agent posts:create \
+  -c "Content 1" -m "media-for-content-1.jpg" \
+  -c "Content 2" -m "media-for-content-2.jpg" \
+  -c "Content 3" -m "media-for-content-3.jpg" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+Each of the three lines is one pair: Pair 1, Pair 2 and Pair 3.
+
+- **1st `-c`** = Main post
+- **2nd `-c`** = First comment (posted after delay)
+- **3rd `-c`** = Second comment (posted after delay)
+- Each `-m` is paired with the corresponding `-c` (in order)
+
+### Media is Optional
+
+```bash
+ihateposting-agent posts:create \
+  -c "Post with media" -m "image.jpg" \
+  -c "Comment without media" \
+  -c "Another comment" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+Result:
+- Post with image
+- Text-only comment
+- Another text-only comment
+
+### Multiple Media per Post/Comment
+
+```bash
+ihateposting-agent posts:create \
+  -c "Main post" -m "img1.jpg,img2.jpg,img3.jpg" \
+  -c "Comment" -m "img4.jpg,img5.jpg" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+Result:
+- Main post with 3 images
+- Comment with 2 images
+
+## Real Examples
+
+### Example 1: Product Launch
+
+```bash
+ihateposting-agent posts:create \
+  -c "🚀 Launching ProductX today!" \
+  -m "hero.jpg,features.jpg" \
+  -c "⭐ Key features you'll love..." \
+  -m "features-detail.jpg" \
+  -c "💰 Special offer: 50% off!" \
+  -m "discount.jpg" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123,linkedin-456"
+```
+
+### Example 2: Twitter Thread
+
+```bash
+ihateposting-agent posts:create \
+  -c "🧵 Thread: How to X (1/5)" -m "intro.jpg" \
+  -c "Step 1: ... (2/5)" -m "step1.jpg" \
+  -c "Step 2: ... (3/5)" -m "step2.jpg" \
+  -c "Step 3: ... (4/5)" -m "step3.jpg" \
+  -c "Conclusion (5/5)" -m "done.jpg" \
+  -d 2000 \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+### Example 3: Tutorial with Screenshots
+
+```bash
+ihateposting-agent posts:create \
+  -c "Tutorial: Feature X 📖" \
+  -m "tutorial-cover.jpg" \
+  -c "1. Open settings" \
+  -m "settings-screenshot.jpg" \
+  -c "2. Enable feature X" \
+  -m "enable-screenshot.jpg" \
+  -c "3. You're done! 🎉" \
+  -m "success-screenshot.jpg" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+### Example 4: Content with Special Characters
+
+```bash
+ihateposting-agent posts:create \
+  -c "Main post about programming" \
+  -c "First tip: Use const; avoid var" \
+  -c "Second tip: Functions should do one thing; keep it simple" \
+  -c "Third tip: Comments should explain 'why'; not 'what'" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+**No escaping needed!** Semicolons work perfectly.
+
+## Options Reference
+
+| Option | Alias | Multiple? | Description |
+|--------|-------|-----------|-------------|
+| `--content` | `-c` | ✅ Yes | Post/comment content |
+| `--media` | `-m` | ✅ Yes | Comma-separated media URLs |
+| `--alt` | - | ✅ Yes | Comma-separated alt texts for the media of the corresponding `-m`, same order |
+| `--integrations` | `-i` | ❌ No | Integration IDs |
+| `--date` | `-s` | ❌ No | ISO 8601 date (required unless `--json` is used) |
+| `--type` | `-t` | ❌ No | `schedule` (default) or `draft` |
+| `--delay` | `-d` | ❌ No | Delay between comments (minutes, default: 0) |
+| `--shortLink` | - | ❌ No | Use short links (default: true) |
+| `--settings` | - | ❌ No | Platform-specific settings as a JSON string |
+| `--json` | `-j` | ❌ No | Load from JSON file |
+
+`posts:create --help` prints the same list with the program's own examples.
+
+## Delay Between Comments
+
+Use `-d` to control the delay between comments:
+
+```bash
+# 10 minutes between each
+ihateposting-agent posts:create \
+  -c "Main" \
+  -c "Comment 1" \
+  -c "Comment 2" \
+  -d 10 \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+**Default:** 0 (no delay)
+
+## Command Line vs JSON
+
+### Use Command Line When:
+- ✅ Quick posts
+- ✅ Same content for all platforms
+- ✅ Simple structure
+- ✅ Dynamic/scripted content
+
+### Use JSON When:
+- ✅ Different content per platform
+- ✅ Very complex structures
+- ✅ Reusable templates
+- ✅ Integration with other tools
+
+## For AI Agents
+
+### Generating Commands
+
+```bash
+# Build a multi-post command with media
+ihateposting-agent posts:create \
+  -c "Main post" \
+  -m "img1.jpg,img2.jpg" \
+  -c "Comment; with semicolon!" \
+  -m "img3.jpg" \
+  -c "Another comment" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+## Migration Guide
+
+If you have existing scripts using the old syntax (a `--comments` option and an `--image` option, which this program does not have; it ignores an option it does not know, so such a script runs but posts only its main text and no picture):
+
+### Before:
+```bash
+ihateposting-agent posts:create \
+  -c "Main post" \
+  --comments "Comment 1;Comment 2" \
+  --image "main-image.jpg" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+### After:
+```bash
+ihateposting-agent posts:create \
+  -c "Main post" -m "main-image.jpg" \
+  -c "Comment 1" \
+  -c "Comment 2" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  -i "x-123"
+```
+
+## Documentation
+
+See these files for more details:
+
+- **[COMMAND_LINE_GUIDE.md](./examples/COMMAND_LINE_GUIDE.md)** - Comprehensive command-line guide
+- **[draft-from-flags.sh](./examples/draft-from-flags.sh)** - Executable examples
+- **[EXAMPLES.md](./examples/EXAMPLES.md)** - Full usage patterns
+- **[SKILL.md](./SKILL.md)** - AI agent integration
+- **[README.md](./README.md)** - General documentation
+
+## Summary
+
+### ✅ You Can Now:
+
+1. **Use multiple `-c` flags** for main post + comments
+2. **Use multiple `-m` flags** to pair media with each `-c`
+3. **Use semicolons freely** in your content
+4. **Create complex threads** easily from command line
+5. **Each comment has its own media** array
+6. **More intuitive syntax** overall
+
+### 🎯 Perfect For:
+
+- Twitter threads
+- Product launches with follow-ups
+- Tutorials with screenshots
+- Event coverage
+- Multi-step announcements
+- Any post with comments that need their own media!
+
+**The CLI is powerful and user-friendly!** 🚀
+
+## Sections that were in this file before it followed the reference
+
+These sections come unchanged from this file as it was before it followed the reference. They are kept because they hold points the reference's text does not.
+
+### Command line syntax and moving scripts
+
+How a post is written on the command line, how options are spelled, what the program prints, and what to change when you move an existing script to `ihateposting-agent`. Every point is something the program does today; where a result depends on the server, the page says so.
 
 ### How the pairing works
 
@@ -43,52 +338,7 @@ ihateposting-agent posts:create -i instagram-123 -s 2026-12-15T10:00:00Z -t draf
 
 The texts are split at commas, so an alt text that itself contains a comma cannot be given this way. Use a body file for those (see below). If there are fewer alt texts than pictures, the pictures after the last text have none.
 
-### Why one flag per part
-
-Joining parts into one string with a separator breaks as soon as the separator appears in the text, and it leaves no room for media per part. With one flag per part, any character is allowed (including `;`), every part can have its own pictures, and a script can build the command from a list of strings.
-
-## Real examples
-
-A launch post with follow-ups and their pictures:
-
-```bash
-ihateposting-agent posts:create -i x-123,linkedin-456 -s 2026-12-15T10:00:00Z -t draft \
-  -c "ProductX is out today" -m "<hero>,<features>" \
-  -c "What it does, in three lines" -m "<details>" \
-  -c "Launch offer: half price this week" -m "<offer>"
-```
-
-A thread on X, with a pause between the parts:
-
-```bash
-ihateposting-agent posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft -d 5 \
-  -c "Thread: how we test a release (1/4)" \
-  -c "1. A branch runs the checks on every change (2/4)" \
-  -c "2. A staging copy gets the release first (3/4)" \
-  -c "3. Then we ship, and we watch the graphs (4/4)"
-```
-
-Text with punctuation that would otherwise need escaping:
-
-```bash
-ihateposting-agent posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft \
-  -c "Three tips for scripts" \
-  -c "Tip one: use const; avoid var" \
-  -c "Tip two: keep functions small; name them well, always"
-```
-
-Build the command from a list, one `-c` for each item:
-
-```bash
-parts=("Main post" "Second, with a comma" "Third; with a semicolon")
-args=()
-for part in "${parts[@]}"; do
-  args+=(-c "$part")
-done
-ihateposting-agent posts:create -i "$CHANNEL_ID" "${args[@]}" -s 2026-12-15T10:00:00Z -t draft
-```
-
-## Delay between parts
+### Delay between parts
 
 `-d <minutes>` (long form `--delay`) sets the delay between a post and its comments. It is written into every part, and the default is `0`:
 
@@ -99,24 +349,7 @@ ihateposting-agent posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft -d 10 
 
 One delay applies to all parts. To give each part its own delay, use a body file, where each part has its own `delay`.
 
-## All options of `posts:create`
-
-| Option | Short | More than once? | What it takes |
-| --- | --- | --- | --- |
-| `--content` | `-c` | yes | The text of one part |
-| `--media` | `-m` | yes | Comma-separated addresses of already uploaded files, for the `-c` in the same position |
-| `--alt` | | yes | Comma-separated alt texts, same order as `-m` |
-| `--integrations` | `-i` | no | Comma-separated channel ids |
-| `--date` | `-s` | no | When the post is due, ISO 8601. Required unless `--json` is used |
-| `--type` | `-t` | no | `schedule` (default) or `draft` |
-| `--delay` | `-d` | no | Minutes between the parts. Default `0` |
-| `--json` | `-j` | no | Path of a body file |
-| `--shortLink` | | no | Shorten links in the text. Default on; `--no-shortLink` turns it off |
-| `--settings` | | no | The platform settings as a JSON string |
-
-`posts:create --help` prints the same list with the program's own examples.
-
-## Command line or body file
+### Command line or body file
 
 Use flags for quick posts, for the same text on several channels, and for commands a script builds. Use a body file (`--json <file>`) for different content per channel, for alt texts with commas, for addresses that contain commas, for a different delay per part, and for anything you want to keep and review.
 
@@ -140,7 +373,7 @@ With `--json`, the file is sent exactly as it is and every other post option is 
 
 Examples for each platform are in [examples/](examples/README.md). When the program builds the body from flags it also adds `"creationMethod": "CLI"`; a body file does not get that.
 
-## Pictures and videos are addresses, never local files
+### Pictures and videos are addresses, never local files
 
 `-m` takes the addresses of files that are already in your media library. Upload first, then use the `path` the upload printed:
 
@@ -151,14 +384,14 @@ ihateposting-agent posts:create -i x-123 -c "Look" -m "<path from the upload>" -
 
 `posts:create` never uploads anything. If you write `-m ./photo.png`, the text `./photo.png` is sent as the address, and the server will most likely refuse or ignore it. See [SUPPORTED_FILE_TYPES.md](SUPPORTED_FILE_TYPES.md).
 
-## The date, the type and the links
+### The date, the type and the links
 
 - **The date is always required.** `--date` (short `-s`) must be given unless the whole body comes from `--json`. There is no default and no "now". The program sends your text as typed; the server judges it.
 - **Only two types.** `-t schedule` (the default) and `-t draft`. Anything else is refused by the program, with the usage text, before it asks the server. `posts:status <id> --status draft|schedule` moves an existing post between the two.
 - **Short links are on.** `--shortLink` defaults to `true`; turn it off with `--no-shortLink`.
 - **Settings are a JSON string**, the same for every channel in `-i`. See [PROVIDER_SETTINGS.md](PROVIDER_SETTINGS.md).
 
-## Option spellings
+### Option spellings
 
 Options are handled by yargs, so a multi-word option can be written in camelCase or with dashes: `--startDate` or `--start-date`, `--release-id` or `--releaseId`, `--auth-server` or `--authServer`, `--no-shortLink` or `--no-short-link`.
 
@@ -171,7 +404,7 @@ Watch the short names, they are not the same everywhere:
 | `-t` | `--type` | | | | |
 | `-p` | | | | | `--page` |
 
-## What the program prints
+### What the program prints
 
 Most commands print one **header line**, then the answer as indented JSON on standard output. The header of each command:
 
@@ -200,13 +433,13 @@ There is **one failure code**: every failure ends with exit code `1`. There are 
 
 Mistakes in the command line itself (a missing required option, a value that is not one of the choices) print the command's usage and the reason on standard error and end with `1`, without contacting the server.
 
-## Things that are quiet, and things that wait
+### Things that are quiet, and things that wait
 
 - A **command name the program does not know does nothing and exits `0`**, and an **option it does not know is ignored**. A typo such as `--setting` (instead of `--settings`) or `post:create` does not warn you. Check `--help` when a command seems to have no effect.
 - Nothing is retried and nothing is waited out: a rate limit or a server error is shown once and the command ends.
 - There is no time limit. A server that never answers is waited for; use your shell's `timeout` when a script must not hang.
 
-## For AI agents: writing commands
+### For AI agents: writing commands
 
 1. One `-c` for each part. Never join parts into a single string.
 2. A `-m` for each part that has media, in the same order. Use `-m ""` to skip a part.
@@ -216,7 +449,7 @@ Mistakes in the command line itself (a missing required option, a value that is 
 6. After the call, read the JSON, not just the exit code: `0` means the server accepted the request.
 7. Never print or log the key. If a command fails, show the program's own message; the program does not put the key in its messages.
 
-## Moving an existing script
+### Moving an existing script
 
 Scripts written with other flag names will not do what they say. Because the program ignores an option it does not know, they can still run, and "run" is not the same as "work". These are the changes that matter most:
 
@@ -247,7 +480,7 @@ ihateposting-agent posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft \
   -c "Details below"
 ```
 
-## Quick translation
+### Quick translation
 
 | You want to | Do this |
 | --- | --- |
@@ -260,7 +493,7 @@ ihateposting-agent posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft \
 | Find an id for a setting | `integrations:trigger <id> <method>` |
 | See what is scheduled | `posts:list` |
 
-## See also
+### See also
 
 - [examples/COMMAND_LINE_GUIDE.md](examples/COMMAND_LINE_GUIDE.md): the command line option by option.
 - [examples/EXAMPLES.md](examples/EXAMPLES.md): longer examples.

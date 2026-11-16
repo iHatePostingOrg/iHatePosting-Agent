@@ -84,7 +84,7 @@ export IHATEPOSTING_API_KEY=your-api-key   # iHatePosting → Settings → Agent
 dsh web
 ```
 
-The iHatePosting tools then appear as `mcp__ihateposting__*` (`integrationList`, `integrationSchema`, `integrationSchedulePostTool`, ...). See the [plugin README](plugins/dsh-ihateposting/README.md) for configuration.
+The iHatePosting tools then appear as `mcp__ihateposting__*` (`integrationList`, `integrationSchema`, `integrationSchedulePostTool`, ...). Without a key the plugin loads, warns once and no tools appear. See the [plugin README](plugins/dsh-ihateposting/README.md) for its four settings.
 
 # iHatePosting CLI
 

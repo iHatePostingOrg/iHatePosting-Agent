@@ -1,0 +1,102 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ihateposting",
+  "version": "1.0.0",
+  "description": "Draft, schedule and publish social media posts, upload pictures and videos to a media library and review upcoming posts across 15 platforms including X, LinkedIn (profiles and pages), Instagram, Facebook, Threads, YouTube, TikTok, Pinterest, Bluesky, Mastodon, Google Business, Discord, Slack, Telegram and Tumblr, from ChatGPT or Codex.",
+  "author": {
+    "name": "iHatePosting",
+    "url": "https://ihateposting.com"
+  },
+  "homepage": "https://ihateposting.com",
+  "repository": "https://github.com/iHatePostingOrg/iHatePosting-Agent",
+  "license": "MIT",
+  "keywords": ["ihateposting", "social-media", "scheduling", "posting", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "iHatePosting",
+        "shortDescription": "Schedule Social Media Posts",
+        "longDescription": "iHatePosting helps users manage social media publishing from ChatGPT. Users can:\n- Schedule social media posts to 15 platforms including X, LinkedIn (profiles and pages), Instagram, Facebook, Threads, YouTube, TikTok, Pinterest, Bluesky, Mastodon, Google Business, Discord, Slack, Telegram and Tumblr\n- List connected channels and groups\n- Inspect platform requirements\n- Upload media from a public web address, or from their own computer where the client shows an upload panel\n- Create drafts or scheduled posts\n- Update provider settings\n- Review upcoming posts\n- Delete posts.\n\nWhat to know: it needs an iHatePosting account, and it works only with channels you have already connected in iHatePosting; it cannot connect a new channel. It does not write images or videos with AI. A post published now goes out to the real platform and cannot be recalled from here; deleting a post removes it from iHatePosting and cannot be undone, and a post that is already live stays live on the platform. Which options a post accepts depends on the platform, and the plugin reads them from iHatePosting before it posts.",
+        "developerName": "iHatePosting",
+        "category": "Communication",
+        "capabilities": [
+          "Draft social media posts",
+          "Schedule posts for a later time",
+          "Publish posts now",
+          "Read each platform's rules and settings",
+          "Upload pictures and videos to a media library",
+          "List posts and their state",
+          "Change the platform settings of an unpublished post",
+          "Delete posts"
+        ],
+        "websiteURL": "https://ihateposting.com",
+        "supportURL": "https://ihateposting.com/contact",
+        "privacyPolicyURL": "https://ihateposting.com/privacy",
+        "termsOfServiceURL": "https://ihateposting.com/terms",
+        "defaultPrompt": [
+          "Which social channels do I have connected?",
+          "Draft a LinkedIn post about our new feature.",
+          "Show me my scheduled posts for next week."
+        ],
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "onboardingSkill": "./skills/get-started/SKILL.md",
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "List the connected channels",
+              "prompt": "Which social channels do I have connected? Show the platform and the name of each one.",
+              "tools_triggered": "integrationList",
+              "expected_behavior": "Calls integrationList and lists every channel with its platform and name, so the person can pick where to post. No post is created."
+            },
+            {
+              "description": "Read a platform's rules and settings",
+              "prompt": "What are the posting rules and the available settings for my LinkedIn channel?",
+              "tools_triggered": "integrationList, integrationSchema",
+              "expected_behavior": "Finds the LinkedIn channel's id, calls integrationSchema and summarises the platform's rules (the longest post, what attachments it may carry) and the settings it accepts. Read-only: no post is created or changed."
+            },
+            {
+              "description": "Save a text draft without publishing it",
+              "prompt": "Create a draft for my X channel for next Monday at 10:00 UTC that says \"Hello from the iHatePosting review account\". Keep it a draft: do not schedule or publish it.",
+              "tools_triggered": "integrationList, integrationSchema, integrationSchedulePostTool",
+              "expected_behavior": "Finds the X channel, reads its rules, then calls integrationSchedulePostTool once with type \"draft\". Answers the new post's id and a preview link and says it was saved as a draft. Nothing is published to X."
+            },
+            {
+              "description": "Find the posts that are coming up",
+              "prompt": "Show me my drafts and scheduled posts for the next 30 days.",
+              "tools_triggered": "postsListTool",
+              "expected_behavior": "Calls postsListTool with a window from now to 30 days ahead and lists each post's time, state, channel and text, including the draft made by the previous case. Read-only."
+            },
+            {
+              "description": "Put a picture from a web address into the media library",
+              "prompt": "Add this picture to my media library and tell me when it is ready: https://raw.githubusercontent.com/iHatePostingOrg/iHatePosting-Agent/main/assets/logo.png . Do not create a post.",
+              "tools_triggered": "uploadFromUrlTool, mediaStatusTool",
+              "expected_behavior": "Calls uploadFromUrlTool with the address, answers the file's id and path, and checks mediaStatusTool until the file is ready if it is still being prepared. No post is created."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Not a social post: a calendar change",
+              "prompt": "Move my team meeting from tomorrow to Friday afternoon."
+            },
+            {
+              "description": "Only wording was asked for, nothing to post",
+              "prompt": "Write me three short post ideas about productivity. Just write them here, do not post or schedule anything."
+            },
+            {
+              "description": "Unsupported request: AI-made media",
+              "prompt": "Generate a video with AI for my launch post and publish it to TikTok."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "This plugin does not sell anything and takes no payments."
+      },
+      "publication": {
+        "release_notes": "First release for the new hosted iHatePosting server: channels, platform rules, drafts, scheduled and immediate posts, media from a public address or an upload panel, post list, settings changes and deletion."
+      }
+    }
+  }
+}

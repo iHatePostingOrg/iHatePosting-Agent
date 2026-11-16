@@ -256,7 +256,7 @@ yargs(hideBin(process.argv))
         })
         .example("$0 integrations:trigger pinterest-123 boards", "Get list of boards")
         .example("$0 integrations:trigger slack-123 channels", "Get list of channels")
-        .example("$0 integrations:trigger youtube-123 getPlaylists", "Get YouTube playlists");
+        .example("$0 integrations:trigger linkedin-123 mention -d '{\"query\":\"acme\"}'", "Find a LinkedIn company page to tag");
     },
     triggerIntegrationTool,
   )
@@ -313,16 +313,16 @@ yargs(hideBin(process.argv))
           type: "boolean",
           default: false,
           describe:
-            "Adjust the file to the platforms' limits after the upload: videos are scaled to 1080p and re-encoded to MP4, oversized images are scaled down. Wait until media:status returns ready before publishing a post with the returned path, or the post uses the original file",
+            "Accepted for compatibility: iHatePosting does not adjust files, so the file is used as uploaded and media:status returns ready at once",
         })
         .example("$0 upload ./image.png", "Upload an image")
-        .example("$0 upload ./video.mp4 --adjust", "Upload a video and adjust it to the platforms' limits");
+        .example("$0 upload ./video.mp4 --adjust", "Upload a video (--adjust is accepted and changes nothing)");
     },
     uploadFile,
   )
   .command(
     "media:status <id>",
-    "Check whether a file uploaded with --adjust finished adjusting",
+    "Check whether an uploaded file is ready (iHatePosting does not adjust files, so it is ready at once)",
     (yargs) => {
       return yargs
         .positional("id", {

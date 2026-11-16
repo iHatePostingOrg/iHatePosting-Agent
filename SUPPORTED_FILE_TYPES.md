@@ -1,17 +1,337 @@
-# Files you can upload
+# Supported File Types for Upload
 
-`ihateposting-agent upload <file>` sends a file to your workspace's media library, and the answer gives you the address (`path`) to use in posts. This page explains what the program does with a file, which file types it recognises, and what it leaves to the server.
+The iHatePosting CLI correctly detects and uploads various media types.
+
+## How It Works
+
+The CLI automatically detects the MIME type based on the file extension:
+
+```bash
+ihateposting-agent upload video.mp4
+# ✅ Detected as: video/mp4
+
+ihateposting-agent upload image.png
+# ✅ Detected as: image/png
+
+ihateposting-agent upload audio.mp3
+# ✅ Detected as: audio/mpeg
+```
+
+The program does not print the type it chose: it sends the type to the server together with the file, and the comments above say what is sent. It looks at the name of the file only, never at what is inside.
+
+## Supported File Types
+
+The CLI recognises every extension in the tables below: it sends the MIME type shown, whatever the server then does with the file. **Supported** says whether the app's media library takes the type. That is how the app was last read, and it is unverified from this repository: a refused upload shows the server's own reason (see Troubleshooting). A type the app takes may still be refused by the platform you post to.
+
+### Images
+
+| Extension | MIME Type | Supported |
+|-----------|-----------|-----------|
+| `.png` | `image/png` | ✅ Yes |
+| `.jpg`, `.jpeg` | `image/jpeg` | ✅ Yes |
+| `.gif` | `image/gif` | ✅ Yes |
+| `.webp` | `image/webp` | ✅ Yes |
+| `.bmp` | `image/bmp` | ✅ Yes |
+| `.svg` | `image/svg+xml` | ❌ No |
+| `.ico` | `image/x-icon` | ❌ No |
+
+**Examples:**
+```bash
+ihateposting-agent upload photo.jpg
+ihateposting-agent upload logo.png
+ihateposting-agent upload animation.gif
+```
+
+### Videos
+
+| Extension | MIME Type | Supported |
+|-----------|-----------|-----------|
+| `.mp4` | `video/mp4` | ✅ Yes |
+| `.mov` | `video/quicktime` | ❌ No |
+| `.avi` | `video/x-msvideo` | ❌ No |
+| `.mkv` | `video/x-matroska` | ❌ No |
+| `.webm` | `video/webm` | ❌ No |
+| `.flv` | `video/x-flv` | ❌ No |
+| `.wmv` | `video/x-ms-wmv` | ❌ No |
+| `.m4v` | `video/x-m4v` | ❌ No |
+| `.mpeg`, `.mpg` | `video/mpeg` | ❌ No |
+| `.3gp` | `video/3gpp` | ❌ No |
+
+**Examples:**
+```bash
+ihateposting-agent upload video.mp4
+```
+
+### Audio
+
+| Extension | MIME Type | Supported |
+|-----------|-----------|-----------|
+| `.mp3` | `audio/mpeg` | ❌ No |
+| `.wav` | `audio/wav` | ❌ No |
+| `.ogg` | `audio/ogg` | ❌ No |
+| `.aac` | `audio/aac` | ❌ No |
+| `.flac` | `audio/flac` | ❌ No |
+| `.m4a` | `audio/mp4` | ❌ No |
+
+The CLI labels these files, but the app's media library takes only pictures and MP4 videos, so, as last read, the server refuses an upload of one.
+
+### Documents
+
+| Extension | MIME Type | Supported |
+|-----------|-----------|-----------|
+| `.pdf` | `application/pdf` | ❌ No |
+| `.doc` | `application/msword` | ❌ No |
+| `.docx` | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | ❌ No |
+
+The CLI labels these files, but the app's media library takes only pictures and MP4 videos, so, as last read, the server refuses an upload of one.
+
+### Other Files
+
+For file types not listed above, the CLI uses:
+- MIME type: `application/octet-stream`
+- This is a generic binary file type
+
+The program still uploads the file; the server decides. The app, as last read, also takes AVIF and TIFF pictures, which are not listed above: the CLI sends them as `application/octet-stream`, and the app judges a file by what is inside it (unverified).
+
+## Usage Examples
+
+### Upload an Image
+
+```bash
+ihateposting-agent upload ./images/photo.jpg
+```
+
+Response (after the header line `✅ File uploaded successfully!`):
+```json
+{
+  "id": "media-123",
+  "name": "photo.jpg",
+  "originalName": "photo.jpg",
+  "path": "https://media.example/uploads/photo.jpg",
+  "thumbnail": null,
+  "alt": null,
+  "status": "ready"
+}
+```
+
+These are placeholder values, as the app describes the answer; the exact fields are the server's.
+
+### Upload a Video (MP4)
+
+```bash
+ihateposting-agent upload ./videos/promo.mp4
+```
+
+Response (abridged):
+```json
+{
+  "id": "media-456",
+  "name": "promo.mp4",
+  "originalName": "promo.mp4",
+  "path": "https://media.example/uploads/promo.mp4",
+  "status": "ready"
+}
+```
+
+### Upload and Use in Post
+
+```bash
+# 1. Upload the file (tail skips the header line)
+RESULT=$(ihateposting-agent upload video.mp4 | tail -n +2)
+echo "$RESULT"
+
+# 2. Extract the path (you'll need jq or similar)
+MEDIA_PATH=$(echo "$RESULT" | jq -r '.path')
+
+# 3. Use in a post
+ihateposting-agent posts:create \
+  -c "Check out my video!" \
+  -m "$MEDIA_PATH" \
+  -s "2024-12-31T12:00:00Z" \
+  -t draft \
+  --settings '{"content_posting_method":"DIRECT_POST","privacy_level":"SELF_ONLY","duet":false,"stitch":false,"comment":false,"autoAddMusic":"no","brand_content_toggle":false,"brand_organic_toggle":false}' \
+  -i "tiktok-123"
+```
+
+TikTok needs its eight required settings even for a quick post (see [PROVIDER_SETTINGS.md](PROVIDER_SETTINGS.md)). The variable is called `MEDIA_PATH` and not `PATH`: assigning `PATH` would break the shell, which uses it to find commands.
+
+### Upload Multiple Files
+
+The command takes one file per run, so run it once for each file:
+
+```bash
+# Upload images
+ihateposting-agent upload image1.jpg
+ihateposting-agent upload image2.png
+ihateposting-agent upload image3.gif
+
+# Upload videos
+ihateposting-agent upload video1.mp4
+ihateposting-agent upload video2.mp4
+```
+
+## What Changed (Fix)
+
+Nothing had to be fixed in this program: this is how it labels a file.
+
+### Before (❌ Bug)
+
+There is no such bug here, so there is no "before" to show: the program does not default to `image/jpeg` for a file it does not know.
+
+### After (✅ Fixed)
+
+```bash
+ihateposting-agent upload video.mp4
+# ✅ Correctly detected as: video/mp4
+
+ihateposting-agent upload audio.mp3
+# ✅ Correctly detected as: audio/mpeg
+
+ihateposting-agent upload document.pdf
+# ✅ Correctly detected as: application/pdf
+
+ihateposting-agent upload notes.xyz
+# ✅ An unknown extension is sent as: application/octet-stream
+```
+
+## Platform-Specific Notes
+
+These are the gist of each platform's rules text (`output.rules` of `integrations:settings`); read that text for the exact version. The program does not know these rules: they are here so you can decide what to upload. Whatever a platform allows, the app's media library takes only the pictures and the MP4 videos named above.
+
+### TikTok
+- Supports: one video, or one or more pictures; never none
+- Video type: MP4 (the only video type the app takes)
+- Recommended: MP4
+
+### YouTube
+- Supports: one video; never empty
+- Video type: MP4 (the only video type the app takes)
+- Recommended: MP4
+
+### Instagram
+- Supports: at least one attachment; a story only one picture
+- Video type: MP4 (the only video type the app takes)
+- Recommended: MP4 for videos
+
+### Twitter/X
+- Supports: up to four pictures, or one video, or none
+- Video type: MP4 (the only video type the app takes)
+
+### LinkedIn
+- Supports (LinkedIn and LinkedIn Page): one attachment when it is a video; a carousel needs at least two pictures and nothing else
+- Video type: MP4 (the only video type the app takes)
+- Documents (PDF, DOC, DOCX): not accepted by the app's media library
+
+## Troubleshooting
+
+### "Upload failed: Unsupported file type"
+
+The app's media library takes only a short list of types (see the tables above), and a platform may accept fewer. A refused upload prints `❌ Failed to upload file: Upload failed (<status>): <the server's words>`. The words after the status are the server's, so how a refusal for the type is worded is the server's too.
+
+**Solution:** Convert the file to a supported format:
+
+```bash
+# Convert video to MP4
+ffmpeg -i video.avi video.mp4
+
+# Then upload
+ihateposting-agent upload video.mp4
+```
+
+### File Size Limits
+
+The program sets no limit of its own: it reads the whole file into memory and sends it (its tests upload a 50 MB file to a stand-in server without trouble). The limits that count are the app's and the platforms':
+
+- **The app's media library**: pictures up to about 10 MB, videos up to about 1 GB (as last read; unverified from this repository)
+- **Each platform** has limits of its own, which are not checked here (unverified)
+
+### "MIME type mismatch"
+
+If you renamed a file with the wrong extension:
+
+```bash
+# ❌ Wrong: PNG file renamed to .jpg
+mv image.png image.jpg
+ihateposting-agent upload image.jpg  # Might fail
+
+# ✅ Correct: Keep original extension
+ihateposting-agent upload image.png
+```
+
+The program prints no message of that name: it labels the file by its extension (here `image/jpeg`) and never looks inside it. The app, as last read, judges a file by what is inside, so a mismatch can only show up as a refusal from the server (unverified).
+
+## Testing File Upload
+
+```bash
+# Set API key
+export IHATEPOSTING_API_KEY=your_key
+
+# Test image upload
+ihateposting-agent upload test-image.jpg
+
+# Test video upload
+ihateposting-agent upload test-video.mp4
+```
+
+## Error Messages
+
+### File Not Found
+```
+❌ Failed to upload file: ENOENT: no such file or directory, open '<path>'
+```
+
+**Solution:** Check the file path is correct.
+
+### No Permission
+```
+❌ Failed to upload file: EACCES: permission denied, open '<path>'
+```
+
+**Solution:** Check file permissions:
+```bash
+chmod 644 your-file.mp4
+```
+
+### Invalid API Key
+```
+❌ Failed to upload file: Upload failed (401): <the server's words>
+```
+
+**Solution:** Set your API key:
+```bash
+export IHATEPOSTING_API_KEY=your_key
+```
+
+A sign-in saved by `ihateposting-agent auth:login` is used before the variable. `ihateposting-agent auth:status` shows which one is in use and whether it is still valid.
+
+## Summary
+
+✅ **28 file extensions recognised**
+✅ **Automatic MIME type detection**
+✅ **Images, videos, audio, documents recognised** (the app's media library takes pictures and MP4 videos)
+✅ **Correct labelling of MP4, MOV, MP3, etc.**
+✅ **No defaulting to JPEG!**
+
+**The CLI labels every upload by its extension!** 🎉
+
+## Sections that were in this file before it followed the reference
+
+These sections come unchanged from this file as it was before it followed the reference. They are kept because they hold points the reference's text does not.
+
+### Files you can upload
+
+`ihateposting-agent upload <file>` sends a file to your workspace's media library, and the answer gives you the address (`path`) to use in posts.
 
 ```bash
 ihateposting-agent upload ./photo.png
 ihateposting-agent upload ./clip.mp4 --adjust
 ```
 
-## What the program does
+### What the program does
 
 1. It reads the whole file into memory. It checks nothing about size, content or name. An empty file is sent as it is.
 2. It takes the file's **name** from the path you typed: everything after the last `/`. On Windows, write the path with forward slashes (`C:/pictures/photo.png`) or change to the folder first (`cd C:\pictures`, then `upload ./photo.png`); with backslashes the whole path would be sent as the name.
-3. It chooses a **content type** from the name's extension, the text after the last `.`, in lower case (so `PHOTO.PNG` and `photo.png` are the same). The tables below are the complete list. An extension that is not in the list, or no extension at all, is sent as `application/octet-stream` (plain bytes).
+3. It chooses a **content type** from the name's extension, the text after the last `.`, in lower case (so `PHOTO.PNG` and `photo.png` are the same). The tables above are the complete list. An extension that is not in the list, or no extension at all, is sent as `application/octet-stream` (plain bytes).
 4. It sends the file as a form (`multipart/form-data`) with the field `file`. With `--adjust` it adds a field `adjust` with the value `true`; without the flag the field is not sent.
 5. It prints `✅ File uploaded successfully!` and the server's JSON. On a refusal it prints `❌ Failed to upload file: Upload failed (<status>): <the server's words>` and exits with `1`.
 
@@ -19,7 +339,7 @@ The program never refuses a file because of its type. The server may.
 
 Only the first path counts: `upload a.png b.png` uploads `a.png` and ignores the second word. To upload several files, run the command once per file (see below).
 
-## How the type is chosen
+### How the type is chosen
 
 The program looks at the name, never at the bytes. A few cases show what that means:
 
@@ -34,72 +354,7 @@ The program looks at the name, never at the bytes. A few cases show what that me
 | `upload ./photo.heic` | `application/octet-stream` | `heic` is not in the table |
 | `upload ./photo.png` that is really a JPEG inside | `image/png` | the bytes are not looked at |
 
-## The content types the program knows
-
-### Pictures
-
-| Extension | Sent as |
-| --- | --- |
-| `png` | `image/png` |
-| `jpg`, `jpeg` | `image/jpeg` |
-| `gif` | `image/gif` |
-| `webp` | `image/webp` |
-| `svg` | `image/svg+xml` |
-| `bmp` | `image/bmp` |
-| `ico` | `image/x-icon` |
-
-```bash
-ihateposting-agent upload ./photo.jpg
-ihateposting-agent upload ./logo.png
-ihateposting-agent upload ./animation.gif
-```
-
-### Videos
-
-| Extension | Sent as |
-| --- | --- |
-| `mp4` | `video/mp4` |
-| `mov` | `video/quicktime` |
-| `avi` | `video/x-msvideo` |
-| `mkv` | `video/x-matroska` |
-| `webm` | `video/webm` |
-| `flv` | `video/x-flv` |
-| `wmv` | `video/x-ms-wmv` |
-| `m4v` | `video/x-m4v` |
-| `mpeg`, `mpg` | `video/mpeg` |
-| `3gp` | `video/3gpp` |
-
-```bash
-ihateposting-agent upload ./promo.mp4
-ihateposting-agent upload ./promo.mp4 --adjust
-```
-
-### Audio
-
-| Extension | Sent as |
-| --- | --- |
-| `mp3` | `audio/mpeg` |
-| `wav` | `audio/wav` |
-| `ogg` | `audio/ogg` |
-| `aac` | `audio/aac` |
-| `flac` | `audio/flac` |
-| `m4a` | `audio/mp4` |
-
-### Documents
-
-| Extension | Sent as |
-| --- | --- |
-| `pdf` | `application/pdf` |
-| `doc` | `application/msword` |
-| `docx` | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` |
-
-### Anything else
-
-Any other extension, or none, goes as `application/octet-stream`. The program still uploads it.
-
-This list says what the program labels a file as, not what a platform will publish. A file type the program can label may still be refused by the server or by the platform you post to.
-
-## What the server decides (unverified from this repository)
+### What the server decides (unverified from this repository)
 
 This repository holds only the command line, so these points are **not** verified here and you should confirm them against your server:
 
@@ -108,7 +363,7 @@ This repository holds only the command line, so these points are **not** verifie
 - **What `--adjust` does.** The program's help describes it as scaling videos to 1080p and re-encoding them to MP4, and scaling oversized pictures down. What a given server does with the `adjust` field is up to that server. A server that does no adjusting may accept the field, store the file unchanged and report it as ready at once. The help also says to wait until `media:status <media-id>` reports `ready` before using the returned `path`, so that the post does not use the original file.
 - **Which of these files a platform accepts in a post.** Each platform's rules (`output.rules` of `integrations:settings`) say what it expects; the table in the next section gives the gist.
 
-## What the platforms ask for
+### What the platforms ask for
 
 The program does not know these rules; it is here so you can decide what to upload. The words come from the rules text that `integrations:settings` prints for each channel, so read that text for the exact version.
 
@@ -125,7 +380,7 @@ The program does not know these rules; it is here so you can decide what to uplo
 | Instagram | At least one attachment; a story only one picture |
 | Mastodon, Telegram, Threads, Slack, Discord, Tumblr | No rules text about attachments in the schemas the app publishes |
 
-## Using the result in a post
+### Using the result in a post
 
 `upload` prints an object with (among other things) an `id` and a `path`. As the app describes it, the answer looks like this (placeholder values; the exact fields are the server's):
 
@@ -153,7 +408,7 @@ ihateposting-agent posts:create -i <channel-id> -c "A photo" -m "<that path>" -s
 
 A video is attached the same way as a picture. A pin that needs a cover picture next to its video lists both. For several files, upload each one and give the paths to `-m` separated by commas (`-m "<path1>,<path2>"`), or put them in the `image` list of a body file (see [examples/post-with-comments-and-media.json](examples/post-with-comments-and-media.json)). Alt texts go with `--alt "<text1>,<text2>"`, in the same order as the paths.
 
-### Uploading several files
+#### Uploading several files
 
 The program takes one file per run, so loop in your shell:
 
@@ -179,7 +434,7 @@ $answer = ($lines | Select-Object -Skip 1) -join "`n" | ConvertFrom-Json
 $answer.path
 ```
 
-## Adjusting a file and waiting for it
+### Adjusting a file and waiting for it
 
 `--adjust` asks the server to fit the file to the platforms' limits after the upload. The program's help says to wait for `ready` before you publish with the returned path. `media:status` takes the `id` from the upload answer and prints only JSON:
 
@@ -210,7 +465,7 @@ exit 1
 
 Without `--adjust` there is nothing to wait for.
 
-## Checking and finding uploads
+### Checking and finding uploads
 
 ```bash
 ihateposting-agent media:list                 # newest first, 18 per page
@@ -220,7 +475,7 @@ ihateposting-agent media:status <media-id>    # for a file uploaded with --adjus
 
 Both print JSON only, without a header line. As the app describes it, `media:list` answers an object with `pages` (how many pages there are) and `results` (the files of the page you asked for). The search is on the name the file was uploaded with, and it ignores upper and lower case. A page number of `0`, or one that is not a number (`abc`), is left out of the request, so you get the first page.
 
-## Before you upload: a short checklist
+### Before you upload: a short checklist
 
 1. The path points at a file, not a folder, and it is written with forward slashes on Windows.
 2. The extension matches what the file really is. The program labels by name, and a server may check the content.
@@ -229,7 +484,7 @@ Both print JSON only, without a header line. As the app describes it, `media:lis
 5. You will keep the `path` (and the `id`, if you use `--adjust`) from the answer.
 6. The first post that uses the file is a draft.
 
-## If an upload fails
+### If an upload fails
 
 | Message | What to try |
 | --- | --- |
@@ -248,7 +503,7 @@ Notice that a refused upload says `Upload failed (<status>)`, while every other 
 
 If the server says the type is not supported, converting the file is the remedy. For a video, an MP4 is the safest choice; most tools can produce one, for example `ffmpeg -i clip.mov clip.mp4`.
 
-## Trying it without risk
+### Trying it without risk
 
 Upload one small picture first and look at the answer. If your terminal has no picture handy, any small file with a `.png` extension is enough to see how the program and the server answer; the server may judge its content, so use a real picture to see a success:
 
@@ -259,7 +514,7 @@ ihateposting-agent media:list -s small
 
 The file stays in your media library until you remove it in the app. Use drafts (`-t draft`) for the first posts that use it.
 
-## See also
+### See also
 
 - [FEATURES.md](FEATURES.md): the media commands next to the rest of the program.
 - [PROVIDER_SETTINGS.md](PROVIDER_SETTINGS.md): the settings that refer to uploaded pictures (`thumbnail`, `article_cover`).

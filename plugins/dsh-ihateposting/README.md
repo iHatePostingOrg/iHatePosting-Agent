@@ -1,96 +1,162 @@
 # dsh-ihateposting
 
-A plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`) that connects its agent to iHatePosting's hosted MCP server, so the agent can find your channels, read each platform's rules, handle media and schedule or draft posts. It also gives the agent a skill that says how to go about it.
+[![npm](https://img.shields.io/npm/v/dsh-ihateposting)](https://www.npmjs.com/package/dsh-ihateposting)
 
-Status: **0.1.0, never run inside a real `dsh`** (see "Unverified" below). It has not been published to npm.
+**npm:** [`dsh-ihateposting`](https://www.npmjs.com/package/dsh-ihateposting) ·
+**source:** [iHatePostingOrg/iHatePosting-Agent](https://github.com/iHatePostingOrg/iHatePosting-Agent/tree/main/plugins/dsh-ihateposting)
+
+[DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`) plugin for
+[iHatePosting](https://ihateposting.com), the social media scheduler. It connects the agent
+to the iHatePosting MCP server so it can list your connected channels, fetch each platform's
+posting rules, and schedule, draft, or publish posts across 15 platforms (X, LinkedIn,
+Instagram, Facebook, Threads, TikTok, YouTube, Pinterest, Bluesky, Mastodon,
+Discord, Slack, Telegram, and more).
 
 ## Install
 
-From a clone of this repository, in the folder that holds `plugins/`:
+From the repository:
 
 ```bash
-dsh plugin --profile web add ./plugins/dsh-ihateposting
+dsh plugin --profile web add "github:iHatePostingOrg/iHatePosting-Agent#path:/plugins/dsh-ihateposting"
 ```
 
-From npm, once it is published (it has not been published yet, so this does not work today):
+Or from npm:
 
 ```bash
 dsh plugin --profile web add dsh-ihateposting
 ```
 
-`web` is one of the profile templates `dsh` ships; use the profile you want. Installing straight from GitHub with `github:` is not described here, because the plugin sits in a subfolder of this repository and the public documentation only shows that form for a repository whose root is the plugin (unverified for a subfolder).
-
-Then give it your workspace key (create one under **Settings > Agents / Dev** in the iHatePosting app) and start `dsh`:
+Then give it an iHatePosting API key. Get it from **iHatePosting → Settings → Agents / Dev**
+and export it before starting dsh, or put it in `$DSH_HOME/.env`:
 
 ```bash
-# bash
-export IHATEPOSTING_API_KEY=your_key
-dsh --profile web
+export IHATEPOSTING_API_KEY=your-api-key
+dsh web
 ```
+
+Restart the profile after installing. Ask the agent *"List my connected social media
+accounts"* to verify the connection.
+
+## What you get
+
+The bundle mounts two rows:
+
+| Row | Package | Role |
+|---|---|---|
+| `ihateposting` | `dsh-ihateposting` (this package) | Reads the API key, exposes `ctx.ihateposting` (`url`, `headers`), and registers the `ihateposting` skill that teaches the agent the posting workflow and the HTML content rules. |
+| `ihateposting-mcp` | `@deepseek-ai/dsh-mcp-client` (shipped with dsh) | Connects to `https://app.ihateposting.com/api/mcp` over streamable HTTP with a `Bearer` header and registers the server's tools. |
+
+The model sees the iHatePosting MCP tools under the `mcp__ihateposting__` namespace:
+
+| Tool | What it does |
+|---|---|
+| `mcp__ihateposting__integrationList` | List connected channels (optionally filtered by group) |
+| `mcp__ihateposting__groupList` | List customer groups |
+| `mcp__ihateposting__integrationSchema` | Posting rules, character limits, and required settings for a platform |
+| `mcp__ihateposting__triggerTool` | Platform helpers (list Discord channels, list Pinterest boards, look up LinkedIn pages) |
+| `mcp__ihateposting__integrationSchedulePostTool` | Schedule, draft, or immediately publish posts |
+| `mcp__ihateposting__postsListTool` | List posts between two dates |
+| `mcp__ihateposting__postSettingsTool` | Update settings of an unpublished post |
+| `mcp__ihateposting__deletePostTool` | Delete a post |
+| `mcp__ihateposting__uploadFromUrlTool` / `mediaListTool` / `mediaStatusTool` | Put a picture or video into the media library from a public web address, find a file that is already there, check that it is ready |
+| `mcp__ihateposting__uploadWidgetTool` / `uploadWidgetStatusTool` | An upload panel for files on the person's own computer (only in a client that shows panels), and the list of what was added |
+
+The tool list comes from the server at connect time, so new iHatePosting tools appear without a
+plugin update.
+
+## Configuration
+
+Override the `ihateposting` row in your profile's `cordis.patch.yml` (`$DSH_HOME/profiles/web/cordis.patch.yml`).
+A bare `id:` configures the existing row:
+
+```yaml
+- id: ihateposting
+  config:
+    apiKeyEnv: IHATEPOSTING_API_KEY            # env var that holds the key (default)
+    baseUrl: https://app.ihateposting.com/api  # another server that answers the same routes: https://your-server.example.com/api
+    skill: true                                # register the `ihateposting` workflow skill
+```
+
+| Field | Default | Description |
+|---|---|---|
+| `apiKeyEnv` | `IHATEPOSTING_API_KEY` | Environment variable read at boot for the API key. |
+| `apiKey` | `''` | Inline key. Prefer the env var; this exists for patch-level overrides. |
+| `baseUrl` | `https://app.ihateposting.com/api` | iHatePosting API address. The MCP endpoint is `<baseUrl>/mcp` (an address that already ends in `/mcp` is used as it is). Another server that answers the same routes can be named here. |
+| `skill` | `true` | Register the `ihateposting` skill on `ctx.skills`. |
+
+Without a key the `ihateposting` row logs a warning naming the variable to set, and the
+`ihateposting-mcp` row connects without credentials, which iHatePosting refuses with a 401, so it registers no tools. dsh keeps booting.
+
+## Self-hosted iHatePosting
+
+The MCP server is part of the iHatePosting app's API and listens at `/mcp` (Bearer auth), so by
+default the plugin connects to `https://app.ihateposting.com/api/mcp`. The app is hosted, so there
+is no server of your own to set up; another server that answers the same routes can be named with
+`baseUrl`.
+
+## Development
+
+```bash
+cd plugins/dsh-ihateposting
+pnpm test
+```
+
+Link a local checkout into a profile:
+
+```bash
+dsh plugin --profile web add /absolute/path/to/iHatePosting-Agent/plugins/dsh-ihateposting
+```
+
+## Related
+
+- [iHatePosting CLI](https://github.com/iHatePostingOrg/iHatePosting-Agent) — the `ihateposting-agent` command-line tool and the Claude Code / Cursor / Grok plugins in this repository.
+
+## License
+
+MIT, same as the rest of this repository.
+
+## Sections that were in this file before it followed the reference
+
+### Status
+
+Status: **0.1.0, never run inside a real `dsh`** (see "Unverified" below).
+
+### The profile name and the PowerShell form of the install
+
+`web` is one of the profile templates `dsh` ships; use the profile you want.
 
 ```powershell
 # PowerShell
 $env:IHATEPOSTING_API_KEY = "your_key"
-dsh --profile web
+dsh web
 ```
 
-`dsh --profile web --dump-config` shows the two rows below. It prints the `!!js` expressions as written, not their values, so the key does not appear in it.
+### How the key is handled
 
-## What it adds
+The key is sent in one place only: the `Authorization: Bearer <key>` header of the `ihateposting-mcp` row, to the address above. The plugin never prints it, logs it or contacts any address itself (the tests check this). A key that holds a space or a control character is not used and is not repeated in the log.
 
-`cordis.patch.yml` inserts two rows into the profile:
+### The browser sign-in address is not used
 
-| Row | What it is | Without a key |
-| --- | --- | --- |
-| `ihateposting` | this package's own plugin: registers the `ihateposting` skill | refuses to load and says: "dsh-ihateposting is not loading because the environment variable IHATEPOSTING_API_KEY is empty or not set, so create a workspace key under Settings > Agents / Dev in iHatePosting and set it before starting dsh." |
-| `ihateposting-mcp` | one `@deepseek-ai/dsh-mcp-client` connection to `https://app.ihateposting.com/api/mcp` over streamable HTTP, with `Authorization: Bearer <key>` | switched off (`disabled`), so no request is made |
+`https://app.ihateposting.com/api/mcp/oauth` (a browser sign-in by OAuth) is not wired: the pages of `dsh`'s MCP client that were read do not describe an OAuth flow (unverified), so this plugin uses the key.
 
-The key is read from `IHATEPOSTING_API_KEY` only. It is sent only in the `Authorization` header of the `ihateposting-mcp` row, to the address above. The plugin's own code never prints it, logs it or contacts any address (the tests check this).
+### What was verified, and from where
 
-The MCP server's tools show up in the agent's tool list as `mcp__ihateposting__<tool>`.
+Read first-hand on 2026-11-15 in `deepseek-ai/deepseek-harness` (branch `master`, commit `39163dd`) and in the published packages:
 
-The other address, `https://app.ihateposting.com/api/mcp/oauth` (a browser sign-in by OAuth), is **not** used: the pages of `dsh`'s MCP client that were read do not mention OAuth, and one third-party article says the client does not run it itself (unverified).
+- A bundle is a package whose `package.json` has `"dsh": { "bundle": { "patch": "./cordis.patch.yml" } }`: [docs/user/develop/basic/publish.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md).
+- A plugin module exports `name`, optionally `inject`, and `apply`; the `Config` export must be a Schemastery schema, never a plain object: [docs/user/develop/basic/index.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/index.md) and [config.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/config.md).
+- A row that lists `inject: [service]` has its `config` read as `!!js ctx.<service>.<field>` after the service is up, and the loader evaluates a row's `config` only then: [publish.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md) (the example with `ctx.myAppStartup.port`) and [docs/cordis-primer.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/cordis-primer.md).
+- In `@deepseek-ai/cordis` 4.1.0 (npm): `ctx.provide(name, value)`, `ctx.inject(deps, callback)` and a callable `ctx.logger` with `info` and `warn`. In `@deepseek-ai/schemastery` 3.19.0 (npm): `.role()`. `dsh`'s own dependency catalog pins cordis 4.0.2 and schemastery 3.18.2, which the peer ranges in `package.json` (`^4.0.1`, `^3.18.1`) include.
+- The MCP client row (`@deepseek-ai/dsh-mcp-client`) takes `transport`, `serverName`, `url` and `headers`, and names tools `mcp__<serverName>__<tool>`: [packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/mcp/mcp-client/README.md) (read on 2026-11-13, second-hand).
 
-### The skill
+From the owner of this project (not checked from here): the MCP address, that the key goes in `Authorization: Bearer <key>`, and that the key is made under Settings > Agents / Dev. The server's refusal of a request without a key is read from the app's own code.
 
-The skill's text is iHatePosting's own `SKILL.md` (a byte for byte copy in `skill/SKILL.md`, so the package is complete without the repository; a test compares it with the repository's file). That file was written for the command line `ihateposting-agent`. So the plugin puts a short note in front of it that tells the agent to do the same jobs with the `mcp__ihateposting__` tools, to treat the commands as descriptions of jobs and to follow a tool's own description where it differs. The note does not name any tool, because the server's tool list was not checked from here. A skill written for the MCP tools would be better; this one is the cheapest true thing.
+### Unverified
 
-## What was verified, and from where
-
-Everything about `dsh`'s plugin interface comes from its public repository, `deepseek-ai/deepseek-harness`, branch `master`, read on 2026-11-13 (through a fetch tool that summarises pages, so exact wording was not read by a person):
-
-- A bundle is a package whose `package.json` has `"dsh": { "bundle": { "patch": "./cordis.patch.yml" } }`; the patch is a YAML list whose `- insert:` rows have `id`, `name` (the package, by name) and optional `config`; the install commands for a local path, GitHub, npm and a tarball; `dsh --profile <name> --dump-config`; `dsh plugin --profile <name> remove <package>`; a package without the `dsh.bundle` declaration installs as a plain dependency only; `engines.dsh` and peer dependencies are how compatibility is checked: [docs/user/develop/basic/publish.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/publish.md) (also on the docs site: https://deepseek-harness.github.io/deepseek-harness/en/develop/basic/publish).
-- A plugin module exports `name`, optionally `inject`, and `apply`; a `Config` export must be a Schemastery schema, a plain object is not accepted (this plugin exports none): [docs/user/develop/basic/tool.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/tool.md) and [docs/user/develop/basic/config.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/basic/config.md).
-- `inject` names the services a plugin waits for: [docs/user/develop/framework/service.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/develop/framework/service.md).
-- `ctx.skills.register(skill)` is synchronous, returns a disposer, takes a kebab-case `name`, a `description`, the Markdown `content` and a required `source` (`'runtime'` is one of the documented values): [docs/subsystems/skills.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/skills.md). The service is named `skills` and a plugin that needs it lists `'skills'` in `inject`: [packages/skill/skill/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/skill/skill/src/index.ts) and [packages/skill/skill-filesystem/src/index.ts](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/skill/skill-filesystem/src/index.ts).
-- The MCP client is the plugin `@deepseek-ai/dsh-mcp-client`, one row per server, with `transport` (`stdio` or `streamable-http`), `serverName` (1 to 32 letters, digits, `_`, `-`), `url` and `headers`; tools are named `mcp__<serverName>__<tool>`; `!!js` with `process.env` is how its README passes a header: [packages/mcp/mcp-client/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/mcp/mcp-client/README.md).
-- A row may carry `disabled: !!js <expression>` (the base bundle uses one for Windows): [packages/bundle/base/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/bundle/base/README.md).
-- `--dump-config` prints `!!js` expressions as written; `.env` files in the invoking directory and the Harness home are loaded: [packages/boot/app-boot/README.md](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/boot/app-boot/README.md).
-
-From the owner of this project (not checked from here): the two MCP addresses, that the key goes in `Authorization: Bearer <key>`, and that the key is made under Settings > Agents / Dev.
-
-## Unverified
-
-- **No real `dsh` was run.** The plugin was never loaded by `dsh`, `dsh plugin add` was not run, and no request was made to iHatePosting's server (no network and no key were used). The tests use a stand-in for the context.
-- Which `dsh` releases it works with. `engines.dsh` is left out on purpose rather than guessed, so installation does not check a release. Node 20 or newer is this repository's own choice, not `dsh`'s.
-- What `dsh` does when a plugin's `apply` throws: the message above is thrown, but whether `dsh` stops or only reports that row was not read in the documentation.
+- **No real `dsh` was run.** The plugin was never loaded by `dsh`, `dsh plugin add` was not run, and no request was made to iHatePosting's server (no network and no key were used). The tests use stand-ins for the context and, where the real package is not installed, for `@deepseek-ai/schemastery`; with the real package installed the same checks run against it.
+- Which `dsh` releases it works with. `engines.dsh` is left out on purpose rather than guessed.
+- The fields `skills.register` is given: `name`, `description`, `content` and `source: 'runtime'` follow the documentation read earlier; `invocation: { modelInvocable, userInvocable }` is added because another published plugin for `dsh` passes it, and no page read describes it.
+- Why other plugins export only named values: one of them says a default export makes the loader drop `inject` and `apply`, and that `schemastery` rejects frozen objects. Neither statement was found in the documentation or the package source. This plugin uses named exports (the documented function form) and hands out a fresh plain copy of the headers on every read, which is right either way.
 - Whether `!!js` expressions see a key that is only in a `.env` file. Put it in the environment to be sure.
-- Whether the MCP client keeps header values out of its own logs and error text. The pages say it hides resolved values only in the mode with `expandTemplates: true`, which this plugin does not use.
-- A row-level `inject` with `!!js ctx.<service>` in the patch is not used, because the public pages read do not document it.
-- That the server accepts the key and what tools it lists.
-- Whether `'runtime'` is what `dsh` wants as the `source` of a plugin's skill (it is in the documented list; no page says which value a plugin should use).
-- Installing from `github:` for this subfolder, and installing from npm (not published).
-
-## Tests
-
-From the root of the repository (no network, no key, nothing to install):
-
-```bash
-node --test plugins/dsh-ihateposting/test
-```
-
-Newer Node releases (24 was the one used here) no longer expand a folder given to `node --test`; they run the path as a file. `test/package.json` points that path at `index.test.mjs`, so the command above works, and `node --test "plugins/dsh-ihateposting/test/*.test.mjs"` does the same thing. `npm test` inside this folder uses the second form.
-
-## Licence
-
-MIT. See `LICENSE`.
+- Whether the MCP client keeps header values out of its own logs and error text.
+- Installing from `github:` for this subfolder, and installing from npm.

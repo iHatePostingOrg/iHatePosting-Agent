@@ -5,13 +5,61 @@
   "tags": [],
   "posts": [
     {
-      "integration": { "id": "x-123" },
+      "integration": {
+        "id": "x-123"
+      },
       "value": [
-        { "content": "1/3 We moved to weekly releases. Here is why.", "image": [], "delay": 0 },
-        { "content": "2/3 Smaller releases mean smaller surprises, and quicker fixes when there is one.", "image": [], "delay": 5 },
-        { "content": "3/3 Next up: how we test each release before it goes out.", "image": [], "delay": 5 }
+        {
+          "content": "🧵 Thread: How to use iHatePosting CLI for automated social media posting (1/5)",
+          "image": [
+            {
+              "id": "media-123",
+              "path": "https://media.example/uploads/tutorial-intro.jpg"
+            }
+          ]
+        },
+        {
+          "content": "Step 1: Install the CLI and set your API key\n\nexport IHATEPOSTING_API_KEY=your_key\npnpm install -g ihateposting-agent (2/5)",
+          "image": [
+            {
+              "id": "media-124",
+              "path": "https://media.example/uploads/tutorial-install.jpg"
+            }
+          ],
+          "delay": 2
+        },
+        {
+          "content": "Step 2: List your connected integrations to get their IDs\n\nihateposting-agent integrations:list (3/5)",
+          "image": [
+            {
+              "id": "media-125",
+              "path": "https://media.example/uploads/tutorial-integrations.jpg"
+            }
+          ],
+          "delay": 2
+        },
+        {
+          "content": "Step 3: Create your first post\n\nihateposting-agent posts:create -c \"Hello World!\" -s \"2026-12-31T12:00:00Z\" -t draft -i \"x-123\" (4/5)",
+          "image": [
+            {
+              "id": "media-126",
+              "path": "https://media.example/uploads/tutorial-create.jpg"
+            }
+          ],
+          "delay": 2
+        },
+        {
+          "content": "That's it! You can now automate your social media posts with ease. Check out our docs for more advanced features! 🚀 (5/5)",
+          "image": [
+            {
+              "id": "media-127",
+              "path": "https://media.example/uploads/tutorial-done.jpg"
+            }
+          ],
+          "delay": 2
+        }
       ],
-      "settings": { "who_can_reply_post": "everyone" }
+      "settings": {}
     }
   ]
 }

@@ -1,0 +1,74 @@
+{
+  "type": "draft",
+  "date": "2026-12-25T12:00:00Z",
+  "shortLink": true,
+  "tags": [],
+  "posts": [
+    {
+      "integration": {
+        "id": "x-123"
+      },
+      "value": [
+        {
+          "content": "Happy Holidays! 🎄 Check out our special offers!",
+          "image": [
+            {
+              "id": "media-123",
+              "path": "https://media.example/uploads/holiday-x.jpg"
+            }
+          ]
+        },
+        {
+          "content": "Limited time offer - 50% off! 🎁",
+          "image": [],
+          "delay": 60
+        }
+      ],
+      "settings": {}
+    },
+    {
+      "integration": {
+        "id": "linkedin-123"
+      },
+      "value": [
+        {
+          "content": "Season's greetings from our team! We're offering exclusive holiday promotions.",
+          "image": [
+            {
+              "id": "media-124",
+              "path": "https://media.example/uploads/holiday-linkedin.jpg"
+            }
+          ]
+        }
+      ],
+      "settings": {}
+    },
+    {
+      "integration": {
+        "id": "facebook-123"
+      },
+      "value": [
+        {
+          "content": "🎅 Happy Holidays! Special announcement in the comments!",
+          "image": [
+            {
+              "id": "media-125",
+              "path": "https://media.example/uploads/holiday-facebook-main.jpg"
+            }
+          ]
+        },
+        {
+          "content": "Our holiday sale is now live! Visit our website for amazing deals 🎁",
+          "image": [
+            {
+              "id": "media-126",
+              "path": "https://media.example/uploads/holiday-sale-banner.jpg"
+            }
+          ],
+          "delay": 5
+        }
+      ],
+      "settings": {}
+    }
+  ]
+}

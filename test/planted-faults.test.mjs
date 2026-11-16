@@ -9,6 +9,8 @@ import os from "node:os";
 import path from "node:path";
 import { before, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
+import { pluginFaults } from "./plugin-faults.mjs";
+import { submissionFaults } from "./submission-faults.mjs";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 // Everything the repository holds except its git history (the documents and the plugin folders are read by the tests too).
@@ -27,6 +29,8 @@ const faults = [
   // Which key and address.
   ["the environment wins over what was saved", "src/config.mjs", [["const creds = loadCredentials();", "const creds = process.env[API_KEY_VARIABLE] ? null : loadCredentials();"]]],
   ["nobody being signed in is not said", "src/config.mjs", [["if (!apiKey) {", "if (false) {"]]],
+  ["the missing-sign-in message names options that auth:login does not have", "src/config.mjs", [["auth:login`);", "auth:login --client-id <id> --client-secret <secret>`);"]]],
+  ["a guide shows the missing-sign-in message with options that auth:login does not have", "HOW_TO_RUN.md", [["OAuth2: ihateposting-agent auth:login", "OAuth2: ihateposting-agent auth:login --client-id <id> --client-secret <secret>"]]],
   // Signing in, out and checking.
   ["a saved file without a token is taken", "src/commands/auth.mjs", [["if (!data.accessToken) return null;", ""]]],
   ["the sign-in server's variable beats the flag", "src/commands/auth.mjs", [["argv.authServer || process.env[AUTH_SERVER_VARIABLE]", "process.env[AUTH_SERVER_VARIABLE] || argv.authServer"]]],
@@ -64,26 +68,32 @@ const faults = [
   ["the CHANGELOG stops saying it is not based on the live repository", "CHANGELOG.md", [["**not based on** the `iHatePostingOrg/agent-skill` repository", "based on the `iHatePostingOrg/agent-skill` repository"]]],
   ["a plugin manifest has another version", ".cursor-plugin/plugin.json", [['"version": "0.1.0"', '"version": "0.1.1"']]],
   ["the DeepSeek plugin has another version", "plugins/dsh-ihateposting/package.json", [["\"version\": \"0.1.0\"", "\"version\": \"0.1.1\""]]],
-  ["the DeepSeek plugin carries another copy of the skill", "plugins/dsh-ihateposting/skill/SKILL.md", [["ihateposting-agent", "ihateposting-agnt"]]],
   ["a document links to a file that is not there", "README.md", [["(./PUBLISHING.md)", "(./PUBLISHING_GONE.md)"]]],
   ["the README shows another logo file", "README.md", [["<img src=\"assets/logo.png\"", "<img src=\"assets/logo.svg\""]]],
-  ["a document names the command line it was shaped on", "SUMMARY.md", [["# ihateposting-agent in one page", "# ihateposting-agent in one page, after pos" + "tiz"]]],
-  ["a document holds a key-looking text", "SUMMARY.md", [["# ihateposting-agent in one page", "# ihateposting-agent in one page " + "0123456789abcdef".repeat(4)]]],
+  ["a document names the command line it was shaped on", "SUMMARY.md", [["# iHatePosting CLI - Creation Summary", "# iHatePosting CLI - Creation Summary, after pos" + "tiz"]]],
+  ["a document holds a key-looking text", "SUMMARY.md", [["# iHatePosting CLI - Creation Summary", "# iHatePosting CLI - Creation Summary " + "0123456789abcdef".repeat(4)]]],
   ["a document names an example file that is not there", "PROVIDER_SETTINGS.md", [["A body file for it is in [examples/tiktok-video.json](examples/tiktok-video.json).", "A body file for it is in examples/gone-video.json (see the examples folder)."]]],
-  ["a manifest loses the author's address", ".claude-plugin/plugin.json", [['    "email": "support@ihateposting.com",\n    "url"', '    "url"']]],
+  ["a manifest loses the author's address", "plugins/claude-ihateposting/.claude-plugin/plugin.json", [['    "email": "support@ihateposting.com",\n    "url"', '    "url"']]],
   ["a platform keyword is dropped from the npm package", "package.json", [['    "tumblr",\n', ""]]],
   ["a manifest counts another number of platforms", "gemini-extension.json", [["across 15 platforms", "across 28+ platforms"]]],
-  ["the author's address is in a document", "SUMMARY.md", [["# ihateposting-agent in one page", "# ihateposting-agent in one page, by support@ihateposting.com"]]],
+  ["the author's address is in a document", "SUMMARY.md", [["# iHatePosting CLI - Creation Summary", "# iHatePosting CLI - Creation Summary, by support@ihateposting.com"]]],
   ["the licence names the person", "LICENSE", [["Copyright (c) 2026 iHatePostingOrg", "Copyright (c) 2026 Parag Hasmukhbhai Gajera"]]],
   ["a platform the product does not have is a keyword", "plugins/dsh-ihateposting/package.json", [['    "slack",\n', '    "slack",\n    "reddit",\n']]],
-  ["a plugin manifest still carries the old plugin name", ".claude-plugin/plugin.json", [['"name": "ihateposting",', '"name": "ihateposting-agent",']]],
+  ["a plugin manifest still carries the old plugin name", "plugins/claude-ihateposting/.claude-plugin/plugin.json", [['"name": "ihateposting",', '"name": "ihateposting-agent",']]],
   ["the Gemini extension still carries the old plugin name", "gemini-extension.json", [['"name": "ihateposting",', '"name": "ihateposting-agent",']]],
-  ["a marketplace loses its own name", ".grok-plugin/marketplace.json", [['"name": "ihateposting-agent",', '"name": "ihateposting",']]],
+  ["a marketplace loses its own name", ".grok-plugin/marketplace.json", [['{\n  "name": "ihateposting-agent",', '{\n  "name": "ihateposting",']]],
   ["a marketplace entry keeps the old plugin name", ".cursor-plugin/marketplace.json", [['"name": "ihateposting",\n      "source"', '"name": "ihateposting-agent",\n      "source"']]],
   ["the README install line names the old plugin", "README.md", [["/plugin install ihateposting@ihateposting-agent", "/plugin install ihateposting-agent@ihateposting-agent"]]],
   ["a manifest points at the old skill folder", ".cursor-plugin/plugin.json", [['"./skills/ihateposting"', '"./skills/ihateposting-agent"']]],
   ["the skill's name no longer matches its folder", "skills/ihateposting/SKILL.md", [["---\nname: ihateposting\n", "---\nname: ihateposting-agent\n"]]],
   ["the sync workflow copies to the old folder", ".github/workflows/sync-skill.yml", [["cp SKILL.md skills/ihateposting/SKILL.md", "cp SKILL.md skills/ihateposting-agent/SKILL.md"]]],
+  ["the sync workflow writes the DeepSeek copy again", ".github/workflows/sync-skill.yml", [["cp SKILL.md skills/ihateposting/SKILL.md", "cp SKILL.md skills/ihateposting/SKILL.md\n          cp SKILL.md plugins/dsh-ihateposting/skill/SKILL.md"]]],
+  ["the sync workflow starts on a release again", ".github/workflows/sync-skill.yml", [["on:\n  workflow_dispatch:", "on:\n  release:\n    types: [published]\n  workflow_dispatch:"]]],
+  ["the publish workflow starts on a release again", ".github/workflows/publish-npm.yml", [["on:\n  workflow_dispatch:", "on:\n  release:\n    types: [published]\n  workflow_dispatch:"]]],
+  ["the publish workflow no longer checks the version asked for", ".github/workflows/publish-npm.yml", [["WANTED_VERSION", "WANTED_VERSIN"]]],
+  ["the DeepSeek skill copy is back", "plugins/dsh-ihateposting/package.json", [['"README.md",', '"README.md",\n    "skill/",']]],
+  ["a guide says four copies of the skill again", "PUBLISHING.md", [["The three copies of the skill are identical", "The four copies of the skill are identical"]]],
+  ["a guide says the workflows run on a release again", "PUBLISHING.md", [["run only when started by hand", "run when a release is published on GitHub"]]],
   ["a document names the old skill folder", "SUMMARY.md", [["`skills/ihateposting/SKILL.md` is what", "`skills/ihateposting-agent/SKILL.md` is what"]]],
   ["the Qwen Code install line is gone", "README.md", [["qwen extensions install iHatePostingOrg/iHatePosting-Agent:ihateposting\n", "\n"]]],
   ["the Qwen Code install line names the old plugin", "README.md", [["qwen extensions install iHatePostingOrg/iHatePosting-Agent:ihateposting\n", "qwen extensions install iHatePostingOrg/iHatePosting-Agent:ihateposting-agent\n"]]],
@@ -104,6 +114,9 @@ const faults = [
   ["the publishing guide stops saying the live app's package is not replaced", "PUBLISHING.md", [["and this package does not replace it", "and this package replaces it"]]],
   ["the publishing guide offers a local MCP package", "PUBLISHING.md", [["This repository has no such package and does not publish one", "This repository publishes it too"]]],
   ["the hosted MCP server's address is another one", "mcp.json", [["https://app.ihateposting.com/api/mcp/oauth", "https://example.com/mcp"]]],
+  // The files prepared for the submissions (their faults are listed in submission-faults.mjs).
+  ...submissionFaults,
+  ...pluginFaults,
 ];
 
 describe("a planted fault is seen by the command line's tests", () => {
@@ -124,6 +137,8 @@ describe("a planted fault is seen by the command line's tests", () => {
       fs.writeFileSync(path.join(dir, file), text);
     }
     const tests = fs.readdirSync(path.join(dir, "test")).filter((f) => f.endsWith(".test.mjs")).map((f) => path.join("test", f));
+    // the DeepSeek plugin has tests of its own, which see the faults planted in it
+    tests.push(path.join("plugins", "dsh-ihateposting", "test", "index.test.mjs"));
     const status = await new Promise((resolve) => {
       const env = { ...process.env };
       delete env.NODE_TEST_CONTEXT; // a child that is told it is inside a test run does not run its tests as a run

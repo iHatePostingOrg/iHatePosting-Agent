@@ -12,11 +12,7 @@
     {
       "name": "ihateposting",
       "description": "Social media automation skill for the iHatePosting CLI, for scheduling posts, managing integrations, uploading media, and tracking analytics across 15 platforms including X, LinkedIn (profiles and pages), Instagram, Facebook, Threads, YouTube, TikTok, Pinterest, Bluesky, Mastodon, Google Business, Discord, Slack, Telegram, and Tumblr",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/ihateposting"
-      ]
+      "source": "./plugins/claude-ihateposting"
     }
   ]
 }

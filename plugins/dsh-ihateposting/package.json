@@ -6,11 +6,11 @@
   "main": "./lib/index.js",
   "exports": {
     ".": "./lib/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
   },
   "files": [
     "lib/",
-    "skill/",
     "cordis.patch.yml",
     "README.md",
     "LICENSE"
@@ -22,6 +22,10 @@
     "bundle": {
       "patch": "./cordis.patch.yml"
     }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/schemastery": "^3.18.1"
   },
   "keywords": [
     "dsh",

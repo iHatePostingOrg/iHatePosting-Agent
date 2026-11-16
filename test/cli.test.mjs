@@ -274,7 +274,7 @@ describe("when the API refuses or is not there", () => {
     const { code, stdout, stderr } = await run(["integrations:list"], { env: { IHATEPOSTING_API_URL: api.url } });
     assert.equal(code, 1);
     assert.equal(stdout, "");
-    assert.equal(stderr, "❌ Error: No authentication found.\nOptions:\n  1. OAuth2: ihateposting-agent auth:login --client-id <id> --client-secret <secret>\n  2. API Key: export IHATEPOSTING_API_KEY=your_api_key\n");
+    assert.equal(stderr, "❌ Error: No authentication found.\nOptions:\n  1. OAuth2: ihateposting-agent auth:login\n  2. API Key: export IHATEPOSTING_API_KEY=your_api_key\n");
     assert.equal(api.requests.length, before);
   });
 });

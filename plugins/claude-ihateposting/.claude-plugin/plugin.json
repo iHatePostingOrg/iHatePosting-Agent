@@ -1,5 +1,6 @@
 {
   "name": "ihateposting",
+  "displayName": "iHatePosting",
   "version": "0.1.0",
   "description": "Social media automation skill for the iHatePosting CLI, for scheduling posts, managing integrations, uploading media, and tracking analytics across 15 platforms including X, LinkedIn (profiles and pages), Instagram, Facebook, Threads, YouTube, TikTok, Pinterest, Bluesky, Mastodon, Google Business, Discord, Slack, Telegram, and Tumblr",
   "author": {
@@ -10,9 +11,11 @@
   "homepage": "https://github.com/iHatePostingOrg/iHatePosting-Agent#readme",
   "repository": "https://github.com/iHatePostingOrg/iHatePosting-Agent",
   "license": "MIT",
-  "skills": [
-    "./skills/ihateposting"
-  ],
+  "icon": "./logo.png",
+  "documentationUrl": "https://github.com/iHatePostingOrg/iHatePosting-Agent#readme",
+  "supportUrl": "https://ihateposting.com/contact",
+  "privacyPolicyUrl": "https://ihateposting.com/privacy",
+  "termsOfServiceUrl": "https://ihateposting.com/terms",
   "keywords": [
     "ihateposting",
     "social-media",

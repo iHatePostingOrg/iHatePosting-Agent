@@ -1,24 +1,411 @@
-# Discovering a channel's settings
+# Integration Settings Discovery
 
-Every platform has its own rules: how long a post may be, whether it needs a picture, which options it takes. You (or an agent) should not have to guess them. `integrations:settings` asks the server what applies to one channel and prints it. Run it before you write a post for a channel you have not posted to in this way before.
+The CLI now has a powerful feature to discover what settings are available for each integration!
+
+## New Command: `integrations:settings`
+
+Get the settings schema, validation rules, and maximum character limits for any integration.
+
+## Usage
 
 ```bash
-ihateposting-agent integrations:settings <channel-id>
+ihateposting-agent integrations:settings <integration-id>
 ```
 
-This page explains the command, how to read what it prints, and how to turn the answer into a correct post. For the keys of each platform see [PROVIDER_SETTINGS.md](PROVIDER_SETTINGS.md); for the helpers named in the answer see [INTEGRATION_TOOLS_WORKFLOW.md](INTEGRATION_TOOLS_WORKFLOW.md).
+## What It Returns
 
-## The command
+```json
+{
+  "output": {
+    "rules": "...",
+    "maxLength": 280,
+    "settings": {
+      "type": "object",
+      "properties": {
+        "who_can_reply_post": {
+          "enum": ["everyone", "following", "mentionedUsers", "subscribers", "verified"]
+        },
+        "community": {
+          "pattern": "^(https://x.com/i/communities/\\d+)?$"
+        }
+      }
+    }
+  }
+}
+```
 
-| Part | Meaning |
-| --- | --- |
-| `<channel-id>` | The `id` of an entry of `ihateposting-agent integrations:list`. The program's help calls a channel an "integration". |
+(Abridged outline of an X channel's answer, not a recorded one: the real `rules`, `maxLength` and `description` texts are what your server returns. X has no required settings, so there is no `required` list. The program prints a header line, `⚙️  Settings for integration: <integration-id>`, before the JSON.)
 
-There are no options besides `--help`. The program makes one request, `GET /public/v1/integration-settings/<channel-id>`, prints a header line and the server's JSON, and ends with exit code `0`. On any failure it prints `❌ Failed to get integration settings: <why>` on standard error and ends with `1`.
+## Workflow
 
-A channel id that is not in your workspace is refused by the server, and the program shows the refusal after `❌ Failed to get integration settings: Request failed: API Error (<status>): ...`.
+### 1. List Your Integrations
 
-## What the answer holds
+```bash
+ihateposting-agent integrations:list
+```
+
+Output:
+```json
+[
+  {
+    "id": "pinterest-abc123",
+    "name": "My Pinterest Account",
+    "identifier": "pinterest",
+    "disabled": false
+  },
+  {
+    "id": "youtube-def456",
+    "name": "My YouTube Channel",
+    "identifier": "youtube",
+    "disabled": false
+  },
+  {
+    "id": "x-ghi789",
+    "name": "@myhandle",
+    "identifier": "x",
+    "disabled": false
+  }
+]
+```
+
+(Placeholder values. The program prints a header line before the list, and each entry has more fields; these are the ones used here.)
+
+### 2. Get Settings for Specific Integration
+
+```bash
+ihateposting-agent integrations:settings pinterest-abc123
+```
+
+Output:
+```json
+{
+  "output": {
+    "rules": "...",
+    "maxLength": 500,
+    "settings": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "link": {
+          "type": "string",
+          "format": "url"
+        },
+        "dominant_color": {
+          "type": "string"
+        },
+        "board": {
+          "type": "string",
+          "not": { "type": "null" },
+          "minLength": 1,
+          "pattern": "^\\d+$",
+          "description": "..."
+        }
+      },
+      "required": ["board"]
+    },
+    "tools": [
+      {
+        "methodName": "boards",
+        "description": "...",
+        "dataSchema": []
+      }
+    ]
+  }
+}
+```
+
+(Abridged outline, not a recorded answer: the real `rules`, `maxLength` and `description` texts are what your server returns.)
+
+### 3. Use the Settings in Your Post
+
+Now you know what settings are available and required!
+
+```bash
+ihateposting-agent posts:create \
+  -c "My post content" \
+  -m "image.jpg" \
+  -s "2024-12-31T12:00:00Z" \
+  --settings '{
+    "board": "1234567890",
+    "title": "Check this out!"
+  }' \
+  -i "pinterest-abc123"
+```
+
+## Examples by Platform
+
+The numbers below are the ones the app lists at the time of writing; the number your channel answers is the one that counts.
+
+### Pinterest
+
+```bash
+ihateposting-agent integrations:settings pinterest-abc123
+```
+
+Returns:
+- Max length: 500 characters
+- Required settings: board
+- Optional: title, link, dominant_color
+
+### YouTube
+
+```bash
+ihateposting-agent integrations:settings youtube-def456
+```
+
+Returns:
+- Max length: 5,000 characters (description)
+- Required settings: title, type (public/private/unlisted)
+- Optional: tags, thumbnail, selfDeclaredMadeForKids
+
+### X (Twitter)
+
+```bash
+ihateposting-agent integrations:settings x-ghi789
+```
+
+Returns:
+- Max length: 280 characters (or 4,000 for verified)
+- Required settings: none
+- Optional: who_can_reply_post, community, post_type, article_title, article_status, article_cover, made_with_ai, paid_partnership
+
+### LinkedIn
+
+```bash
+ihateposting-agent integrations:settings linkedin-jkl012
+```
+
+Returns:
+- Max length: 3,000 characters
+- Optional settings: post_as_images_carousel, carousel_name
+
+### TikTok
+
+```bash
+ihateposting-agent integrations:settings tiktok-mno345
+```
+
+Returns:
+- Max length: 2,000 characters
+- Required settings: privacy_level, duet, stitch, comment, autoAddMusic, brand_content_toggle, brand_organic_toggle, content_posting_method
+- Optional: title, video_made_with_ai
+- Posting method: every setting except title requires `content_posting_method: "DIRECT_POST"` — with `"UPLOAD"` only the title/content is kept
+- Media type: duet, stitch, video_made_with_ai are video-only; autoAddMusic is photo-only; see [PROVIDER_SETTINGS.md](./PROVIDER_SETTINGS.md)
+
+### Instagram
+
+```bash
+ihateposting-agent integrations:settings instagram-pqr678
+```
+
+Returns:
+- Max length: 2,200 characters
+- Required settings: post_type (post or story)
+- Optional: is_trial_reel, graduation_strategy, collaborators
+
+## No Additional Settings Required
+
+Some platforms don't require specific settings:
+
+```bash
+ihateposting-agent integrations:settings threads-stu901
+```
+
+Returns:
+```json
+{
+  "output": {
+    "maxLength": 500,
+    "settings": "No additional settings required"
+  }
+}
+```
+
+Platforms with no additional settings:
+- Threads
+- Mastodon
+- Bluesky
+- Telegram
+
+## Use Cases
+
+### 1. Discovery
+
+Find out what settings are available before posting:
+
+```bash
+# What settings does YouTube support?
+ihateposting-agent integrations:settings youtube-123
+
+# What settings does Pinterest support?
+ihateposting-agent integrations:settings pinterest-456
+```
+
+### 2. Validation
+
+Check maximum character limits:
+
+```bash
+ihateposting-agent integrations:settings x-789 | tail -n +2 | jq '.output.maxLength'
+# Output: 280 (4000 for a channel marked as verified)
+```
+
+### 3. AI Agent Integration
+
+AI agents can call this endpoint to:
+- Discover available settings dynamically
+- Validate settings before posting
+- Adapt to platform-specific requirements
+
+```bash
+# Get settings schema
+INTEGRATION_ID="your-integration-id"
+SETTINGS=$(ihateposting-agent integrations:settings "$INTEGRATION_ID" | tail -n +2)
+
+# Extract max length
+MAX_LENGTH=$(echo "$SETTINGS" | jq '.output.maxLength')
+
+# Check and truncate content if needed
+CONTENT="Your post content"
+if [ ${#CONTENT} -gt "$MAX_LENGTH" ]; then
+  CONTENT="${CONTENT:0:$MAX_LENGTH}"
+fi
+
+# List required settings
+echo "$SETTINGS" | jq '.output.settings.required // []'
+```
+
+### 4. Form Generation
+
+Use the schema to generate UI forms:
+
+```bash
+# Inspect the settings schema for form generation
+ihateposting-agent integrations:settings pinterest-123 | tail -n +2 | jq '.output.settings'
+
+# Extract specific field properties
+ihateposting-agent integrations:settings pinterest-123 | tail -n +2 \
+  | jq '.output.settings.properties'
+# → board (text, required, digits only)
+# → title (text, up to 100 characters)
+# → link (text, a web address)
+# → dominant_color (text)
+```
+
+## Combined Workflow
+
+Complete workflow for posting with correct settings:
+
+```bash
+#!/bin/bash
+export IHATEPOSTING_API_KEY=your_key
+
+# 1. List integrations
+echo "📋 Available integrations:"
+ihateposting-agent integrations:list
+
+# 2. Get settings for Pinterest
+echo ""
+echo "⚙️  Pinterest settings:"
+SETTINGS=$(ihateposting-agent integrations:settings pinterest-123 | tail -n +2)
+echo "$SETTINGS" | jq '.output.maxLength'
+echo "$SETTINGS" | jq '.output.settings'
+
+# 3. Create post with correct settings
+echo ""
+echo "📝 Creating post..."
+ihateposting-agent posts:create \
+  -c "My post content" \
+  -m "image.jpg" \
+  -s "2024-12-31T12:00:00Z" \
+  --settings '{
+    "board": "1234567890",
+    "title": "Interesting post"
+  }' \
+  -i "pinterest-123"
+```
+
+## API Endpoint
+
+The command calls:
+```
+GET /public/v1/integration-settings/:id
+```
+
+Returns:
+```text
+{
+  output: {
+    rules?: string;
+    maxLength: number;
+    settings: <schema> | "No additional settings required" | {};
+    tools?: [{ methodName: string; description: string; dataSchema: [{ key, type, description }] }];
+  }
+}
+```
+
+## Error Handling
+
+### Integration Not Found
+
+```bash
+ihateposting-agent integrations:settings invalid-id
+# ❌ Failed to get integration settings: Request failed: API Error (<status>): <the server's words>
+```
+
+### API Key Not Set
+
+```bash
+ihateposting-agent integrations:settings pinterest-123
+# ❌ Error: No authentication found.
+```
+
+## Tips
+
+1. **Always check settings first** before creating posts with custom settings
+2. **Use the schema** to validate your settings object
+3. **Check maxLength** to avoid exceeding character limits
+4. **For AI agents**: Cache the settings to avoid repeated API calls
+5. **Required fields** must be included in your settings object
+
+## Comparison: Before vs After
+
+### Before ❌
+
+```bash
+# Had to guess what settings are available
+# Had to read documentation or source code
+# Didn't know character limits
+```
+
+### After ✅
+
+```bash
+# Discover settings programmatically
+ihateposting-agent integrations:settings pinterest-123
+
+# See exactly what's required and optional
+# Know the exact character limits
+# Get validation schemas
+```
+
+## Summary
+
+✅ **Discover settings for any integration**
+✅ **Get character limits**
+✅ **See validation schemas**
+✅ **Know required vs optional fields**
+✅ **Perfect for AI agents**
+✅ **No more guesswork!**
+
+**Now you can discover what settings each platform supports!** 🎉
+
+## Sections that were in this file before it followed the reference
+
+### What the answer holds
 
 The program prints a header line, `⚙️  Settings for integration: <channel-id>`, and then the server's JSON. Everything useful is under `output`:
 
@@ -40,7 +427,7 @@ The program prints a header line, `⚙️  Settings for integration: <channel-id
 | `output.settings` | The platform's settings as a JSON-schema-like object, **or** a short sentence when the platform has no settings, **or** an empty object. | Build your `--settings` from it. See "Reading the schema". |
 | `output.tools` | A list of helpers, each with a `methodName`, a `description` and a `dataSchema`. Absent when the platform has none. | Run them with `integrations:trigger` to find values the platform decides (boards, rooms, companies). |
 
-### The three shapes of `settings`
+#### The three shapes of `settings`
 
 1. **A schema object**: the platform has settings. This is most platforms. It has `type: "object"` and a `properties` map.
 2. **A sentence**: `"No additional settings required"`. The platform takes none; leave `--settings` out. Bluesky, Mastodon, Telegram and Threads answer this way.
@@ -48,7 +435,7 @@ The program prints a header line, `⚙️  Settings for integration: <channel-id
 
 A program that reads the answer should therefore check `typeof output.settings` before it looks for `properties`.
 
-## Reading the schema
+### Reading the schema
 
 The schema describes one object, the settings you will pass. Its parts:
 
@@ -69,7 +456,7 @@ A key can be nested (a media object has `id`, `path`, ...). Nested objects are w
 
 What the schema cannot say: conditions that depend on another key (for example "required when `post_type` is `article`") appear only in a `description` or in `output.rules`. A schema can look complete and still miss a rule, so read both.
 
-## Pulling out the parts you need
+### Pulling out the parts you need
 
 The header line is not JSON, so drop it before you parse. With `jq`:
 
@@ -103,7 +490,7 @@ $answer.output.settings.required
 
 (`tail -n +2` and `sed 1d` both remove the first line. If the answer holds characters outside plain ASCII and PowerShell shows them garbled, set `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` first.)
 
-### Keeping an answer to compare later
+#### Keeping an answer to compare later
 
 ```bash
 ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 > "settings-$CHANNEL_ID.json"
@@ -111,68 +498,7 @@ ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 > "settings-
 
 Run the command again after the app has been updated and compare the two files with `diff`. A new key, a changed limit or a new rule shows up as a change in the file. The file holds only what the server answered, never your key.
 
-## The workflow in three steps
-
-### 1. Find the channel
-
-```bash
-ihateposting-agent integrations:list
-```
-
-```json
-[
-  { "id": "pinterest-123", "name": "Tidy Shelves", "identifier": "pinterest", "disabled": false },
-  { "id": "bluesky-789", "name": "Example", "identifier": "bluesky", "disabled": false }
-]
-```
-
-(Placeholder values, abridged: each entry has more fields. The program prints a header line before the list.) The `id` is what you pass on; the `identifier` is the platform.
-
-### 2. Read its settings
-
-```bash
-ihateposting-agent integrations:settings pinterest-123
-```
-
-The answer has this outline (abridged, and not a recorded answer; the real `rules`, `maxLength` and `description` texts are what your server returns):
-
-```json
-{
-  "output": {
-    "rules": "...",
-    "maxLength": "<a number>",
-    "settings": {
-      "type": "object",
-      "properties": {
-        "title": { "type": "string", "maxLength": 100 },
-        "link": { "type": "string", "format": "url" },
-        "dominant_color": { "type": "string" },
-        "board": { "type": "string", "not": { "type": "null" }, "minLength": 1, "pattern": "^\\d+$", "description": "..." }
-      },
-      "required": ["board"]
-    },
-    "tools": [ { "methodName": "boards", "description": "...", "dataSchema": [] } ]
-  }
-}
-```
-
-What it tells you: the rules say what a pin needs in the way of media; `title` may be at most 100 characters; `link` is a web address; `board` is required and must be digits only; and a helper called `boards` takes no input (its `dataSchema` is empty).
-
-### 3. Use it in a post
-
-Get the one value only the platform knows, with the helper, then make the post:
-
-```bash
-ihateposting-agent integrations:trigger pinterest-123 boards
-
-ihateposting-agent posts:create -i pinterest-123 -c "Ten quick tips for tidy shelves" \
-  -m "<path from upload>" -s 2026-12-15T10:00:00Z -t draft \
-  --settings '{"board":"1234567890","title":"Ten tips","link":"https://example.com/tips"}'
-```
-
-A ready body file for the same thing is [examples/pinterest-pin.json](examples/pinterest-pin.json).
-
-## A second walk-through: a TikTok video
+### A second walk-through: a TikTok video
 
 TikTok is the platform with the most required keys, so it shows why reading the schema first pays off.
 
@@ -221,99 +547,18 @@ ihateposting-agent posts:create -i tiktok-123 -c "Thirty seconds on how we pack 
 ihateposting-agent posts:status <post-id> --status schedule
 ```
 
-## What to expect, platform by platform
-
-This is a map of what each answer usually contains, from the schemas the app publishes. It is a guide to help you recognise an answer, not a promise: your server's answer wins.
-
-### X
-
-- **Required settings:** none.
-- **Optional settings:** reply control, an X community, the article keys (`post_type`, `article_title`, `article_status`, `article_cover`) and two labels (`made_with_ai`, `paid_partnership`).
-- **Rules:** up to four pictures or one video, or neither; articles are written as HTML. The sentence about links may be added by the server's configuration.
-- **maxLength:** short for a normal post, longer for a channel marked as verified, much longer for an article. The number depends on the channel and on the post's mode, so read it for your channel.
-- **Helpers:** none.
-
-### LinkedIn and LinkedIn Page
-
-- **Required settings:** none. Optional: `post_as_images_carousel`, `carousel_name`.
-- **Rules:** one attachment when it is a video; a carousel needs two or more pictures.
-- **Helpers:** `mention`, which needs `{"query": "<company page name>"}`.
-
-### Instagram
-
-- **Required settings:** `post_type` (`post` or `story`).
-- **Optional settings:** `collaborators`, `graduation_strategy`, `is_trial_reel` (listed without a type).
-- **Rules:** at least one attachment; a story only one picture.
-- **Helpers:** none.
-
-### TikTok
-
-- **Required settings:** eight keys: `content_posting_method`, `privacy_level`, `duet`, `stitch`, `comment`, `autoAddMusic`, `brand_content_toggle`, `brand_organic_toggle`.
-- **Optional settings:** `title`, `video_made_with_ai`.
-- **Rules:** a long text. Read it. It explains that `DIRECT_POST` publishes and `UPLOAD` does not, which keys count in which mode, and which apply to videos only or photos only.
-- **Helpers:** none.
-
-### YouTube
-
-- **Required settings:** `title`, `type`. Optional: `selfDeclaredMadeForKids`, `thumbnail`, `tags`.
-- **Rules:** a video is needed; the post cannot be empty.
-- **Helpers:** none.
-
-### Pinterest
-
-- **Required settings:** `board`. Optional: `title`, `link`, `dominant_color`.
-- **Rules:** at least one picture; a video pin needs a cover picture too; up to five pictures.
-- **Helpers:** `boards`.
-
-### Facebook
-
-- **Required settings:** none. Optional: `post_type`, `url`, `title`, `text_format_preset_id`.
-- **Rules:** text, pictures or a video; a story needs an attachment and each attachment is its own story.
-- **Helpers:** none.
-
-### Tumblr
-
-- **Required settings:** none. Optional: `title`, `link`, `sourceUrl`, `tags`. No rules text.
-- **Helpers:** none.
-
-### Google Business
-
-- **Required settings:** none. Optional: the post kind, the button, event and offer details.
-- **Rules:** text and optionally one picture; updates, events and offers.
-- **Helpers:** none.
-
-### Slack and Discord
-
-- **Required settings:** `channel`, the id of the room to post in.
-- **Helpers:** `channels`, which lists the rooms.
-
-### Bluesky, Mastodon, Telegram, Threads
-
-No settings. The answer is short:
-
-```json
-{
-  "output": {
-    "maxLength": 300,
-    "settings": "No additional settings required"
-  }
-}
-```
-
-Bluesky's answer also has a `rules` sentence about how many pictures or videos a post may hold. The `maxLength` differs from platform to platform; the number above is only an illustration.
-
-## What you can do with the answer
+### What you can do with the answer
 
 Read the answer once per channel, not once per post: `required` says which keys you must send, `rules` says what to attach, and `maxLength` bounds the text.
 
-### Check the length
+#### Check the length
 
 ```bash
 LIMIT=$(ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).output.maxLength')
 echo "At most $LIMIT characters"
 ```
 
-### List the keys a channel takes
+#### List the keys a channel takes
 
 This prints every key of the settings schema, marks the required ones with `*`, and shows the allowed values or the type:
 
@@ -333,7 +578,7 @@ process.stdin.on("data", (d) => (s += d)).on("end", () => {
 
 The same schema is what a form builder or an agent needs to ask a person for the right values: one field per key, a drop-down when there is an `enum`, a check box for `boolean`, a required marker from `required`.
 
-### Build the post from the answer
+#### Build the post from the answer
 
 A script that reads the answer, refuses a text that is too long, refuses to continue when required settings are missing, and then makes a draft (it never publishes):
 
@@ -370,28 +615,7 @@ ihateposting-agent posts:create "${args[@]}"
 
 Run it as `CHANNEL_ID=<id> SETTINGS_JSON='{"board":"1234567890"}' bash build-draft.sh`. The shell counts characters its own way and the platform may count differently, so leave room under the limit. [examples/discover-and-draft.sh](examples/discover-and-draft.sh) is a longer script in the same spirit.
 
-## What the program asks the server
-
-```text
-GET /public/v1/integration-settings/<channel-id>
-```
-
-The answer:
-
-```text
-{
-  output: {
-    rules?: string;
-    maxLength: number;
-    settings: <schema> | "No additional settings required" | {};
-    tools?: [{ methodName: string; description: string; dataSchema: [{ key, type, description }] }];
-  }
-}
-```
-
-The key goes in the `Authorization` header exactly as it is; see [README.md](README.md) for how the program finds it. The shape above is the one the app documents; the exact `rules` and `description` words are the server's.
-
-## When something goes wrong
+### When something goes wrong
 
 | What you see | What to check |
 | --- | --- |
@@ -405,19 +629,7 @@ The key goes in the `Authorization` header exactly as it is; see [README.md](REA
 | `maxLength` is `0` and everything else is empty | The server does not know this channel's platform. Nothing is known about it; ask whoever runs the server. |
 | The server refuses a post although the settings match the schema | The schema does not show conditions between keys. Read `output.rules` and the `description` of each key, then read the server's message after `API Error (<status>)`. |
 
-## Tips for AI agents
-
-1. **Take channel ids only from `integrations:list`.** Do not make them up and do not reuse one from another workspace.
-2. **Read the answer, do not recall it.** The rules, limits and schema belong to the server and can change. Read them for the channel you are about to post to.
-3. **Keep four things:** `rules`, `maxLength`, the schema, and the names of the helpers. Do not keep the whole answer in a long prompt; keep the parts you use.
-4. **Fill every required key.** If a key needs a value only the platform knows, find a helper in `tools` and run it.
-5. **Branch on the shape.** Check whether `settings` is an object, a sentence or empty before you read `properties`.
-6. **Obey the rules text even when the schema is silent.** It carries the conditions that depend on other keys.
-7. **Draft first.** Make the post with `-t draft`, check it, and only then `posts:status <post-id> --status schedule`.
-8. **If the server refuses something, read its words, fix the cause and try once more.** The program does not retry for you, and a rate limit is shown once.
-9. **Cache sensibly.** One read per channel per session is plenty. Read again when a post is refused in a way the old answer does not explain.
-
-## See also
+### See also
 
 - [PROVIDER_SETTINGS.md](PROVIDER_SETTINGS.md) and [PROVIDER_SETTINGS_SUMMARY.md](PROVIDER_SETTINGS_SUMMARY.md): the keys and values of each platform.
 - [INTEGRATION_TOOLS_WORKFLOW.md](INTEGRATION_TOOLS_WORKFLOW.md): running the helpers that `output.tools` lists.

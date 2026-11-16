@@ -1,18 +1,21 @@
-# Publishes the package to npm when a GitHub release is published. Files only: nothing here has been run, and the repository has no remote yet
-# (PUBLISHING.md says what the owner does by hand first: the npm name, the repository, the NPM_TOKEN secret).
-name: Publish to npm on release
+# Publishes the package to npm, started by hand from the Actions tab: a release does not start it (the owner's decision of 2026-11-15: releases are
+# published by hand with two-factor authentication; this file stays in the repository as a button the owner may use). Files only: nothing here has
+# been run. PUBLISHING.md, "The two workflows", says what it needs and why a run makes little sense today.
+name: Publish to npm by hand
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "The version to publish: it must be the version in package.json, for example 0.1.0"
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 jobs:
   publish:
-    # A pre-release is never published to npm.
-    if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,12 +25,12 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
-      - name: The release tag must be the version in package.json
+      - name: The version asked for must be the version in package.json
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          WANTED_VERSION: ${{ inputs.version }}
         run: |
-          if [ "v$(node -p "require('./package.json').version")" != "$RELEASE_TAG" ]; then
-            echo "The tag $RELEASE_TAG is not the version in package.json"
+          if [ "$(node -p "require('./package.json').version")" != "${WANTED_VERSION#v}" ]; then
+            echo "The version $WANTED_VERSION is not the version in package.json"
             exit 1
           fi
 

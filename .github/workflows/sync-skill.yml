@@ -1,10 +1,9 @@
-# Keeps the plugin folders' copy of the skill (skills/ihateposting/SKILL.md) the same as the root SKILL.md whenever a release is published (or
-# by hand), so the plugin manifests always point at a real file and never at a link. Files only: nothing here has been run.
-name: Sync the plugin skill on release
+# Copies the root SKILL.md over skills/ihateposting/SKILL.md (the copy the Cursor and Grok manifests point at and `npx skills add` finds) and commits
+# the result to main. It runs only when someone starts it by hand from the Actions tab (the owner's decision of 2026-11-15: no workflow starts on a
+# release); it does not write the Claude plugin's own copy. Files only: nothing here has been run.
+name: Sync the plugin skill by hand
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
 
 permissions:
@@ -18,22 +17,19 @@ jobs:
         with:
           ref: main
 
-      - name: Copy SKILL.md into the plugin skill folders
+      - name: Copy SKILL.md into the skill folder
         run: |
-          mkdir -p skills/ihateposting plugins/dsh-ihateposting/skill
+          mkdir -p skills/ihateposting
           cp SKILL.md skills/ihateposting/SKILL.md
-          cp SKILL.md plugins/dsh-ihateposting/skill/SKILL.md
 
       - name: Commit and push when it changed
-        env:
-          WHICH: ${{ github.event.release.tag_name || 'a manual run' }}
         run: |
-          if git diff --quiet -- skills/ihateposting/SKILL.md plugins/dsh-ihateposting/skill/SKILL.md; then
-            echo "the plugin skill copies are already up to date"
+          if git diff --quiet -- skills/ihateposting/SKILL.md; then
+            echo "the skill copy is already up to date"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add skills/ihateposting/SKILL.md plugins/dsh-ihateposting/skill/SKILL.md
-          git commit -m "chore: sync the plugin skill for ${WHICH}"
+          git add skills/ihateposting/SKILL.md
+          git commit -m "chore: sync the plugin skill (a manual run)"
           git push origin main

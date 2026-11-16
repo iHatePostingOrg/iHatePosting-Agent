@@ -16,6 +16,9 @@ credentials.json
 .DS_Store
 *.swp
 
+# The ZIP that `npm run chatgpt-plugin:zip` builds for the owner to upload
+dist/
+
 # Logs and temporary files
 *.log
 *.tmp

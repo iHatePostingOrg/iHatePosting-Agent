@@ -129,7 +129,7 @@ describe("a planted fault is seen by the command line's tests", () => {
     let applied = true;
     if (fault) {
       const [, file, pairs] = fault;
-      let text = fs.readFileSync(path.join(dir, file), "utf8");
+      let text = fs.readFileSync(path.join(dir, file), "utf8").replace(/\r\n/g, "\n"); // the faults are written with \n: a CRLF working copy (Windows autocrlf) would never match their text
       for (const [from, to] of pairs) {
         if (!text.includes(from)) applied = false;
         text = text.split(from).join(to);

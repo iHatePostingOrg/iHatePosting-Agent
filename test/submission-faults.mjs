@@ -42,6 +42,10 @@ export const submissionFaults = [
   ["the Registry version is not above the old entry's latest", "server.json", [['"version": "0.13.0"', '"version": "0.1.1"']]],
   ["the Registry name has no namespace", "server.json", [['"name": "com.ihateposting/mcp"', '"name": "ihateposting-mcp"']]],
   ["the Registry name is a new entry instead of the old app's", "server.json", [['"name": "com.ihateposting/mcp"', '"name": "com.ihateposting/agent"']]],
+  ["the guide makes the ClawHub copy's key optional", "PUBLISHING.md", [["`IHATEPOSTING_API_KEY` (**required**, as in the reference project's published copy", "`IHATEPOSTING_API_KEY` (**optional**, as in the reference project's published copy"]]],
+  ["the guide adds an install entry to the ClawHub copy", "PUBLISHING.md", [["no `primaryEnv`, no `envVars` and no `install` entry", "a `primaryEnv`, `envVars` and an `install` entry"]]],
+  ["the guide publishes only SKILL.md to ClawHub", "PUBLISHING.md", [["holds `SKILL.md` and 13 of this repository's guides", "holds `SKILL.md` only and none of this repository's guides"]]],
+  ["the guide says ClawHub publishes under the repository's own licence", "PUBLISHING.md", [["**MIT-0**, which differs from this repository's MIT", "**MIT**, the same as this repository's MIT"]]],
   ["a Registry remote is plain http", "server.json", [['"url": "https://app.ihateposting.com/api/mcp",', '"url": "http://app.ihateposting.com/api/mcp",']]],
   ["the Registry's header is not secret", "server.json", [['"isSecret": true', '"isSecret": false']]],
   // The owner's guide.

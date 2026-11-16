@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - The Claude Code plugin's copy of the skill (`plugins/claude-ihateposting/skills/ihateposting/SKILL.md`) differs from the other two copies in two places, so that the Claude directory's check can read it (the owner's decision of 2026-11-16): the front matter's one-line JSON `metadata` is written as plain indented lines, and the line that links the npm page is left out. Not in the npm package (its `skills/` folder keeps the one-line JSON).
+- The Grok Build plugin's MCP file, `.grok-plugin/mcp.json`, is wrapped in `mcpServers`, the form of the standard `.mcp.json` (the owner's decision of 2026-11-16). xAI's marketplace tool that lists what a plugin contains reads only that form, so the flat file showed the plugin without its MCP server. Not in the npm package.
 
 ## [0.1.1] - 2026-11-16
 

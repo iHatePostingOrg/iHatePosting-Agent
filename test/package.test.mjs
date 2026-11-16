@@ -227,7 +227,11 @@ describe("the plugin folders", () => {
   });
 
   it("all point the hosted MCP server at the app's sign-in address", () => {
-    for (const file of [".cursor-plugin/mcp.json", ".grok-plugin/mcp.json", "mcp.json"]) assert.deepEqual(json(file), { ihateposting: { type: "http", url: "https://app.ihateposting.com/api/mcp/oauth" } }, file);
+    const server = { type: "http", url: "https://app.ihateposting.com/api/mcp/oauth" };
+    for (const file of [".cursor-plugin/mcp.json", "mcp.json"]) assert.deepEqual(json(file), { ihateposting: server }, file);
+    // The Grok plugin's file is wrapped in `mcpServers`, as the standard `.mcp.json` is: xAI's own index tool (scripts/plugin_catalog.py) reads only that form, so a flat file would show the
+    // plugin without its MCP server in the marketplace's component index (owner, 2026-11-16).
+    assert.deepEqual(json(".grok-plugin/mcp.json"), { mcpServers: { ihateposting: server } }, ".grok-plugin/mcp.json");
     assert.equal(json("gemini-extension.json").mcpServers.ihateposting.httpUrl, "https://app.ihateposting.com/api/mcp/oauth");
   });
 

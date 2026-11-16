@@ -17,6 +17,7 @@ export const pluginFaults = [
   ["the Claude plugin carries another copy of the skill", `${CLAUDE}/skills/ihateposting/SKILL.md`, [["ihateposting-agent", "ihateposting-agnt"]]],
   ["the Claude plugin's skill has the one-line JSON mapping in its front matter again", `${CLAUDE}/skills/ihateposting/SKILL.md`, [['metadata:\n  openclaw:\n    emoji: "📬"\n    requires:\n      env:\n        - IHATEPOSTING_API_URL', 'metadata: {"openclaw":{"emoji":"📬","requires":{"bins":[],"env":["IHATEPOSTING_API_URL"]}}}']]],
   ["the Claude plugin's skill links the npm page again", `${CLAUDE}/skills/ihateposting/SKILL.md`, [["ihateposting cli github:", "npm release: https://www.npmjs.com/package/ihateposting-agent\nihateposting cli github:"]]],
+  ["the Grok plugin's MCP file is no longer wrapped in mcpServers", ".grok-plugin/mcp.json", [['"mcpServers"', '"servers"']]],
   ["the Claude plugin's README no longer says what it runs", `${CLAUDE}/README.md`, [["It has no hooks, no scripts and no bundled server.", "It is a plugin."]]],
   // The DeepSeek plugin, matched to the other project's design.
   ["the DeepSeek plugin prints the key", `${DSH}/lib/index.js`, [["(key from ${connection.source})", "(key ${connection.headers.Authorization})"]]],

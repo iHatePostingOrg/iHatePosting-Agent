@@ -4,6 +4,16 @@ Four packs, one for each place the owner asked to have ready: the Cursor Marketp
 
 **Nothing in this repository submits anything, signs in anywhere, opens a pull request or publishes.** Every step is the owner's, on the place's own website, signed in as the owner, and each real submission waits for the owner's own yes. What is written here was read from the official pages named in each pack on 2026-11-15; those rules change often, so read the page again before submitting. "Unverified" means it could not be confirmed; "second-hand" means a helper read the page and it was not read again.
 
+## Where things stand (2026-11-17)
+
+Checked on 2026-11-17 by reading GitHub's and npm's public pages (nothing was changed or submitted for this). The block of 2026-11-15 below is kept as it was written; where the two disagree, this one is newer.
+
+- **Committed and pushed.** The repository's `main` holds everything these packs describe, including `plugins/dsh-ihateposting/` (the repository is public; its last push was 2026-11-16 at 16:12 UTC). The first bullet of the 2026-11-15 block ("not committed") no longer applies.
+- **Topics.** Changed by the owner: the repository now carries `dsh-plugin`, `gemini-cli-extension`, `claude-code` and `openclaw-skills` among its 20 topics.
+- **npm.** `dsh-ihateposting@0.1.1` and `ihateposting-agent@0.1.1` are published, and 0.1.1 is `latest` for both (the registry's last change for them was 2026-11-16 at 07:08 and 06:59 UTC). `ihateposting-agent@0.1.0` is still there.
+- **DeepSeek Harness community list: merged.** The pull request awesome-dsh-plugin/awesome-dsh-plugin#15823, "Add iHatePostingOrg/iHatePosting-Agent#dsh-ihateposting", was merged by the list's maintainer on 2026-11-16 at 17:27 UTC (22:57 in India). It added one file, `data/plugins/iHatePostingOrg__iHatePosting-Agent--plugins-dsh-ihateposting.yml`, with the `url` `https://github.com/iHatePostingOrg/iHatePosting-Agent/tree/main/plugins/dsh-ihateposting`, the `name` `iHatePostingOrg/iHatePosting-Agent#dsh-ihateposting`, the category `tools` and the English description of Part B in pack 3. The file is on the list's `main` and the folder it points at is on this repository's `main`. The maintainer's later comment, 已合并, means "merged"; nothing needs an answer.
+- **Not checked in this block:** whether a real DeepSeek Harness loads the plugin (none ever has; the plugin's README says so) and the state of the other places (the Cursor Marketplace, the Claude plugin portal, xAI, ClawHub and the Claude and ChatGPT connectors).
+
 ## Where things stand (2026-11-15)
 
 - **The changes these packs describe are not committed.** The Claude plugin's own folder (`plugins/claude-ihateposting/`), the rewritten DeepSeek plugin and these files exist only in the working copy. The Claude portal and xAI read the repository on GitHub, so the changes must be committed and pushed first.

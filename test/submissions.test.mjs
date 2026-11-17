@@ -141,6 +141,21 @@ describe("the ChatGPT and Codex plugin folder", () => {
   });
 });
 
+/**
+ * Expands a ZIP with Windows PowerShell's own Expand-Archive. Two things keep that honest when the tests are started from PowerShell 7
+ * (found 2026-11-17: the test failed there with "Cannot find an overload for ExtractToDirectory" and nothing was extracted):
+ * - the child must not inherit PSModulePath: PowerShell 7 puts its own module folders in it, so Windows PowerShell 5.1 loads PowerShell 7's
+ *   newer Microsoft.PowerShell.Archive, which calls a .NET method that 5.1's .NET Framework does not have;
+ * - the command must stop at its first error: Expand-Archive's errors are not terminating, so the exit status stayed 0 with nothing written.
+ * A quote in a folder's name is doubled, as PowerShell's single-quoted strings need.
+ */
+const expandWithWindowsPowerShell = (zipFile, dest) => {
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^psmodulepath$/i.test(key)));
+  const quoted = (value) => `'${value.replaceAll("'", "''")}'`;
+  const command = `$ErrorActionPreference = 'Stop'; Expand-Archive -LiteralPath ${quoted(zipFile)} -DestinationPath ${quoted(dest)}`;
+  return spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", command], { encoding: "utf8", timeout: 60_000, env });
+};
+
 describe("the ZIP script", () => {
   it("collects exactly plugin.json, mcp.json, the skills and the assets; the folder's README stays out", () => {
     const names = collect(DEFAULT_SOURCE).map((e) => e.name);
@@ -176,7 +191,7 @@ describe("the ZIP script", () => {
     fs.writeFileSync(out, buildPluginZip(DEFAULT_SOURCE));
     if (process.platform === "win32") {
       const dest = path.join(tempDir(), "expanded");
-      const r = spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", `Expand-Archive -LiteralPath '${out}' -DestinationPath '${dest}'`], { encoding: "utf8", timeout: 60_000 });
+      const r = expandWithWindowsPowerShell(out, dest);
       if (r.error) return t.skip("PowerShell is not available");
       assert.equal(r.status, 0, r.stderr);
       for (const { name } of collect(DEFAULT_SOURCE)) assert.ok(fs.readFileSync(path.join(dest, ...name.split("/"))).equals(fs.readFileSync(path.join(DEFAULT_SOURCE, ...name.split("/")))), name);
@@ -185,6 +200,28 @@ describe("the ZIP script", () => {
       if (r.error) return t.skip("unzip is not available");
       assert.equal(r.status, 0, r.stdout + r.stderr);
     }
+  });
+
+  it("still reads back when the tests are started from PowerShell 7, whose module folders Windows PowerShell must not inherit (and in a folder whose name has a quote)", (t) => {
+    const modules7 = path.join(process.env.ProgramFiles ?? "C:\\Program Files", "PowerShell", "7", "Modules");
+    if (process.platform !== "win32" || !fs.existsSync(modules7)) return t.skip("only on Windows with PowerShell 7 installed: there is no folder of its to inherit");
+    const folder = path.join(tempDir(), "it's here");
+    fs.mkdirSync(folder);
+    const zipFile = path.join(folder, "own.zip");
+    fs.writeFileSync(zipFile, buildPluginZip(DEFAULT_SOURCE));
+    const dest = path.join(folder, "expanded");
+    const before = process.env.PSModulePath;
+    process.env.PSModulePath = `${modules7};${before ?? ""}`; // what a PowerShell 7 parent hands down
+    let r;
+    try {
+      r = expandWithWindowsPowerShell(zipFile, dest);
+    } finally {
+      if (before === undefined) delete process.env.PSModulePath;
+      else process.env.PSModulePath = before;
+    }
+    if (r.error) return t.skip("PowerShell is not available");
+    assert.equal(r.status, 0, r.stderr);
+    for (const { name } of collect(DEFAULT_SOURCE)) assert.ok(fs.readFileSync(path.join(dest, ...name.split("/"))).equals(fs.readFileSync(path.join(DEFAULT_SOURCE, ...name.split("/")))), name);
   });
 
   it("--check says how many files would go in and writes nothing; no option at all builds dist/ihateposting-chatgpt-plugin.zip's name", () => {

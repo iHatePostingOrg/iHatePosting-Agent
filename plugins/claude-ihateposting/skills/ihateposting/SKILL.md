@@ -65,7 +65,7 @@ ihateposting-agent auth:status
 
 If not authenticated, either:
 1. **OAuth2:** `ihateposting-agent auth:login`
-2. **API Key:** `export IHATEPOSTING_API_KEY=your_api_key`
+2. **API Key:** `export IHATEPOSTING_API_KEY=YOUR_API_KEY`
 
 **Do NOT proceed with any other commands until authentication is confirmed.**
 
@@ -133,7 +133,7 @@ Credentials are stored in `~/.ihateposting/credentials.json`. OAuth2 credentials
 
 **Option 2: API Key**
 ```bash
-export IHATEPOSTING_API_KEY=your_api_key_here
+export IHATEPOSTING_API_KEY=YOUR_API_KEY
 ```
 
 **Optional custom API URL:**
@@ -850,7 +850,7 @@ ihateposting-agent posts:create \
 
 ## Common Gotchas
 
-1. **Not authenticated** - Run `ihateposting-agent auth:login` or `export IHATEPOSTING_API_KEY=key` before using CLI
+1. **Not authenticated** - Run `ihateposting-agent auth:login` or `export IHATEPOSTING_API_KEY=YOUR_API_KEY` before using CLI
 2. **Invalid integration ID** - Run `integrations:list` to get current IDs
 3. **Settings schema mismatch** - Check `integrations:settings` for required fields
 4. **Media MUST be uploaded to iHatePosting first** - ⚠️ **CRITICAL (Rule 2):** Every value passed to `-m` or to an `image`/media field in JSON mode must be a `.path` returned by `ihateposting-agent upload`. Raw local filenames (`image.jpg`) and external URLs (`https://...`) cannot be relied on — `-m` never uploads anything, and TikTok, Instagram, YouTube and many other providers only accept verified URLs. No exceptions: even a "quick test post" needs the upload step — or a `.path` of a file already uploaded (find it with `media:list -s <name>`).
@@ -872,7 +872,7 @@ ihateposting-agent posts:create \
 ihateposting-agent auth:status                                             # Check if authenticated
 ihateposting-agent auth:login                                              # OAuth2 device flow login
 ihateposting-agent auth:logout                                             # Remove credentials
-export IHATEPOSTING_API_KEY=key                                            # Or use API key
+export IHATEPOSTING_API_KEY=YOUR_API_KEY                                   # Or use API key
 
 # Discovery (only after auth is confirmed)
 ihateposting-agent integrations:list                           # Get integration IDs
@@ -944,7 +944,7 @@ ihateposting-agent --version
 If nobody is signed in, choose one:
 
 1. **Code sign-in:** `ihateposting-agent auth:login`. It prints a code in a box and a web address, and tries to open the page in a browser. A person types the code there and approves on the next page. The command waits, then saves the sign-in. Because it needs a person at a browser, an unattended agent should ask for one, or use a key.
-2. **Key:** `export IHATEPOSTING_API_KEY=your_key`. The key is under Settings > Agents / Dev in iHatePosting.
+2. **Key:** `export IHATEPOSTING_API_KEY=YOUR_API_KEY`. The key is under Settings > Agents / Dev in iHatePosting.
 
 A saved sign-in is used before the key in the environment.
 

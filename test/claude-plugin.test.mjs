@@ -17,15 +17,16 @@ const entry = marketplace.plugins[0];
 const manifest = json(`${FOLDER}/.claude-plugin/plugin.json`);
 
 describe("the Claude Code marketplace at the repository's root", () => {
-  it("names the marketplace and the plugin so that the install line is `ihateposting@ihateposting-agent` (the plugin keeps its name; the owner's answer of 2026-11-15, Back to ihateposting)", () => {
-    assert.equal(marketplace.name, "ihateposting-agent");
+  it("names the marketplace and the plugin so that the install line is `ihateposting@ihateposting` (the plugin keeps its name, the marketplace follows the package: the owner's answers of 2026-11-15, Back to ihateposting, and of 2026-11-19, all should be ihateposting)", () => {
+    assert.equal(marketplace.name, "ihateposting");
     assert.match(marketplace.name, /^[A-Za-z0-9][A-Za-z0-9._-]*$/);
     assert.ok(!marketplace.name.includes(".."));
     assert.equal(marketplace.plugins.length, 1);
     assert.equal(entry.name, "ihateposting");
     assert.equal(entry.name, manifest.name, "the entry and the plugin's own manifest must agree on the name");
     assert.match(read("README.md"), /\/plugin marketplace add iHatePostingOrg\/iHatePosting-Agent\n/);
-    assert.match(read("README.md"), /\/plugin install ihateposting@ihateposting-agent\n/);
+    assert.match(read("README.md"), /\/plugin install ihateposting@ihateposting\n/);
+    assert.doesNotMatch(read("README.md"), /\/plugin install ihateposting@ihateposting-agent/, "the install line names the old marketplace");
     assert.doesNotMatch(read("README.md"), /\/plugin install ihateposting-agent@/, "the plugin was renamed in an install line");
   });
 
@@ -60,7 +61,7 @@ describe("the Claude Code plugin folder", () => {
     // The skill with the two changes the Claude directory's check needs (owner, 2026-11-16; test/package.test.mjs says why): plain indented `metadata` lines, and no line linking the npm page.
     const forTheClaudeDirectory = read("SKILL.md")
       .replace('metadata: {"openclaw":{"emoji":"📬","requires":{"bins":[],"env":["IHATEPOSTING_API_URL"]}}}', 'metadata:\n  openclaw:\n    emoji: "📬"\n    requires:\n      env:\n        - IHATEPOSTING_API_URL')
-      .replace("npm release: https://www.npmjs.com/package/ihateposting-agent\n", "");
+      .replace("npm release: https://www.npmjs.com/package/ihateposting\n", "");
     assert.equal(read(`${FOLDER}/skills/ihateposting/SKILL.md`), forTheClaudeDirectory);
   });
 
@@ -72,7 +73,7 @@ describe("the Claude Code plugin folder", () => {
       assert.ok(!/(^|\/)(package(-lock)?\.json|\.mcp\.json|mcp\.json|pnpm-lock\.yaml|yarn\.lock)$/.test(file), `${file} would make the plugin more than a skill`);
     }
     assert.equal(fs.existsSync(path.join(ROOT, FOLDER, "bin")), false);
-    assert.ok(fs.existsSync(path.join(ROOT, "bin", "ihateposting-agent.mjs")), "the program's own bin/ stays at the repository's root");
+    assert.ok(fs.existsSync(path.join(ROOT, "bin", "ihateposting.mjs")), "the program's own bin/ stays at the repository's root");
   });
 
   it("meets the directory's file rules: at most 512 files, only text and complete PNG pictures, no symbolic link, path names of letters, digits, dots, hyphens and underscores", () => {
@@ -101,11 +102,11 @@ describe("the Claude Code plugin folder", () => {
   it("says in its README everything the plugin runs, sends and fetches, and how it is installed, with the same names as the rest of the repository", () => {
     const readme = read(`${FOLDER}/README.md`);
     assert.match(readme, /It has no hooks, no scripts and no bundled server/);
-    assert.match(readme, /npm install -g ihateposting-agent/);
+    assert.match(readme, /npm install -g ihateposting(?![-\w])/);
     assert.match(readme, /https:\/\/app\.ihateposting\.com\/api/);
     assert.match(readme, /IHATEPOSTING_API_KEY/);
     assert.match(readme, /\/plugin marketplace add iHatePostingOrg\/iHatePosting-Agent/);
-    assert.match(readme, /\/plugin install ihateposting@ihateposting-agent/);
+    assert.match(readme, /\/plugin install ihateposting@ihateposting(?![-\w])/);
     assert.ok(!readme.includes("@ihateposting.com") && !readme.includes("Parag"), "the README names the author");
   });
 

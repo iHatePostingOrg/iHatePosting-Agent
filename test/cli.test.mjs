@@ -98,7 +98,7 @@ describe("every command asks the API what it says and prints the header line and
       const { code, stdout, stderr } = await run(argv, { env: env() });
       assert.equal(code, 1, argv.join(" "));
       assert.equal(stdout, "");
-      assert.ok(stderr.startsWith("ihateposting-agent posts:create\n\nCreate a new post\n\nOptions:"), stderr.slice(0, 80));
+      assert.ok(stderr.startsWith("ihateposting posts:create\n\nCreate a new post\n\nOptions:"), stderr.slice(0, 80));
       assert.ok(stderr.trimEnd().endsWith(said), `${argv.join(" ")} -> ${stderr.slice(-120)}`);
     }
     const bad = await run(["posts:create", "-c", "x", "-i", "c1", "-s", "d", "-t", "now"], { env: env() });
@@ -274,7 +274,7 @@ describe("when the API refuses or is not there", () => {
     const { code, stdout, stderr } = await run(["integrations:list"], { env: { IHATEPOSTING_API_URL: api.url } });
     assert.equal(code, 1);
     assert.equal(stdout, "");
-    assert.equal(stderr, "❌ Error: No authentication found.\nOptions:\n  1. OAuth2: ihateposting-agent auth:login\n  2. API Key: export IHATEPOSTING_API_KEY=your_api_key\n");
+    assert.equal(stderr, "❌ Error: No authentication found.\nOptions:\n  1. OAuth2: ihateposting auth:login\n  2. API Key: export IHATEPOSTING_API_KEY=your_api_key\n");
     assert.equal(api.requests.length, before);
   });
 });
@@ -331,7 +331,7 @@ describe("auth:status and auth:logout", () => {
   it("says nobody is signed in, with the two ways, and ends with 0", async () => {
     const { code, stdout } = await run(["auth:status"], {});
     assert.equal(code, 0);
-    assert.equal(stdout, "❌ Not authenticated.\n\nOptions:\n  1. OAuth2: ihateposting-agent auth:login\n  2. API Key: export IHATEPOSTING_API_KEY=your_api_key\n");
+    assert.equal(stdout, "❌ Not authenticated.\n\nOptions:\n  1. OAuth2: ihateposting auth:login\n  2. API Key: export IHATEPOSTING_API_KEY=your_api_key\n");
   });
 
   it("removes what was saved, and says so when there was nothing", async () => {
@@ -359,11 +359,11 @@ describe("help, version and what is not a command", () => {
     const { code, stdout, stderr } = await run(["--help"], {});
     assert.equal(code, 0);
     assert.equal(stderr, "");
-    assert.ok(stdout.startsWith("ihateposting-agent <command> [options]\n\nCommands:\n"));
-    const names = [...stdout.matchAll(/^  ihateposting-agent (\S+)/gm)].map((m) => m[1]);
+    assert.ok(stdout.startsWith("ihateposting <command> [options]\n\nCommands:\n"));
+    const names = [...stdout.matchAll(/^  ihateposting (\S+)/gm)].map((m) => m[1]);
     assert.deepEqual(names, ["posts:create", "posts:list", "posts:delete", "posts:missing", "posts:status", "posts:settings", "posts:connect", "integrations:list", "integrations:groups", "integrations:settings", "integrations:trigger", "analytics:platform", "analytics:post", "upload", "media:status", "media:list", "auth:login", "auth:logout", "auth:status"]);
     assert.ok(!/clipping|agent-media|pos(?:ti)z/i.test(stdout));
-    assert.match(stdout, /Options:\n  -h, --help     Show help +\[boolean\]\n  -v, --version  Show version number +\[boolean\]\n\nFor more information, visit: https:\/\/ihateposting\.com\n\nAuthentication:\n  OAuth2: ihateposting-agent auth:login\n  API Key: export IHATEPOSTING_API_KEY=your_api_key\n$/);
+    assert.match(stdout, /Options:\n  -h, --help     Show help +\[boolean\]\n  -v, --version  Show version number +\[boolean\]\n\nFor more information, visit: https:\/\/ihateposting\.com\n\nAuthentication:\n  OAuth2: ihateposting auth:login\n  API Key: export IHATEPOSTING_API_KEY=your_api_key\n$/);
     assert.equal((await run(["-h"], {})).stdout, stdout);
   });
 
@@ -373,12 +373,13 @@ describe("help, version and what is not a command", () => {
     const none = await run([], {});
     assert.equal(none.code, 1);
     assert.equal(none.stdout, "");
-    assert.ok(none.stderr.startsWith("ihateposting-agent <command> [options]"));
+    assert.ok(none.stderr.startsWith("ihateposting <command> [options]"));
     assert.ok(none.stderr.trimEnd().endsWith("You need at least one command"));
   });
 
-  it("does nothing, silently, with exit 0, for a word that is not a command, as yargs does here", async () => {
-    for (const argv of [["posts:explode"], ["login", KEY], ["whoami"], ["clipping:create", "x"], ["notifications"], ["upload:url", "x"], ["groups:list"]]) {
+  it("does nothing, silently, with exit 0, for a word that is not a command, as yargs does here: the old command line of the live app that `ihateposting` was before 1.0.0 (login, logout, whoami, accounts, platforms, boards, posts, post, skill) is not part of this program, so a script of it ends without an error and without a result (the owner kept the reference's behaviour on 2026-11-19)", async () => {
+    const oldCommandLine = [["accounts"], ["platforms"], ["boards"], ["posts"], ["logout"], ["skill"], ["post", "hello", "--to", "bluesky", "--now"], ["post", "hello", "--to", "linkedin", "--at", "2026-12-01 9:00 AM", "--check"]];
+    for (const argv of [["posts:explode"], ["login", KEY], ["whoami"], ["clipping:create", "x"], ["notifications"], ["upload:url", "x"], ["groups:list"], ...oldCommandLine]) {
       const { code, stdout, stderr } = await run(argv, { env: env() });
       assert.deepEqual([code, stdout, stderr], [0, "", ""], argv.join(" "));
     }
@@ -387,7 +388,7 @@ describe("help, version and what is not a command", () => {
   it("shows one command's usage with its options, defaults and examples for `<command> --help`", async () => {
     const { code, stdout } = await run(["posts:create", "--help"], {});
     assert.equal(code, 0);
-    assert.match(stdout, /^ihateposting-agent posts:create\n\nCreate a new post\n\nOptions:\n  -c, --content {7}Post\/comment content \(can be used multiple times\) +\[string\]/);
+    assert.match(stdout, /^ihateposting posts:create\n\nCreate a new post\n\nOptions:\n  -c, --content {7}Post\/comment content \(can be used multiple times\) +\[string\]/);
     assert.match(stdout, /-t, --type +Post type: "schedule" or "draft"\n +\[string\] \[choices: "schedule", "draft"\] \[default: "schedule"\]/);
     assert.match(stdout, /--shortLink +Use short links +\[boolean\] \[default: true\]/);
     assert.match(stdout, /Examples:\n/);

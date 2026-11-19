@@ -13,7 +13,7 @@
 #   ./post-from-body-file.sh my-post.json
 #
 # Variables
-#   AGENT             How to start the program (default: ihateposting-agent).
+#   AGENT             How to start the program (default: ihateposting).
 #   CONFIRM_SCHEDULE  Set to "yes" to allow a body whose type is "schedule".
 #
 # Before you use a sample: replace every placeholder (channel ids, media ids and addresses, the
@@ -22,7 +22,7 @@
 
 set -euo pipefail
 
-AGENT="${AGENT:-ihateposting-agent}"
+AGENT="${AGENT:-ihateposting}"
 BODY_FILE="${1:?Usage: $0 <body.json>}"
 
 if [[ ! -f "${BODY_FILE}" ]]; then
@@ -60,5 +60,5 @@ if [[ "${body_type}" == "schedule" && "${CONFIRM_SCHEDULE:-}" != "yes" ]]; then
 fi
 
 echo "Sending ${BODY_FILE} (type: ${body_type:-not set})"
-# $AGENT is unquoted on purpose, so "node ./bin/ihateposting-agent.mjs" is split into words.
+# $AGENT is unquoted on purpose, so "node ./bin/ihateposting.mjs" is split into words.
 $AGENT posts:create --json "${BODY_FILE}"

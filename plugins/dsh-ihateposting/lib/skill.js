@@ -1,7 +1,7 @@
 // The skill this plugin hands to the agent, written for the tools of iHatePosting's hosted MCP server.
 //
 // It is short on purpose: the job order, the writing rules and the few things the server will not do. It is
-// not the long skill for the `ihateposting-agent` command line (that one is for a shell); the model reads the
+// not the long skill for the `ihateposting` command line (that one is for a shell); the model reads the
 // tools' own descriptions for the rest. The tools show up as mcp__ihateposting__<tool> because the MCP row of
 // cordis.patch.yml names its server "ihateposting".
 

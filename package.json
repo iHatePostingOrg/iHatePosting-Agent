@@ -1,6 +1,6 @@
 {
-  "name": "ihateposting-agent",
-  "version": "0.1.1",
+  "name": "ihateposting",
+  "version": "1.0.0",
   "description": "iHatePosting CLI - Command line interface for the iHatePosting social media scheduling API",
   "keywords": [
     "ihateposting",
@@ -41,7 +41,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "ihateposting-agent": "bin/ihateposting-agent.mjs"
+    "ihateposting": "bin/ihateposting.mjs"
   },
   "files": [
     "bin",

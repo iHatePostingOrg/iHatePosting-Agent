@@ -26,15 +26,15 @@ export const SERVICE_NAME = 'ihateposting'
 /** The variable that holds the key unless the settings name another. */
 export const DEFAULT_KEY_VARIABLE = 'IHATEPOSTING_API_KEY'
 
-/** The API of the hosted app; the MCP endpoint is this address followed by /mcp. */
-export const DEFAULT_BASE_URL = 'https://app.ihateposting.com/api'
+/** The hosted app's address; the key-based MCP endpoint is this address followed by /mcp. */
+export const DEFAULT_BASE_URL = 'https://app.ihateposting.com'
 
 export const Config = z.object({
   /** Environment variable that holds the key (made under Settings > Agents / Dev in iHatePosting). */
   apiKeyEnv: z.string().default(DEFAULT_KEY_VARIABLE),
   /** Inline key, for a patch-level override. Prefer the environment variable. */
   apiKey: z.string().role('secret').default(''),
-  /** The API address. The MCP endpoint is `<baseUrl>/mcp`; another host (self-hosted) goes here. */
+  /** The app's address. The MCP endpoint is `<baseUrl>/mcp`; another host (self-hosted) goes here. */
   baseUrl: z.string().default(DEFAULT_BASE_URL),
   /** Register the iHatePosting skill on `ctx.skills`. */
   skill: z.boolean().default(true),

@@ -4,7 +4,7 @@ Post bodies and shell scripts to copy and edit. Everything here uses placeholder
 
 ## The post bodies (`.json`)
 
-A body file is sent with `ihateposting-agent posts:create --json <file>`. The program sends it exactly as it is, so the file has to hold the whole request:
+A body file is sent with `ihateposting posts:create --json <file>`. The program sends it exactly as it is, so the file has to hold the whole request:
 
 ```json
 {
@@ -31,7 +31,7 @@ A body file is sent with `ihateposting-agent posts:create --json <file>`. The pr
 | `shortLink` | `true` to shorten the links in the text, `false` to leave them. |
 | `tags` | A list; the samples leave it empty. |
 | `posts` | One entry per channel. |
-| `posts[].integration.id` | The channel's id, from `ihateposting-agent integrations:list`. |
+| `posts[].integration.id` | The channel's id, from `ihateposting integrations:list`. |
 | `posts[].value` | The parts of the post: the first is the post, the following ones are comments (a thread). |
 | `value[].content` | The text of that part. |
 | `value[].image` | Files attached to that part, each with an `id` and a `path` (and optionally an `alt` text). Videos go here too. |
@@ -72,9 +72,9 @@ To run one from a clone of the repository:
 
 ```bash
 cd examples
-AGENT="node ../bin/ihateposting-agent.mjs" CHANNEL_ID=<your channel id> bash basic-usage.sh
+AGENT="node ../bin/ihateposting.mjs" CHANNEL_ID=<your channel id> bash basic-usage.sh
 ```
 
-`AGENT` says how to start the program; it defaults to `ihateposting-agent`. Sign in first (`auth:login`) or export `IHATEPOSTING_API_KEY` in your own shell; never write a key into a script. In every script the date comes from `POST_DATE` (a fixed example date by default), so change it to a future date you mean.
+`AGENT` says how to start the program; it defaults to `ihateposting`. Sign in first (`auth:login`) or export `IHATEPOSTING_API_KEY` in your own shell; never write a key into a script. In every script the date comes from `POST_DATE` (a fixed example date by default), so change it to a future date you mean.
 
 The scripts use Node (to read JSON), `sed` and `grep`, which a machine that runs the program usually has.

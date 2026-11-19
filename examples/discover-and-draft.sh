@@ -10,7 +10,7 @@
 #
 # Variables
 #   CHANNEL_ID     (required) id of a channel from `integrations:list`.
-#   AGENT          How to start the program (default: ihateposting-agent).
+#   AGENT          How to start the program (default: ihateposting).
 #   HELPER         A helper name from the channel's output.tools, e.g. boards or channels.
 #   HELPER_DATA    The helper's input as a JSON string, e.g. '{"query":"example-company"}'.
 #   DRAFT_TEXT     The text of the draft. Without it no draft is made.
@@ -24,7 +24,7 @@
 
 set -euo pipefail
 
-AGENT="${AGENT:-ihateposting-agent}"
+AGENT="${AGENT:-ihateposting}"
 : "${CHANNEL_ID:?Set CHANNEL_ID to the id of a channel (see: ${AGENT} integrations:list)}"
 POST_DATE="${POST_DATE:-2026-12-15T10:00:00Z}"
 

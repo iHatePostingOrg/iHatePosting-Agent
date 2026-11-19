@@ -3,7 +3,7 @@
   "mcpServers": {
     "ihateposting": {
       "type": "streamable-http",
-      "url": "https://app.ihateposting.com/api/mcp/oauth",
+      "url": "https://app.ihateposting.com/mcp/oauth",
       "extensions": {
         "com.openai": {
           "auth": {

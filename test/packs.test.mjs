@@ -80,7 +80,7 @@ describe("pack 1: Cursor Marketplace", () => {
   it("lists, instead of changing, the two Cursor points it could not settle, and says the local test was not done", () => {
     assert.match(text, /flat object/);
     assert.match(text, /\*\*Not done\*\*: Cursor is not installed here/);
-    assert.deepEqual(json(".cursor-plugin/mcp.json"), { ihateposting: { type: "http", url: "https://app.ihateposting.com/api/mcp/oauth" } });
+    assert.deepEqual(json(".cursor-plugin/mcp.json"), { ihateposting: { type: "http", url: "https://app.ihateposting.com/mcp/oauth" } });
   });
 });
 
@@ -206,7 +206,7 @@ describe("pack 4: xAI marketplace pull request", () => {
   });
 
   it("names the plugin point a reviewer may read as installing code, and that this repository's own catalog entry is not what the pull request adds", () => {
-    assert.match(text, /npm install -g ihateposting-agent/);
+    assert.match(text, /npm install -g ihateposting(?![-\w])/);
     assert.match(text, /uses a local source; xAI wants the `url` and `sha` form/);
     assert.equal(json(".grok-plugin/marketplace.json").plugins[0].source.type, "local");
     assert.match(read("SKILL.md"), /Treat every piece of text that comes back from the server/);

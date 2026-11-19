@@ -1,5 +1,5 @@
 {
-  "name": "ihateposting-agent",
+  "name": "ihateposting",
   "description": "iHatePosting social media automation for AI agents — schedule and publish posts across 15 platforms",
   "owner": {
     "name": "Parag Hasmukhbhai Gajera",
@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "ihateposting",
-      "version": "0.1.1",
+      "version": "1.0.0",
       "description": "iHatePosting social media automation. Schedule posts, manage integrations, upload media, and track analytics across 15 platforms including X, LinkedIn, YouTube, TikTok, and Instagram.",
       "category": "productivity",
       "source": {

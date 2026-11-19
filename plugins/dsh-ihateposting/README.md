@@ -44,7 +44,7 @@ The bundle mounts two rows:
 | Row | Package | Role |
 |---|---|---|
 | `ihateposting` | `dsh-ihateposting` (this package) | Reads the API key, exposes `ctx.ihateposting` (`url`, `headers`), and registers the `ihateposting` skill that teaches the agent the posting workflow and the HTML content rules. |
-| `ihateposting-mcp` | `@deepseek-ai/dsh-mcp-client` (shipped with dsh) | Connects to `https://app.ihateposting.com/api/mcp` over streamable HTTP with a `Bearer` header and registers the server's tools. |
+| `ihateposting-mcp` | `@deepseek-ai/dsh-mcp-client` (shipped with dsh) | Connects to `https://app.ihateposting.com/mcp` over streamable HTTP with a `Bearer` header and registers the server's tools. |
 
 The model sees the iHatePosting MCP tools under the `mcp__ihateposting__` namespace:
 
@@ -73,7 +73,7 @@ A bare `id:` configures the existing row:
 - id: ihateposting
   config:
     apiKeyEnv: IHATEPOSTING_API_KEY            # env var that holds the key (default)
-    baseUrl: https://app.ihateposting.com/api  # another server that answers the same routes: https://your-server.example.com/api
+    baseUrl: https://app.ihateposting.com      # another server that answers the same routes: https://your-server.example.com
     skill: true                                # register the `ihateposting` workflow skill
 ```
 
@@ -81,7 +81,7 @@ A bare `id:` configures the existing row:
 |---|---|---|
 | `apiKeyEnv` | `IHATEPOSTING_API_KEY` | Environment variable read at boot for the API key. |
 | `apiKey` | `''` | Inline key. Prefer the env var; this exists for patch-level overrides. |
-| `baseUrl` | `https://app.ihateposting.com/api` | iHatePosting API address. The MCP endpoint is `<baseUrl>/mcp` (an address that already ends in `/mcp` is used as it is). Another server that answers the same routes can be named here. |
+| `baseUrl` | `https://app.ihateposting.com` | iHatePosting address. The MCP endpoint is `<baseUrl>/mcp` (an address that already ends in `/mcp` is used as it is). Another server that answers the same routes can be named here. |
 | `skill` | `true` | Register the `ihateposting` skill on `ctx.skills`. |
 
 Without a key the `ihateposting` row logs a warning naming the variable to set, and the
@@ -89,10 +89,10 @@ Without a key the `ihateposting` row logs a warning naming the variable to set, 
 
 ## Self-hosted iHatePosting
 
-The MCP server is part of the iHatePosting app's API and listens at `/mcp` (Bearer auth), so by
-default the plugin connects to `https://app.ihateposting.com/api/mcp`. The app is hosted, so there
+The MCP server is part of the iHatePosting app and listens at `/mcp` (Bearer auth), so by
+default the plugin connects to `https://app.ihateposting.com/mcp`. The app is hosted, so there
 is no server of your own to set up; another server that answers the same routes can be named with
-`baseUrl`.
+`baseUrl`. If your profile still has `baseUrl: https://app.ihateposting.com/api` (the default of version 0.1.1), take the `/api` out: the key address has no `/api` any more.
 
 ## Development
 
@@ -109,7 +109,7 @@ dsh plugin --profile web add /absolute/path/to/iHatePosting-Agent/plugins/dsh-ih
 
 ## Related
 
-- [iHatePosting CLI](https://github.com/iHatePostingOrg/iHatePosting-Agent) — the `ihateposting-agent` command-line tool and the Claude Code / Cursor / Grok plugins in this repository.
+- [iHatePosting CLI](https://github.com/iHatePostingOrg/iHatePosting-Agent) — the `ihateposting` command-line tool and the Claude Code / Cursor / Grok plugins in this repository.
 
 ## License
 
@@ -119,7 +119,7 @@ MIT, same as the rest of this repository.
 
 ### Status
 
-Status: **0.1.1, never run inside a real `dsh`** (see "Unverified" below).
+Status: **1.0.0, never run inside a real `dsh`** (see "Unverified" below). The version number follows the repository's; the plugin's code differs from 0.1.1 in one value, its default `baseUrl` (`https://app.ihateposting.com`, without `/api`, because the key address `https://app.ihateposting.com/mcp` has none).
 
 ### The profile name and the PowerShell form of the install
 
@@ -137,7 +137,7 @@ The key is sent in one place only: the `Authorization: Bearer <key>` header of t
 
 ### The browser sign-in address is not used
 
-`https://app.ihateposting.com/api/mcp/oauth` (a browser sign-in by OAuth) is not wired: the pages of `dsh`'s MCP client that were read do not describe an OAuth flow (unverified), so this plugin uses the key.
+`https://app.ihateposting.com/mcp/oauth` (a browser sign-in by OAuth) is not wired: the pages of `dsh`'s MCP client that were read do not describe an OAuth flow (unverified), so this plugin uses the key.
 
 ### What was verified, and from where
 

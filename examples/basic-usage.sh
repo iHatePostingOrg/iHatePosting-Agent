@@ -18,7 +18,7 @@ echo ""
 
 # 1. List integrations
 echo "📋 Step 1: Listing connected integrations..."
-ihateposting-agent integrations:list
+ihateposting integrations:list
 echo ""
 
 # 2. Create a post
@@ -27,7 +27,7 @@ echo ""
 # The date in the last line is 1 hour from now. That form of date works on macOS;
 # on Linux write: date -u -d '+1 hour' +%Y-%m-%dT%H:%M:%SZ
 echo "📝 Step 2: Creating a test post..."
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Hello from iHatePosting CLI! This is an automated test post." \
   -t draft \
   -i "x-123" \
@@ -36,13 +36,13 @@ echo ""
 
 # 3. List posts
 echo "📋 Step 3: Listing recent posts..."
-ihateposting-agent posts:list
+ihateposting posts:list
 echo ""
 
 echo "✅ Example workflow completed!"
 echo ""
 echo "💡 Tips:"
 echo "  - Use -i flag to specify integrations when creating posts"
-echo "  - Upload images with: ihateposting-agent upload ./path/to/image.png"
-echo "  - Delete posts with: ihateposting-agent posts:delete <post-id>"
-echo "  - Get help: ihateposting-agent --help"
+echo "  - Upload images with: ihateposting upload ./path/to/image.png"
+echo "  - Delete posts with: ihateposting posts:delete <post-id>"
+echo "  - Get help: ihateposting --help"

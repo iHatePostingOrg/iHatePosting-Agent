@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const ROOT = fileURLToPath(new URL("../", import.meta.url));
-export const BIN = path.join(ROOT, "bin", "ihateposting-agent.mjs");
+export const BIN = path.join(ROOT, "bin", "ihateposting.mjs");
 export const KEY = "a".repeat(64);
 export const TOKEN = `pos_${"T".repeat(40)}`;
 

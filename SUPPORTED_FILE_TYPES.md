@@ -7,13 +7,13 @@ The iHatePosting CLI correctly detects and uploads various media types.
 The CLI automatically detects the MIME type based on the file extension:
 
 ```bash
-ihateposting-agent upload video.mp4
+ihateposting upload video.mp4
 # ✅ Detected as: video/mp4
 
-ihateposting-agent upload image.png
+ihateposting upload image.png
 # ✅ Detected as: image/png
 
-ihateposting-agent upload audio.mp3
+ihateposting upload audio.mp3
 # ✅ Detected as: audio/mpeg
 ```
 
@@ -37,9 +37,9 @@ The CLI recognises every extension in the tables below: it sends the MIME type s
 
 **Examples:**
 ```bash
-ihateposting-agent upload photo.jpg
-ihateposting-agent upload logo.png
-ihateposting-agent upload animation.gif
+ihateposting upload photo.jpg
+ihateposting upload logo.png
+ihateposting upload animation.gif
 ```
 
 ### Videos
@@ -59,7 +59,7 @@ ihateposting-agent upload animation.gif
 
 **Examples:**
 ```bash
-ihateposting-agent upload video.mp4
+ihateposting upload video.mp4
 ```
 
 ### Audio
@@ -98,7 +98,7 @@ The program still uploads the file; the server decides. The app, as last read, a
 ### Upload an Image
 
 ```bash
-ihateposting-agent upload ./images/photo.jpg
+ihateposting upload ./images/photo.jpg
 ```
 
 Response (after the header line `✅ File uploaded successfully!`):
@@ -119,7 +119,7 @@ These are placeholder values, as the app describes the answer; the exact fields 
 ### Upload a Video (MP4)
 
 ```bash
-ihateposting-agent upload ./videos/promo.mp4
+ihateposting upload ./videos/promo.mp4
 ```
 
 Response (abridged):
@@ -137,14 +137,14 @@ Response (abridged):
 
 ```bash
 # 1. Upload the file (tail skips the header line)
-RESULT=$(ihateposting-agent upload video.mp4 | tail -n +2)
+RESULT=$(ihateposting upload video.mp4 | tail -n +2)
 echo "$RESULT"
 
 # 2. Extract the path (you'll need jq or similar)
 MEDIA_PATH=$(echo "$RESULT" | jq -r '.path')
 
 # 3. Use in a post
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Check out my video!" \
   -m "$MEDIA_PATH" \
   -s "2024-12-31T12:00:00Z" \
@@ -161,13 +161,13 @@ The command takes one file per run, so run it once for each file:
 
 ```bash
 # Upload images
-ihateposting-agent upload image1.jpg
-ihateposting-agent upload image2.png
-ihateposting-agent upload image3.gif
+ihateposting upload image1.jpg
+ihateposting upload image2.png
+ihateposting upload image3.gif
 
 # Upload videos
-ihateposting-agent upload video1.mp4
-ihateposting-agent upload video2.mp4
+ihateposting upload video1.mp4
+ihateposting upload video2.mp4
 ```
 
 ## What Changed (Fix)
@@ -181,16 +181,16 @@ There is no such bug here, so there is no "before" to show: the program does not
 ### After (✅ Fixed)
 
 ```bash
-ihateposting-agent upload video.mp4
+ihateposting upload video.mp4
 # ✅ Correctly detected as: video/mp4
 
-ihateposting-agent upload audio.mp3
+ihateposting upload audio.mp3
 # ✅ Correctly detected as: audio/mpeg
 
-ihateposting-agent upload document.pdf
+ihateposting upload document.pdf
 # ✅ Correctly detected as: application/pdf
 
-ihateposting-agent upload notes.xyz
+ihateposting upload notes.xyz
 # ✅ An unknown extension is sent as: application/octet-stream
 ```
 
@@ -235,7 +235,7 @@ The app's media library takes only a short list of types (see the tables above),
 ffmpeg -i video.avi video.mp4
 
 # Then upload
-ihateposting-agent upload video.mp4
+ihateposting upload video.mp4
 ```
 
 ### File Size Limits
@@ -252,10 +252,10 @@ If you renamed a file with the wrong extension:
 ```bash
 # ❌ Wrong: PNG file renamed to .jpg
 mv image.png image.jpg
-ihateposting-agent upload image.jpg  # Might fail
+ihateposting upload image.jpg  # Might fail
 
 # ✅ Correct: Keep original extension
-ihateposting-agent upload image.png
+ihateposting upload image.png
 ```
 
 The program prints no message of that name: it labels the file by its extension (here `image/jpeg`) and never looks inside it. The app, as last read, judges a file by what is inside, so a mismatch can only show up as a refusal from the server (unverified).
@@ -267,10 +267,10 @@ The program prints no message of that name: it labels the file by its extension 
 export IHATEPOSTING_API_KEY=your_key
 
 # Test image upload
-ihateposting-agent upload test-image.jpg
+ihateposting upload test-image.jpg
 
 # Test video upload
-ihateposting-agent upload test-video.mp4
+ihateposting upload test-video.mp4
 ```
 
 ## Error Messages
@@ -302,7 +302,7 @@ chmod 644 your-file.mp4
 export IHATEPOSTING_API_KEY=your_key
 ```
 
-A sign-in saved by `ihateposting-agent auth:login` is used before the variable. `ihateposting-agent auth:status` shows which one is in use and whether it is still valid.
+A sign-in saved by `ihateposting auth:login` is used before the variable. `ihateposting auth:status` shows which one is in use and whether it is still valid.
 
 ## Summary
 
@@ -320,11 +320,11 @@ These sections come unchanged from this file as it was before it followed the re
 
 ### Files you can upload
 
-`ihateposting-agent upload <file>` sends a file to your workspace's media library, and the answer gives you the address (`path`) to use in posts.
+`ihateposting upload <file>` sends a file to your workspace's media library, and the answer gives you the address (`path`) to use in posts.
 
 ```bash
-ihateposting-agent upload ./photo.png
-ihateposting-agent upload ./clip.mp4 --adjust
+ihateposting upload ./photo.png
+ihateposting upload ./clip.mp4 --adjust
 ```
 
 ### What the program does
@@ -399,9 +399,9 @@ The program does not know these rules; it is here so you can decide what to uplo
 Use the `path`:
 
 ```bash
-ihateposting-agent upload ./photo.png
+ihateposting upload ./photo.png
 # note the "path" in the answer, then:
-ihateposting-agent posts:create -i <channel-id> -c "A photo" -m "<that path>" -s 2026-12-15T10:00:00Z -t draft
+ihateposting posts:create -i <channel-id> -c "A photo" -m "<that path>" -s 2026-12-15T10:00:00Z -t draft
 ```
 
 `posts:create` never uploads. Whatever you give to `-m` is sent as the text you typed; only addresses of files that are already uploaded are meant to go there, not names of files on your disk.
@@ -419,17 +419,17 @@ set -euo pipefail
 CHANNEL_ID="${CHANNEL_ID:?Set CHANNEL_ID to a channel id from integrations:list}"
 paths=""
 for file in ./one.png ./two.png ./three.png; do
-  path="$(ihateposting-agent upload "$file" | tail -n +2 | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).path')"
+  path="$(ihateposting upload "$file" | tail -n +2 | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).path')"
   paths="${paths:+$paths,}$path"
 done
 
-ihateposting-agent posts:create -i "$CHANNEL_ID" -c "Three photos" -m "$paths" -s 2026-12-15T10:00:00Z -t draft
+ihateposting posts:create -i "$CHANNEL_ID" -c "Three photos" -m "$paths" -s 2026-12-15T10:00:00Z -t draft
 ```
 
 The `tail -n +2` removes the header line before Node reads the JSON. In PowerShell:
 
 ```powershell
-$lines = ihateposting-agent upload ./photo.png
+$lines = ihateposting upload ./photo.png
 $answer = ($lines | Select-Object -Skip 1) -join "`n" | ConvertFrom-Json
 $answer.path
 ```
@@ -439,8 +439,8 @@ $answer.path
 `--adjust` asks the server to fit the file to the platforms' limits after the upload. The program's help says to wait for `ready` before you publish with the returned path. `media:status` takes the `id` from the upload answer and prints only JSON:
 
 ```bash
-ihateposting-agent upload ./video.mp4 --adjust
-ihateposting-agent media:status <media-id>
+ihateposting upload ./video.mp4 --adjust
+ihateposting media:status <media-id>
 ```
 
 While the status is `processing`, poll. A polling loop that gives up after five minutes:
@@ -449,10 +449,10 @@ While the status is `processing`, poll. A polling loop that gives up after five 
 #!/usr/bin/env bash
 set -euo pipefail
 
-id="$(ihateposting-agent upload ./video.mp4 --adjust | tail -n +2 | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).id')"
+id="$(ihateposting upload ./video.mp4 --adjust | tail -n +2 | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).id')"
 
 for attempt in $(seq 1 60); do
-  status="$(ihateposting-agent media:status "$id" | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).status')"
+  status="$(ihateposting media:status "$id" | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).status')"
   echo "attempt $attempt: $status"
   if [ "$status" = "ready" ]; then
     exit 0
@@ -468,9 +468,9 @@ Without `--adjust` there is nothing to wait for.
 ### Checking and finding uploads
 
 ```bash
-ihateposting-agent media:list                 # newest first, 18 per page
-ihateposting-agent media:list -s banner -p 2  # name contains "banner", page 2
-ihateposting-agent media:status <media-id>    # for a file uploaded with --adjust
+ihateposting media:list                 # newest first, 18 per page
+ihateposting media:list -s banner -p 2  # name contains "banner", page 2
+ihateposting media:status <media-id>    # for a file uploaded with --adjust
 ```
 
 Both print JSON only, without a header line. As the app describes it, `media:list` answers an object with `pages` (how many pages there are) and `results` (the files of the page you asked for). The search is on the name the file was uploaded with, and it ignores upper and lower case. A page number of `0`, or one that is not a number (`abc`), is left out of the request, so you get the first page.
@@ -508,8 +508,8 @@ If the server says the type is not supported, converting the file is the remedy.
 Upload one small picture first and look at the answer. If your terminal has no picture handy, any small file with a `.png` extension is enough to see how the program and the server answer; the server may judge its content, so use a real picture to see a success:
 
 ```bash
-ihateposting-agent upload ./small.png
-ihateposting-agent media:list -s small
+ihateposting upload ./small.png
+ihateposting media:list -s small
 ```
 
 The file stays in your media library until you remove it in the app. Use drafts (`-t draft`) for the first posts that use it.

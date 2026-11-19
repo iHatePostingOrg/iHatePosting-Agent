@@ -14,7 +14,7 @@ export const submissionFaults = [
   ["the draft case no longer says not to publish", `${FOLDER}/plugin.json`, [["Keep it a draft: do not schedule or publish it.", "Schedule it for me."]]],
   ["a demo link that does not exist is put in", `${FOLDER}/plugin.json`, [['"commerce": false,', '"commerce": false,\n        "demo_recording_url": "https://example.com/demo",']]],
   // The hosted server the plugin points at.
-  ["the plugin points at another server", `${FOLDER}/mcp.json`, [["https://app.ihateposting.com/api/mcp/oauth", "https://example.com/mcp"]]],
+  ["the plugin points at another server", `${FOLDER}/mcp.json`, [["https://app.ihateposting.com/mcp/oauth", "https://example.com/mcp"]]],
   ["the plugin uses the old SSE transport", `${FOLDER}/mcp.json`, [['"type": "streamable-http"', '"type": "sse"']]],
   ["the plugin signs in with a registered client", `${FOLDER}/mcp.json`, [['"mode": "dcr"', '"mode": "provided"']]],
   ["the plugin's server sends a header", `${FOLDER}/mcp.json`, [['"type": "streamable-http",', '"type": "streamable-http",\n      "headers": { "Authorization": "Bearer abc" },']]],
@@ -22,7 +22,7 @@ export const submissionFaults = [
   ["a skill is not named like its folder", `${FOLDER}/skills/get-started/SKILL.md`, [["name: get-started", "name: getstarted"]]],
   ["a skill names a tool the server does not have", `${FOLDER}/skills/schedule-posts/SKILL.md`, [["`integrationSchedulePostTool`", "`integrationSchedulePostTol`"]]],
   ["a skill deletes without asking", `${FOLDER}/skills/manage-scheduled-posts/SKILL.md`, [["2. Ask them to confirm.", "2. Go ahead."]]],
-  ["a skill tells the model to run the command line", `${FOLDER}/skills/get-started/SKILL.md`, [["## What it cannot do", "Run `ihateposting-agent posts:create` to post.\n\n## What it cannot do"]]],
+  ["a skill tells the model to run the command line", `${FOLDER}/skills/get-started/SKILL.md`, [["## What it cannot do", "Run `ihateposting posts:create` to post.\n\n## What it cannot do"]]],
   ["a skill names the other product", `${FOLDER}/skills/get-started/SKILL.md`, [["## What it cannot do", `Works like ${OTHER_PRODUCT}.\n\n## What it cannot do`]]],
   // The ZIP script.
   ["the ZIP takes the folder's README too", SCRIPT, [['const INCLUDED = ["plugin.json", "mcp.json", "skills", "assets"];', 'const INCLUDED = ["plugin.json", "mcp.json", "skills", "assets", "README.md"];']]],
@@ -38,8 +38,8 @@ export const submissionFaults = [
   ["the package has no script for the ZIP", "package.json", [['"chatgpt-plugin:zip": "node scripts/chatgpt-plugin-zip.mjs"', '"chatgpt-plugin:zip": "node scripts/other.mjs"']]],
   // The Registry draft.
   ["the Registry description is over 100 characters", "server.json", [['"description": "Draft, schedule and publish social posts, upload media and list posts across 15 platforms."', '"description": "Draft, schedule and publish social posts, upload media and list posts across 15 platforms, from ChatGPT, Claude, Cursor, Gemini or Grok."']]],
-  ["the Registry version is a range", "server.json", [['"version": "0.13.0"', '"version": "^0.13.0"']]],
-  ["the Registry version is not above the old entry's latest", "server.json", [['"version": "0.13.0"', '"version": "0.1.1"']]],
+  ["the Registry version is a range", "server.json", [['"version": "0.13.1"', '"version": "^0.13.1"']]],
+  ["the Registry version is not above the old entry's latest", "server.json", [['"version": "0.13.1"', '"version": "0.1.1"']]],
   ["the Registry name has no namespace", "server.json", [['"name": "com.ihateposting/mcp"', '"name": "ihateposting-mcp"']]],
   ["the Registry name is a new entry instead of the old app's", "server.json", [['"name": "com.ihateposting/mcp"', '"name": "com.ihateposting/agent"']]],
   ["the guide makes the ClawHub copy's key optional", "PUBLISHING.md", [["`IHATEPOSTING_API_KEY` (**required**, as in the reference project's published copy", "`IHATEPOSTING_API_KEY` (**optional**, as in the reference project's published copy"]]],
@@ -53,7 +53,7 @@ export const submissionFaults = [
   ["the guide says bundle 0.1.3 was not published", "PUBLISHING.md", [["Version 0.1.3, which adds the `package.json` and the icon, was public about 10 minutes after its submission", "Version 0.1.3, which adds the `package.json` and the icon, was prepared and not published"]]],
   ["the guide says the bundle's summary comes from the README", "PUBLISHING.md", [["the listing summary taken from the `package.json` `description`", "the listing summary taken from the README"]]],
   ["the guide says ClawHub publishes under the repository's own licence", "PUBLISHING.md", [["**MIT-0**, which differs from this repository's MIT", "**MIT**, the same as this repository's MIT"]]],
-  ["a Registry remote is plain http", "server.json", [['"url": "https://app.ihateposting.com/api/mcp",', '"url": "http://app.ihateposting.com/api/mcp",']]],
+  ["a Registry remote is plain http", "server.json", [['"url": "https://app.ihateposting.com/mcp",', '"url": "http://app.ihateposting.com/mcp",']]],
   ["the Registry's header is not secret", "server.json", [['"isSecret": true', '"isSecret": false']]],
   // The owner's guide.
   ["the guide drops the January 2027 date", "PUBLISHING.md", [["targeting January 2027", "targeting 2027"]]],

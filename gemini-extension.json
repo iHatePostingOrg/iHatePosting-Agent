@@ -1,10 +1,10 @@
 {
   "name": "ihateposting",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "iHatePosting social media automation: schedule, draft, and publish posts, manage connected channels, upload media, and track analytics across 15 platforms including X, LinkedIn, Instagram, Facebook, Threads, TikTok, YouTube, Bluesky, Mastodon, Discord, Slack, and Telegram. Bundles the hosted iHatePosting MCP server.",
   "mcpServers": {
     "ihateposting": {
-      "httpUrl": "https://app.ihateposting.com/api/mcp/oauth",
+      "httpUrl": "https://app.ihateposting.com/mcp/oauth",
       "description": "Official iHatePosting MCP server (hosted, streamable HTTP). Authorizes via OAuth on first connection: Gemini CLI opens a browser to sign in to iHatePosting; no token or local install required."
     }
   }

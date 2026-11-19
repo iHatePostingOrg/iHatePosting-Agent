@@ -1,6 +1,6 @@
 # Contributing
 
-This repo holds the iHatePosting CLI (published to npm as `ihateposting-agent`), the `ihateposting` agent skill and the plugin folders and manifests for Claude Code, Cursor, Grok, Gemini CLI, DeepSeek Harness and ChatGPT and Codex.
+This repo holds the iHatePosting CLI (published to npm as `ihateposting`), the `ihateposting` agent skill and the plugin folders and manifests for Claude Code, Cursor, Grok, Gemini CLI, DeepSeek Harness and ChatGPT and Codex.
 
 ## Setup
 
@@ -9,7 +9,7 @@ You need Node.js 20 or newer.
 ```bash
 npm install        # install the two dependencies (yargs and node-fetch)
 npm test           # run the tests (the planted-faults file takes ten minutes or more)
-node bin/ihateposting-agent.mjs --help   # run the CLI from a clone
+node bin/ihateposting.mjs --help   # run the CLI from a clone
 ```
 
 There is no build step: what you edit is what runs (see [HOW_TO_RUN.md](HOW_TO_RUN.md)). The lock files (`package-lock.json`, `pnpm-lock.yaml` and `yarn.lock`) are gitignored, so do not commit them. There is no build to check before pushing; run `npm test` instead.
@@ -100,7 +100,7 @@ Version numbers are kept equal in `package.json`, the plugin manifests and the n
 
 Please open an issue with:
 
-- the version (`ihateposting-agent --version`), your Node.js version (`node --version`) and your operating system;
+- the version (`ihateposting --version`), your Node.js version (`node --version`) and your operating system;
 - the exact command you ran, with ids replaced by placeholders if you prefer;
 - what you expected, and what you got: the exit code and the line printed on standard error (for example `❌ Failed to list integrations: Request failed: API Error (401): ...`);
 - whether you signed in with `auth:login` or with `IHATEPOSTING_API_KEY` (not the key itself).

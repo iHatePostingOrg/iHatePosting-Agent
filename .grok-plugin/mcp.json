@@ -2,7 +2,7 @@
   "mcpServers": {
     "ihateposting": {
       "type": "http",
-      "url": "https://app.ihateposting.com/api/mcp/oauth"
+      "url": "https://app.ihateposting.com/mcp/oauth"
     }
   }
 }

@@ -39,13 +39,13 @@ For quick, simple posts:
 
 ```bash
 # Single post
-ihateposting-agent posts:create -c "Hello!" -s "2024-12-31T12:00:00Z" -i "x-123"
+ihateposting posts:create -c "Hello!" -s "2024-12-31T12:00:00Z" -i "x-123"
 
 # With multiple images
-ihateposting-agent posts:create -c "Post" -m "img1.jpg,img2.jpg,img3.jpg" -s "2024-12-31T12:00:00Z" -i "x-123"
+ihateposting posts:create -c "Post" -m "img1.jpg,img2.jpg,img3.jpg" -s "2024-12-31T12:00:00Z" -i "x-123"
 
 # With comments (one -c for each part; a -m after a part's -c gives that part its own media)
-ihateposting-agent posts:create -c "Main" -c "Comment 1" -c "Comment 2" -s "2024-12-31T12:00:00Z" -i "x-123"
+ihateposting posts:create -c "Main" -c "Comment 1" -c "Comment 2" -s "2024-12-31T12:00:00Z" -i "x-123"
 ```
 
 **Limitations of Simple Mode:**
@@ -59,7 +59,7 @@ ihateposting-agent posts:create -c "Main" -c "Comment 1" -c "Comment 2" -s "2024
 For complex posts with comments that have their own delays, or a different post for each channel:
 
 ```bash
-ihateposting-agent posts:create --json complex-post.json
+ihateposting posts:create --json complex-post.json
 ```
 
 **Capabilities:**
@@ -307,7 +307,7 @@ This file now follows the reference page's headings (the owner's decision, 2026-
 
 ### Introduction
 
-What `ihateposting-agent` does, grouped by what you are trying to get done, with the exact command for each. The list of commands is the one that `ihateposting-agent --help` prints. Every command talks to the public API of iHatePosting (`/public/v1/...`) and prints what the server answers.
+What `ihateposting` does, grouped by what you are trying to get done, with the exact command for each. The list of commands is the one that `ihateposting --help` prints. Every command talks to the public API of iHatePosting (`/public/v1/...`) and prints what the server answers.
 
 Three words are used throughout:
 
@@ -337,10 +337,10 @@ That is fifteen platforms and sixteen identifiers: LinkedIn Page is a second kin
 
 | What you want | Command |
 | --- | --- |
-| Sign in with a code, no key to copy | `ihateposting-agent auth:login` |
-| Sign in against another sign-in address | `ihateposting-agent auth:login --auth-server <address>` |
-| See who is signed in and whether it still works | `ihateposting-agent auth:status` |
-| Forget the saved sign-in | `ihateposting-agent auth:logout` |
+| Sign in with a code, no key to copy | `ihateposting auth:login` |
+| Sign in against another sign-in address | `ihateposting auth:login --auth-server <address>` |
+| See who is signed in and whether it still works | `ihateposting auth:status` |
+| Forget the saved sign-in | `ihateposting auth:logout` |
 
 `auth:login` follows the device code pattern. It asks the sign-in server for a code, prints the code in a box, tries to open the page where a person types it, and then asks the server every few seconds until the person has approved or the code has run out. What comes back is kept in `~/.ihateposting/credentials.json` (the folder is made for you alone and the file is written with mode `0600`).
 
@@ -352,11 +352,11 @@ A saved sign-in always wins over the key in the environment, and it brings its o
 
 | What you want | Command |
 | --- | --- |
-| List the connected channels | `ihateposting-agent integrations:list` |
-| List only the channels of one customer | `ihateposting-agent integrations:list --group <customer-id>` |
-| List the customers | `ihateposting-agent integrations:groups` |
-| Read a channel's rules, length limit, settings schema and helpers | `ihateposting-agent integrations:settings <channel-id>` |
-| Run a helper that fetches a value only the platform knows | `ihateposting-agent integrations:trigger <channel-id> <method> -d '<json>'` |
+| List the connected channels | `ihateposting integrations:list` |
+| List only the channels of one customer | `ihateposting integrations:list --group <customer-id>` |
+| List the customers | `ihateposting integrations:groups` |
+| Read a channel's rules, length limit, settings schema and helpers | `ihateposting integrations:settings <channel-id>` |
+| Run a helper that fetches a value only the platform knows | `ihateposting integrations:trigger <channel-id> <method> -d '<json>'` |
 
 `integrations:settings` is the command to run before you write anything for a channel. Its answer holds `output.rules`, `output.maxLength`, `output.settings` and `output.tools`. How to read it is in [INTEGRATION_SETTINGS_DISCOVERY.md](INTEGRATION_SETTINGS_DISCOVERY.md); the helpers are in [INTEGRATION_TOOLS_WORKFLOW.md](INTEGRATION_TOOLS_WORKFLOW.md).
 
@@ -388,13 +388,13 @@ Work with posts that exist:
 
 | What you want | Command |
 | --- | --- |
-| List posts (default window: 30 days back to 30 days ahead) | `ihateposting-agent posts:list` |
-| List posts in a window | `ihateposting-agent posts:list --startDate <ISO date> --endDate <ISO date>` |
-| List one customer's posts | `ihateposting-agent posts:list --customer <customer-id>` |
-| Turn a post into a draft | `ihateposting-agent posts:status <post-id> --status draft` |
-| Schedule a draft | `ihateposting-agent posts:status <post-id> --status schedule` |
-| Change some settings of a post that has not gone out | `ihateposting-agent posts:settings <post-id> --settings '<json>'` |
-| Delete a post | `ihateposting-agent posts:delete <post-id>` |
+| List posts (default window: 30 days back to 30 days ahead) | `ihateposting posts:list` |
+| List posts in a window | `ihateposting posts:list --startDate <ISO date> --endDate <ISO date>` |
+| List one customer's posts | `ihateposting posts:list --customer <customer-id>` |
+| Turn a post into a draft | `ihateposting posts:status <post-id> --status draft` |
+| Schedule a draft | `ihateposting posts:status <post-id> --status schedule` |
+| Change some settings of a post that has not gone out | `ihateposting posts:settings <post-id> --settings '<json>'` |
+| Delete a post | `ihateposting posts:delete <post-id>` |
 
 `posts:settings` sends only the keys you pass and the server merges them into what the post already has; leave out `__type`. `posts:delete` prints a single line and no JSON. The server's delete works on the post's group (the `posts:list` answer has a `group` field): it takes the post with the comments that follow it, and, as far as the app's code says, not the same command's posts on other channels (read from the code, not tried on a live account). Check with `posts:list` before you delete.
 
@@ -404,10 +404,10 @@ There is no command that edits the text of an existing post. For one that has no
 
 | What you want | Command |
 | --- | --- |
-| Upload a picture, video or other file | `ihateposting-agent upload <file>` |
-| Ask the server to adjust the file to platform limits | `ihateposting-agent upload <file> --adjust` |
-| Check whether an adjusted upload is ready | `ihateposting-agent media:status <media-id>` |
-| List what is in the media library | `ihateposting-agent media:list [-s <text>] [-p <page>]` |
+| Upload a picture, video or other file | `ihateposting upload <file>` |
+| Ask the server to adjust the file to platform limits | `ihateposting upload <file> --adjust` |
+| Check whether an adjusted upload is ready | `ihateposting media:status <media-id>` |
+| List what is in the media library | `ihateposting media:list [-s <text>] [-p <page>]` |
 
 `upload` prints the server's answer, which includes the `id` and the `path` of the stored file. Use that `path` in `-m` (or in the `image` list of a body file). `media:list` shows 18 entries per page, newest first, and `-s` filters by the original file name. Which files are accepted is covered in [SUPPORTED_FILE_TYPES.md](SUPPORTED_FILE_TYPES.md).
 
@@ -415,16 +415,16 @@ There is no command that edits the text of an existing post. For one that has no
 
 | What you want | Command |
 | --- | --- |
-| A channel's analytics over the last 7 days | `ihateposting-agent analytics:platform <channel-id>` |
-| Over another number of days | `ihateposting-agent analytics:platform <channel-id> -d 30` |
-| One post's analytics (7 days by default) | `ihateposting-agent analytics:post <post-id>` |
+| A channel's analytics over the last 7 days | `ihateposting analytics:platform <channel-id>` |
+| Over another number of days | `ihateposting analytics:platform <channel-id> -d 30` |
+| One post's analytics (7 days by default) | `ihateposting analytics:post <post-id>` |
 
 `-d` is the number of days to look back. The commands print the server's answer as it is; a post that has not been published has nothing for the platform to count, so its answer may be empty.
 
 Post analytics need the platform's own identifier for the published post (the post's `releaseId`). When a post lacks it, `analytics:post` answers `{"missing": true}`, and you can fix that in two steps:
 
-1. `ihateposting-agent posts:missing <post-id>` asks the server which content on the platform could be this post, and prints the answer (JSON only, no header line).
-2. `ihateposting-agent posts:connect <post-id> --release-id <platform-id>` records the identifier you picked.
+1. `ihateposting posts:missing <post-id>` asks the server which content on the platform could be this post, and prints the answer (JSON only, no header line).
+2. `ihateposting posts:connect <post-id> --release-id <platform-id>` records the identifier you picked.
 
 Whether a platform can offer candidates is up to the server; an empty list means it found none.
 

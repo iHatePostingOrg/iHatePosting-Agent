@@ -78,13 +78,14 @@ describe("the Markdown documents", () => {
     assert.doesNotMatch(readme, /H\.264|scaled to 1080|getCompanies|getPlaylists|companyId|playlistId/);
     assert.match(readme, /does no adjusting/);
     // A line that reads a command's answer with jq skips the header line first, and no example overwrites PATH.
-    assert.doesNotMatch(readme, /\$\(ihateposting-agent (?:upload|integrations:list|integrations:trigger)[^)|]*\)/);
+    assert.doesNotMatch(readme, /\$\(ihateposting (?:upload|integrations:list|integrations:trigger)[^)|]*\)/);
     assert.doesNotMatch(readme, /^PATH=/m);
     assert.match(readme, /Skip the header line with `tail -n \+2`/);
   });
 
   it("never shows auth:login with options it does not have: the missing-sign-in message says plain auth:login and no document names a client id or a client secret (the CHANGELOG, which records the change, excepted)", () => {
     assert.deepEqual(markdown.filter((f) => f !== "CHANGELOG.md" && /--client-(?:id|secret)/.test(read(f))), []);
+    // The 0.1.1 entry is history: the program was called ihateposting-agent when it printed that line.
     assert.match(read("CHANGELOG.md"), /OAuth2: ihateposting-agent auth:login`.*instead of `auth:login --client-id <id> --client-secret <secret>`/);
   });
 

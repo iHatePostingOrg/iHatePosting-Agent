@@ -4,7 +4,7 @@
 
 A complete CLI package for the iHatePosting API has been successfully created at the root of this repository.
 
-`ihateposting-agent` is the command line for iHatePosting, a social-media scheduling app. It talks to the app's public API, so a person, a script or an AI agent can do from a terminal what the app does in a browser: list connected channels, read each platform's rules, upload media, schedule or draft posts, change them, and read analytics.
+`ihateposting` is the command line for iHatePosting, a social-media scheduling app. It talks to the app's public API, so a person, a script or an AI agent can do from a terminal what the app does in a browser: list connected channels, read each platform's rules, upload media, schedule or draft posts, change them, and read analytics.
 
 The repository holds four things:
 
@@ -15,9 +15,9 @@ The repository holds four things:
 
 ### Package Details
 
-- **Package Name:** `ihateposting-agent`
+- **Package Name:** `ihateposting`
 - **Version:** 0.1.0
-- **Executable:** `ihateposting-agent` command
+- **Executable:** `ihateposting` command
 - **Language:** JavaScript, ES modules (`.mjs`), no TypeScript, no bundler
 - **Runtime:** Node.js 20 or newer
 - **Dependencies:** `yargs` (the command line parser) and `node-fetch` (requests); nothing else
@@ -31,7 +31,7 @@ The repository holds four things:
 ```
 iHatePosting-Agent/
 ├── bin/
-│   └── ihateposting-agent.mjs        # Entry point (a shebang line and one import)
+│   └── ihateposting.mjs        # Entry point (a shebang line and one import)
 │
 ├── src/                              # Source code (1,249 lines)
 │   ├── index.mjs                     # CLI entry point with yargs
@@ -85,7 +85,7 @@ iHatePosting-Agent/
 
 ### Commands
 
-Nineteen commands. `ihateposting-agent <command> --help` shows each one's options.
+Nineteen commands. `ihateposting <command> --help` shows each one's options.
 
 1. **posts:create** - Create social media posts
    - ✅ Content input (`-c`, repeated for comments and threads)
@@ -242,7 +242,7 @@ There is no monorepo root; the one `package.json` has these scripts:
 
 ### CLI Package Scripts
 
-The command line is the package at the root, so these are the same two scripts. There is no `dev`, `build`, `start` or `publish-cli` script: the program runs as it is written (`node bin/ihateposting-agent.mjs`), and it is published by hand with `npm publish --access public`.
+The command line is the package at the root, so these are the same two scripts. There is no `dev`, `build`, `start` or `publish-cli` script: the program runs as it is written (`node bin/ihateposting.mjs`), and it is published by hand with `npm publish --access public`.
 
 ## 🎯 Usage Examples
 
@@ -253,13 +253,13 @@ The command line is the package at the root, so these are the same two scripts. 
 export IHATEPOSTING_API_KEY=your_api_key
 
 # Create a post (a draft: the date is required)
-ihateposting-agent posts:create -c "Hello World!" -s "2030-01-01T09:00:00Z" -t draft -i "x-123"
+ihateposting posts:create -c "Hello World!" -s "2030-01-01T09:00:00Z" -t draft -i "x-123"
 
 # List posts
-ihateposting-agent posts:list
+ihateposting posts:list
 
 # Upload media
-ihateposting-agent upload ./image.png
+ihateposting upload ./image.png
 ```
 
 ### AI Agent Usage
@@ -267,7 +267,7 @@ ihateposting-agent upload ./image.png
 ```bash
 # Post to social media
 export IHATEPOSTING_API_KEY="your_key"
-ihateposting-agent posts:create -c "Your content here" -s "2030-01-01T09:00:00Z" -t draft -i "x-123"
+ihateposting posts:create -c "Your content here" -s "2030-01-01T09:00:00Z" -t draft -i "x-123"
 ```
 
 ## ✨ Example Files
@@ -292,9 +292,9 @@ The scripts take ids from environment variables, hold no key, delete nothing and
 ### Manual Testing Completed
 
 ```bash
-✅ ihateposting-agent --help - lists the 19 commands
-✅ ihateposting-agent --version - 0.1.0
-✅ ihateposting-agent <command> --help - works for all 19 commands
+✅ ihateposting --help - lists the 19 commands
+✅ ihateposting --version - 0.1.0
+✅ ihateposting <command> --help - works for all 19 commands
 ```
 
 ### Test Results
@@ -304,13 +304,13 @@ The automated tests (`npm test`) use Node's built-in runner and need no network,
 ## 📋 Checklist
 
 - ✅ CLI package created at the root of the repository
-- ✅ Package name is "ihateposting-agent"
+- ✅ Package name is "ihateposting"
 - ✅ Uses IHATEPOSTING_API_KEY environment variable
 - ✅ Integrates with iHatePosting public API
 - ✅ Built for AI agent usage
 - ✅ SKILL.md created with comprehensive guide
 - ✅ README.md with full documentation
-- ✅ Executable entry point (`bin/ihateposting-agent.mjs`, with a shebang)
+- ✅ Executable entry point (`bin/ihateposting.mjs`, with a shebang)
 - ✅ Examples provided
 - ✅ Error handling implemented
 - ✅ Help text for every command
@@ -321,13 +321,13 @@ The automated tests (`npm test`) use Node's built-in runner and need no network,
 
 ```bash
 # Run it from a clone (there is no build)
-node bin/ihateposting-agent.mjs --help
+node bin/ihateposting.mjs --help
 
 # Link globally (optional)
 npm link
 
 # Use anywhere
-ihateposting-agent --help
+ihateposting --help
 ```
 
 ### To Publish to npm
@@ -342,8 +342,8 @@ The owner publishes by hand, with two-factor authentication; [PUBLISHING.md](PUB
 
 ### To Use in AI Agents
 
-1. Install: `npm install -g ihateposting-agent`
-2. Sign in with `ihateposting-agent auth:login`, or set the API key: `export IHATEPOSTING_API_KEY=your_key`
+1. Install: `npm install -g ihateposting`
+2. Sign in with `ihateposting auth:login`, or set the API key: `export IHATEPOSTING_API_KEY=your_key`
 3. Use commands programmatically
 4. Parse JSON output (skip the header line with `tail -n +2`)
 5. See SKILL.md for patterns
@@ -368,13 +368,13 @@ A complete CLI tool for iHatePosting has been created with:
 - ✅ Plugin folders for Claude Code, Cursor, Grok Build, Gemini CLI, DeepSeek Harness and ChatGPT and Codex
 - ✅ Published to npm as 0.1.0, by hand
 
-The CLI is installed with `npm install -g ihateposting-agent`, and a new version is published to npm whenever the owner is ready!
+The CLI is installed with `npm install -g ihateposting`, and a new version is published to npm whenever the owner is ready!
 
 ## Sections that were in this file before it followed the reference
 
 ### How a command runs
 
-1. `bin/ihateposting-agent.mjs` imports `src/index.mjs`, which declares every command with `yargs` and parses the command line.
+1. `bin/ihateposting.mjs` imports `src/index.mjs`, which declares every command with `yargs` and parses the command line.
 2. `yargs` fills in defaults and runs the checks. For `posts:create` that means: a text (or `--json`), a channel and a date. A failed check prints the command's usage on standard error and ends with exit code `1`, without asking the server.
 3. The handler asks `getConfig()` for a key and an address: a saved sign-in first, then `IHATEPOSTING_API_KEY` and `IHATEPOSTING_API_URL`. With neither, it says how to sign in and ends with exit code `1`.
 4. The handler builds the request and calls one method of the API client.
@@ -412,15 +412,15 @@ The CLI is installed with `npm install -g ihateposting-agent`, and a new version
 ### A typical session
 
 ```bash
-ihateposting-agent auth:login                                  # sign in once
-ihateposting-agent integrations:list                           # find a channel's id
-ihateposting-agent integrations:settings <channel-id>          # read its rules and limits
-ihateposting-agent upload ./picture.png                        # note the "path" in the answer
-ihateposting-agent posts:create -c "Hello!" -m "<path>" \
+ihateposting auth:login                                  # sign in once
+ihateposting integrations:list                           # find a channel's id
+ihateposting integrations:settings <channel-id>          # read its rules and limits
+ihateposting upload ./picture.png                        # note the "path" in the answer
+ihateposting posts:create -c "Hello!" -m "<path>" \
   -s "2030-01-01T09:00:00Z" -t draft -i "<channel-id>"         # a draft, nothing is published
-ihateposting-agent posts:list                                  # see it
-ihateposting-agent posts:status <post-id> --status schedule    # queue it when it looks right
-ihateposting-agent analytics:post <post-id> -d 7               # read the numbers after it went out
+ihateposting posts:list                                  # see it
+ihateposting posts:status <post-id> --status schedule    # queue it when it looks right
+ihateposting analytics:post <post-id> -d 7               # read the numbers after it went out
 ```
 
 ### Platforms
@@ -485,7 +485,7 @@ Point it only at servers you trust.
 | `plugins/dsh-ihateposting/` | DeepSeek Harness | a short skill for the MCP tools and an MCP connection that uses your key (with no key it warns and no tools appear) |
 | `mcp.json` | any MCP client | an entry for the hosted MCP server |
 
-The hosted MCP server is `https://app.ihateposting.com/api/mcp/oauth` (a browser sign-in); `https://app.ihateposting.com/api/mcp` takes the workspace key as a Bearer token instead. One version number is kept in `package.json`, every manifest and the newest CHANGELOG entry, and a test checks that they agree.
+The hosted MCP server is `https://app.ihateposting.com/mcp/oauth` (a browser sign-in); `https://app.ihateposting.com/mcp` takes the workspace key as a Bearer token instead. One version number is kept in `package.json`, every manifest and the newest CHANGELOG entry, and a test checks that they agree.
 
 **The skill's copies.** `SKILL.md` is the source. `skills/ihateposting/SKILL.md` is what the Cursor and Grok manifests point at (and what `npx skills add` finds), and `plugins/claude-ihateposting/skills/ihateposting/SKILL.md` is the Claude Code plugin's own copy (the plugin folder is all that gets installed, so it cannot point out of it). A test checks that all three are identical. The `sync-skill.yml` workflow, which runs only when started by hand, copies the root file over `skills/ihateposting/SKILL.md` (not over the Claude plugin's copy); after a change to `SKILL.md`, copy it to the others by hand.
 
@@ -515,14 +515,14 @@ Tests use Node's built-in runner and need no network, no key and no account. `te
 **From npm or from a clone:**
 
 ```bash
-npm install -g ihateposting-agent
+npm install -g ihateposting
 ```
 
 ```bash
 git clone https://github.com/iHatePostingOrg/iHatePosting-Agent.git
 cd iHatePosting-Agent
 npm install
-node bin/ihateposting-agent.mjs --help
+node bin/ihateposting.mjs --help
 ```
 
 **With an agent:** install the command line, sign in, then add the skill (`npx skills add iHatePostingOrg/iHatePosting-Agent`) or the plugin for your tool. The README says how for each tool.

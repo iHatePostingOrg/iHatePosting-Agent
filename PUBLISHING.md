@@ -2,7 +2,7 @@
 
 This page is for the owner of the package. It says what a release is made of, what to check first, and how to publish it: **by hand, from your own computer, with two-factor authentication** (the owner's decision of 2026-11-15; version 0.1.0 was published this way). Nothing in this repository publishes by itself: the two workflows run only when they are started by hand, they have never run, and they are not part of the way releases are made (see "The two workflows" at the end of this page).
 
-## Quick Publish (Current Name: "ihateposting-agent")
+## Quick Publish (Current Name: "ihateposting")
 
 ```bash
 # From the repository root
@@ -17,17 +17,110 @@ npm asks for a one-time code from your authenticator when it needs one: type it 
 
 Then users can install:
 ```bash
-npm install -g ihateposting-agent
+npm install -g ihateposting
 # or
-pnpm install -g ihateposting-agent
+pnpm install -g ihateposting
 
 # And use:
-ihateposting-agent --help
+ihateposting --help
 ```
+
+## Publishing 1.0.0: the move into `ihateposting`, in order
+
+The owner's decisions of 2026-11-19 (replace it, `ihateposting` only, version 1.0.0, "all should be ihateposting", leave `ihateposting-agent` alone) are in the files. **None of the commands below was run by whoever prepared them**: no `npm publish`, no `npm deprecate`, no `npm unpublish`, no commit and no push (one rename, `bin/ihateposting-agent.mjs` to `bin/ihateposting.mjs`, is staged with `git mv`). Every step is yours, from your own computer, with two-factor authentication. In a PowerShell that blocks scripts, type `npm.cmd` for `npm`. **Two things come before step 4:** the README of this package names the connector's sign-in address `https://app.ihateposting.com/mcp/oauth`, which answers 404 until Shakti routes it to the new backend (the two listings already submitted keep `https://ihateposting.com/mcp/oauth` in their own portals, a second route of his), so do not publish before that, and do not push or run the registry step before it either (the key address `https://app.ihateposting.com/mcp`, which `server.json` and the DeepSeek plugin now name, is routed in the same change, and the old `/api/mcp` key addresses stop with it); and the Agents / Dev card of the app says `npm install -g ihateposting`, which installs the old 0.6.0 until 1.0.0 is `latest`, so do not deploy the app's change before 1.0.0 is published.
+
+1. **Look at what will be published.** From the repository root:
+
+   ```bash
+   git status
+   npm test
+   npm pack --dry-run
+   ```
+
+   `git status` lists the changed files. `npm test` runs every test file; the planted-faults file takes the longest (its own header says about an hour and a half on the owner's computer, measured on 2026-11-16). `npm pack --dry-run` lists the 16 files of `ihateposting@1.0.0` (59.2 kB packed) and uploads nothing.
+
+2. **Try the tarball where nothing of yours is in the way.** A throwaway folder keeps an `ihateposting` you may have installed globally (the old 0.6.0, for example) untouched:
+
+   ```powershell
+   npm pack --pack-destination $env:TEMP
+   npm install -g --prefix "$env:TEMP\ihateposting-try" "$env:TEMP\ihateposting-1.0.0.tgz"
+   & "$env:TEMP\ihateposting-try\ihateposting.cmd" --version
+   & "$env:TEMP\ihateposting-try\ihateposting.cmd" --help
+   ```
+
+   `--version` prints `1.0.0` and `--help` lists the commands as `ihateposting <command>`; neither needs a sign-in. Tried the same way on 2026-11-19: it installs, and an install over 0.6.0 in the same folder leaves only the new program.
+
+3. **Check who you are and what is on npm.**
+
+   ```bash
+   npm whoami
+   npm view ihateposting versions dist-tags
+   ```
+
+   `npm whoami` must name the account that maintains `ihateposting` (the owner's; `npm login` if it does not). The second command must still show 0.1.0 to 0.6.0 with `latest` at 0.6.0, and no 1.0.0.
+
+4. **Publish.** npm asks for a one-time code from your authenticator: type it yourself. Choose one way.
+
+   *Staged*, which keeps `latest` on the old command line until you have looked at the new one:
+
+   ```bash
+   npm publish --access public --tag next
+   npm view ihateposting dist-tags
+   ```
+
+   The second command should show `latest: 0.6.0` and `next: 1.0.0`. Try it in a throwaway folder as in step 2 (with `ihateposting@next` in place of the tarball's path), and when you are satisfied:
+
+   ```bash
+   npm dist-tag add ihateposting@1.0.0 latest
+   ```
+
+   From then on `npm install -g ihateposting` and `npm update -g ihateposting` give 1.0.0 (a global package has no version range, so its wanted version is `latest`: npm's `update` page). npm asks for a one-time code here too, or takes `--otp <code>`. The `next` tag may stay where it is; `npm dist-tag rm ihateposting next` removes it.
+
+   *At once*:
+
+   ```bash
+   npm publish --access public
+   ```
+
+   Publishing sets `latest` to the new version unless `--tag` is given (npm's `dist-tag` page), so 1.0.0 is what everyone gets from this moment.
+
+5. **Check the result.**
+
+   ```bash
+   npm view ihateposting version dist-tags
+   ```
+
+   In a fresh folder, `npx ihateposting --version` should print `1.0.0` (when a package has several commands npx runs the one named like the package; this package has one).
+
+6. **The MCP Registry** (your own step, with your key and the DNS record of 2026-11-16, and only after Shakti has routed `https://app.ihateposting.com/mcp/oauth` and `https://app.ihateposting.com/mcp` to the new backend). `server.json` lists the first as its OAuth remote and the second as its key remote, so it no longer matches what the registry published as 0.13.0 (which named the `/api` addresses), and a published version cannot be changed: a new version is needed. Its number is 0.13.1 (your choice of 2026-11-19, already in `server.json`: above 0.13.0, because the registry takes the latest by semantic-version order); then, from the repository root, one command after the other:
+
+   ```powershell
+   mcp-publisher login dns --domain ihateposting.com --private-key ((Get-Content <your private key file> -Raw).Trim())
+   ```
+
+   ```powershell
+   mcp-publisher publish
+   ```
+
+   The first command proves the domain with the DNS record and the key you made on 2026-11-16 (the key stays outside every repository: it is never pasted into a file here); the second reads `server.json` and publishes the new version of `com.ihateposting/mcp`. `mcp-publisher` is the registry's own program: its quickstart is linked in "Official MCP Registry" below.
+
+7. **The DeepSeek plugin, if you want its new default out** (a separate package, `plugins/dsh-ihateposting`: see "The DeepSeek Harness plugin is separate" below). Its copy here is 1.0.0 and its default `baseUrl` is `https://app.ihateposting.com` (the key address has no `/api`); the published `dsh-ihateposting@0.1.1` still defaults to `https://app.ihateposting.com/api` and stops reaching the server when the `/api` key addresses stop. After the routing is live, from the repository root:
+
+   ```bash
+   node --test "plugins/dsh-ihateposting/test/*.test.mjs"
+   cd plugins/dsh-ihateposting
+   npm publish --access public
+   ```
+
+   npm asks for a one-time code: type it yourself. The account must be the one that maintains `dsh-ihateposting` (it published 0.1.1); 1.0.0 is above 0.1.1, so it becomes `latest`.
+
+8. **Nothing for `ihateposting-agent`.** The owner chose to leave it alone: no `npm deprecate`, no `npm unpublish`. It stays at 0.1.1, and the old and the new program can be installed together (tried on 2026-11-19: different command names, no clash).
+
+If something is wrong after step 4: a published version cannot be changed or published again, so publish the fix as 1.0.1 and mark the bad one with `npm deprecate ihateposting@1.0.0 "use 1.0.1"`. To put the old command line back as `latest` meanwhile, `npm dist-tag add ihateposting@0.6.0 latest` moves the tag (npm's `dist-tag` page: "add: Tags the specified version of the package with the specified tag").
 
 ## Publishing with a Different Package Name
 
-If you want to publish as a different npm package name (e.g., "your-other-name"), for example because "ihateposting-agent" were taken:
+If you want to publish as a different npm package name (e.g., "your-other-name"), for example because "ihateposting" were taken:
 
 ### 1. Change Package Name
 
@@ -36,9 +129,9 @@ Edit `package.json`:
 ```json
 {
   "name": "your-other-name",  // ← Changed package name
-  "version": "0.1.1",
+  "version": "1.0.0",
   "bin": {
-    "ihateposting-agent": "bin/ihateposting-agent.mjs"  // ← Keep command name!
+    "ihateposting": "bin/ihateposting.mjs"  // ← Keep command name!
   }
 }
 ```
@@ -66,51 +159,51 @@ pnpm install -g your-other-name
 Even though the package is called "your-other-name", the command is still:
 
 ```bash
-ihateposting-agent --help  # ← Command name from "bin" field
-ihateposting-agent posts:create -c "Hello!" -s "2030-01-01T09:00:00Z" -t draft -i "x-123"
+ihateposting --help  # ← Command name from "bin" field
+ihateposting posts:create -c "Hello!" -s "2030-01-01T09:00:00Z" -t draft -i "x-123"
 ```
 
 Changing the name touches more than `package.json`:
 
 - the install lines in `README.md`, `SKILL.md` (and its copies), `QUICK_START.md`, `HOW_TO_RUN.md` and the other guides;
-- `test/package.test.mjs`, which asserts that the name is `ihateposting-agent`;
-- the plugin manifests and the marketplaces: the plugin is called `ihateposting` and the Claude marketplace `ihateposting-agent`, so the install line is `ihateposting@ihateposting-agent`; a different npm package name does not have to change them, but the guides and tests that print the package name do.
+- `test/package.test.mjs`, which asserts that the name is `ihateposting`;
+- the plugin manifests and the marketplaces: the plugin is called `ihateposting` and the Claude marketplace `ihateposting`, so the install line is `ihateposting@ihateposting`; a different npm package name does not have to change them, but the guides and tests that print the package name do.
 
 ## Package Name vs Command Name
 
 | Field | Purpose | Example |
 |-------|---------|---------|
-| `"name"` | npm package name (what you install) | `"ihateposting-agent"` |
-| `"bin"` | Command name (what you type) | `"ihateposting-agent"` |
+| `"name"` | npm package name (what you install) | `"ihateposting"` |
+| `"bin"` | Command name (what you type) | `"ihateposting"` |
 
 **Examples:**
 
 1. **Same name** (what the package does now):
    ```json
-   "name": "ihateposting-agent",
-   "bin": { "ihateposting-agent": "bin/ihateposting-agent.mjs" }
+   "name": "ihateposting",
+   "bin": { "ihateposting": "bin/ihateposting.mjs" }
    ```
-   Install: `npm i -g ihateposting-agent`
-   Use: `ihateposting-agent`
+   Install: `npm i -g ihateposting`
+   Use: `ihateposting`
 
 2. **Different names** (an example; the package is not published under another name):
    ```json
    "name": "your-other-name",
-   "bin": { "ihateposting-agent": "bin/ihateposting-agent.mjs" }
+   "bin": { "ihateposting": "bin/ihateposting.mjs" }
    ```
    Install: `npm i -g your-other-name`
-   Use: `ihateposting-agent`
+   Use: `ihateposting`
 
 3. **Multiple commands** (an example; the package has one command):
    ```json
    "name": "your-other-name",
    "bin": {
-     "ihateposting-agent": "bin/ihateposting-agent.mjs",
-     "your-short-name": "bin/ihateposting-agent.mjs"
+     "ihateposting": "bin/ihateposting.mjs",
+     "your-short-name": "bin/ihateposting.mjs"
    }
    ```
    Install: `npm i -g your-other-name`
-   Use: `ihateposting-agent` or `your-short-name`
+   Use: `ihateposting` or `your-short-name`
 
 ## Publishing Checklist
 
@@ -118,16 +211,16 @@ Work down this list. Every item is something you can see for yourself.
 
 ### Before First Publish
 
-- [ ] Verify package name is available on npm
+- [ ] Check the name and the version number against what is on npm
   ```bash
-  npm view ihateposting-agent
-  # If error "404 Not Found" - name is available!
+  npm view ihateposting versions dist-tags
+  # eight versions, 0.1.0 to 0.6.0, latest 0.6.0: the version in package.json must not be among them
   ```
-  On 2026-11-14 this answered `E404` ("404 Not Found - GET https://registry.npmjs.org/ihateposting-agent - Not found"), which is what npm answers for a name nobody has published (read only; npm's own page about that answer was not read, unverified). A name can be taken at any time, so **run it again right before you publish**, or publish under the scope you chose (see "Scoped Packages"). Your npm account must be set up for publishing (npm's own pages say what its two-factor and token rules are today; they have been changing, so read them rather than this page).
+  `ihateposting` is the owner's own package, so the name is not free: its versions 0.1.0 to 0.6.0 are the live app's old command line (read on 2026-11-19: eight versions, `latest` 0.6.0, one maintainer), and this program is its next version, 1.0.0 (see "The package name" at the end of this page). A version that has been published can never be published again, so **run the command again right before you publish**. Your npm account must be the package's maintainer and be set up for publishing (npm's own pages say what its two-factor and token rules are today; they have been changing, so read them rather than this page).
 
 - [ ] Update version if needed
   ```json
-  "version": "0.1.1"
+  "version": "1.0.0"
   ```
   The version is the same in nine places. `test/package.test.mjs` fails if any differ:
 
@@ -168,11 +261,11 @@ Work down this list. Every item is something you can see for yourself.
 - [ ] Test locally
   ```bash
   npm link
-  ihateposting-agent --help
+  ihateposting --help
   ```
 
 - [ ] The code is on GitHub. `package.json` points at `https://github.com/iHatePostingOrg/iHatePosting-Agent`. The repository must exist there, with this code pushed to `main`, before you publish.
-- [ ] `CHANGELOG.md` has an entry for the version, as its newest numbered heading, for example `## [0.1.1] - 2026-11-16`. Changes made since the last release sit under `## [Unreleased]`; when you pick the next number, move them under the new version's heading.
+- [ ] `CHANGELOG.md` has an entry for the version, as its newest numbered heading, for example `## [1.0.0] - 2026-11-19`. Changes made since the last release sit under `## [Unreleased]`; when you pick the next number, move them under the new version's heading.
 - [ ] The three copies of the skill are the same text, apart from two spots in the Claude plugin's copy: `SKILL.md`, `skills/ihateposting/SKILL.md` and `plugins/claude-ihateposting/skills/ihateposting/SKILL.md`. The Claude plugin's copy writes the front matter's `metadata` as plain indented lines instead of one line of JSON, and leaves out the line that links the npm page, because the Claude directory's check reads the one-line JSON differently from Claude Code and holds a skill that names a remote host beside the key variable (owner, 2026-11-16; the first validation of the plugin, main @ a648b2f). The tests fail otherwise. After a change to `SKILL.md`, copy it over `skills/ihateposting/SKILL.md` by hand (`sync-skill.yml` copies it only when it is started by hand; see "The two workflows") and make the same change in the Claude plugin's copy, keeping its two spots.
 - [ ] Nothing secret is in the tree. `test/package.test.mjs` and `test/docs.test.mjs` look for key-like text, token-like text, private paths and email addresses. A last look at `git status` and `git diff` is still worth a minute.
 - [ ] The sign-in server is live (see "The sign-in's server is the iHatePosting app" at the end of this page).
@@ -204,24 +297,24 @@ Publishing by hand, step by step:
 
 Verify it's published:
 ```bash
-npm view ihateposting-agent
+npm view ihateposting
 # Should show your package info
 
-npm view ihateposting-agent version          # the number you just published
+npm view ihateposting version          # the number you just published
 ```
 
 Test installation:
 ```bash
-npm install -g ihateposting-agent
-ihateposting-agent --version                 # the same number
-ihateposting-agent --help                    # the commands; no sign-in needed
+npm install -g ihateposting
+ihateposting --version                 # the same number
+ihateposting --help                    # the commands; no sign-in needed
 ```
 
 Then try it where nothing of yours is in the way: a new folder, a new terminal, and no clone on the `PATH`.
 
 ```bash
 mkdir try-it && cd try-it
-npx ihateposting-agent --version
+npx ihateposting --version
 ```
 
 `--help` and `--version` need no sign-in and make no request. The first command that needs the server (`auth:status`, `integrations:list`) is the real proof that the address and the sign-in work.
@@ -248,7 +341,7 @@ npm publish --access public
 
 ## Version Updates
 
-### Patch Release (0.1.0 → 0.1.1)
+### Patch Release (1.0.0 → 1.0.1)
 
 ```bash
 npm version patch --no-git-tag-version
@@ -256,7 +349,7 @@ npm version patch --no-git-tag-version
 npm publish --access public
 ```
 
-### Minor Release (0.1.0 → 0.2.0)
+### Minor Release (1.0.0 → 1.1.0)
 
 ```bash
 npm version minor --no-git-tag-version
@@ -264,7 +357,7 @@ npm version minor --no-git-tag-version
 npm publish --access public
 ```
 
-### Major Release (0.1.0 → 1.0.0)
+### Major Release (1.0.0 → 2.0.0)
 
 ```bash
 npm version major --no-git-tag-version
@@ -272,7 +365,7 @@ npm version major --no-git-tag-version
 npm publish --access public
 ```
 
-Pick the number by what changed: a fix is a patch (0.1.0 to 0.1.1), a new command or option that leaves the old ones working is a minor (0.1.0 to 0.2.0), and a change that breaks a script someone already wrote is a major (0.1.0 to 1.0.0). While the version starts with `0.`, many people treat any release as possibly breaking; say so in the changelog.
+Pick the number by what changed: a fix is a patch (1.0.0 to 1.0.1), a new command or option that leaves the old ones working is a minor (1.0.0 to 1.1.0), and a change that breaks a script someone already wrote is a major (1.0.0 to 2.0.0). The first number in `ihateposting`, 1.0.0, was chosen by the owner because the package's earlier versions (0.1.0 to 0.6.0) are another program, the live app's own command line; from 1.0.0 on the rule above is the whole rule.
 
 `npm version` bumps `package.json` only, and by default it also makes a git commit and a tag, which is not what this repository wants because eight other files carry the number. That is why the commands above use `--no-git-tag-version`. Then, in this order:
 
@@ -281,7 +374,7 @@ Pick the number by what changed: a fix is a patch (0.1.0 to 0.1.1), a new comman
 3. Run `node --test --test-force-exit test/package.test.mjs`. It fails with the name of the file whose version differs.
 4. Run the whole suite (`npm test`), commit, and publish by hand.
 
-A version can be published only once. If you publish by mistake, npm will not let you replace it ("You cannot publish over the previously published versions"); make the next version instead. `npm deprecate ihateposting-agent@0.1.0 "use 0.1.1"` marks a bad version without removing it. npm limits unpublishing; read its current policy before you count on it.
+A version can be published only once. If you publish by mistake, npm will not let you replace it ("You cannot publish over the previously published versions"); make the next version instead. `npm deprecate ihateposting@1.0.0 "use 1.0.1"` marks a bad version without removing it. npm limits unpublishing; read its current policy before you count on it.
 
 ## Scoped Packages
 
@@ -289,21 +382,21 @@ If you want to publish under an organization scope:
 
 ```json
 {
-  "name": "@yourorg/ihateposting-agent",
+  "name": "@yourorg/ihateposting",
   "bin": {
-    "ihateposting-agent": "bin/ihateposting-agent.mjs"
+    "ihateposting": "bin/ihateposting.mjs"
   }
 }
 ```
 
 Install:
 ```bash
-npm install -g @yourorg/ihateposting-agent
+npm install -g @yourorg/ihateposting
 ```
 
 Use:
 ```bash
-ihateposting-agent --help
+ihateposting --help
 ```
 
 A scoped package is private by default; `npm publish --access public` makes it public.
@@ -315,7 +408,7 @@ A scoped package is private by default; `npm publish --access public` makes it p
 There is no build to test: the code runs as it is written. Run the program, and the tests:
 
 ```bash
-node bin/ihateposting-agent.mjs --help
+node bin/ihateposting.mjs --help
 npm test
 node --test --test-force-exit test/package.test.mjs
 ```
@@ -324,8 +417,8 @@ node --test --test-force-exit test/package.test.mjs
 
 ```bash
 npm link
-ihateposting-agent --help
-npm unlink -g ihateposting-agent
+ihateposting --help
+npm unlink -g ihateposting
 ```
 
 ### Test Publishing (Dry Run)
@@ -349,9 +442,9 @@ npm pack --pack-destination ..                # next to the clone, not inside it
 # Test installing the tarball in a folder of its own
 mkdir ../try-package && cd ../try-package
 npm init -y
-npm install ../ihateposting-agent-0.1.0.tgz
-npx ihateposting-agent --version
-npx ihateposting-agent --help
+npm install ../ihateposting-0.1.0.tgz
+npx ihateposting --version
+npx ihateposting --help
 ```
 
 This installs the two dependencies from the registry, then runs the packed code exactly as a user's computer would. It does not install the command globally, so it cannot replace a copy you already use, and the `.tgz` stays out of the clone (`.gitignore` does not ignore `.tgz` files). Do not run `auth:login` there unless the app's sign-in routes are live.
@@ -360,7 +453,7 @@ This installs the two dependencies from the registry, then runs the packed code 
 
 Publishing to npm is not automated: the owner publishes by hand, from their own computer, with two-factor authentication (the owner's decision of 2026-11-15). `.github/workflows/publish-npm.yml` and `.github/workflows/sync-skill.yml` are in the repository, and both run only when they are started by hand (the Actions tab, choose the workflow, "Run workflow"); neither runs on a push, a pull request or a published release.
 
-- `publish-npm.yml` needs the `NPM_TOKEN` repository secret: an npm token with publish rights on `ihateposting-agent`.
+- `publish-npm.yml` needs the `NPM_TOKEN` repository secret: an npm token with publish rights on `ihateposting`.
 - Neither workflow has ever run.
 
 To release:
@@ -376,13 +469,13 @@ If the publish fails (for example, a wrong one-time code), run it again; a versi
 ### "You do not have permission to publish"
 
 - Make sure you're logged in: `npm login` (`npm whoami` shows who you are)
-- Check package name isn't taken: `npm view ihateposting-agent`
+- Check package name isn't taken: `npm view ihateposting`
 - If scoped, ensure org access: `npm org ls yourorg`
 
 ### "Package name too similar to existing package"
 
 - Choose a more unique name
-- Or use a scoped package: `@yourorg/ihateposting-agent`
+- Or use a scoped package: `@yourorg/ihateposting`
 
 ### "Missing required files"
 
@@ -393,25 +486,25 @@ If the publish fails (for example, a wrong one-time code), run it again; a versi
 ### Command not found after install
 
 - Check `"bin"` field is correct
-- Ensure `bin/ihateposting-agent.mjs` has shebang: `#!/usr/bin/env node`
-- Try reinstalling: `npm uninstall -g ihateposting-agent && npm install -g ihateposting-agent`
+- Ensure `bin/ihateposting.mjs` has shebang: `#!/usr/bin/env node`
+- Try reinstalling: `npm uninstall -g ihateposting && npm install -g ihateposting`
 - npm's global folder may not be on your `PATH`: `npm prefix -g` shows it
 
 ## Recommended Names
 
-If "ihateposting-agent" is taken, consider:
+If "ihateposting" is taken, consider:
 
-- `@yourorg/ihateposting-agent`
-- `ihateposting-agent-cli`
+- `@yourorg/ihateposting`
+- `ihateposting-cli`
 - `agent-ihateposting`
 
 None of these was looked up on npm (unverified): run `npm view <name>` first.
 
-Remember: The package name is just for installation. The command can still be `ihateposting-agent`!
+Remember: The package name is just for installation. The command can still be `ihateposting`!
 
 ## Summary
 
-✅ The package name and the command are both `ihateposting-agent`
+✅ The package name and the command are both `ihateposting`
 ✅ `bin` field defines the command name
 ✅ `name` field defines the npm package name
 ✅ They can be different!
@@ -427,23 +520,23 @@ npm publish --access public
 **Users install:**
 
 ```bash
-npm install -g ihateposting-agent
+npm install -g ihateposting
 # or
-pnpm install -g ihateposting-agent
+pnpm install -g ihateposting
 ```
 
 **Users use:**
 
 ```bash
-ihateposting-agent --help
-ihateposting-agent posts:create -c "Hello!" -s "2030-01-01T09:00:00Z" -t draft -i "x-123"
+ihateposting --help
+ihateposting posts:create -c "Hello!" -s "2030-01-01T09:00:00Z" -t draft -i "x-123"
 ```
 
 🚀 **Publishing is by hand, with two-factor authentication, and every release is a new version number.**
 
 | Question | Answer |
 | --- | --- |
-| Package name and command | `ihateposting-agent`, both |
+| Package name and command | `ihateposting`, both |
 | What is published | `bin`, `src`, `SKILL.md`, `skills`, `README.md`, `CHANGELOG.md`, `LICENSE`, `package.json` |
 | Files that carry the version | Nine; `test/package.test.mjs` checks them |
 | Tests that must pass first | `npm test`, planted-faults file included |
@@ -457,14 +550,14 @@ ihateposting-agent posts:create -c "Hello!" -s "2030-01-01T09:00:00Z" -t draft -
 
 ### What the package contains
 
-`package.json` decides it with a `files` list: `bin`, `src`, `SKILL.md`, `skills`, `README.md`, `CHANGELOG.md` and `LICENSE`. npm adds `package.json` itself. `npm pack --dry-run` prints the result without writing a file or publishing anything; the published 0.1.0 was 16 files, 49.7 kB packed and 170.9 kB unpacked (npm's own output when it was published), and the dry run for 0.1.1 lists the same 16 files, 58.2 kB packed and 210.6 kB unpacked (the skill grew from 42.6 kB to 60.5 kB and is in the package twice):
+`package.json` decides it with a `files` list: `bin`, `src`, `SKILL.md`, `skills`, `README.md`, `CHANGELOG.md` and `LICENSE`. npm adds `package.json` itself. `npm pack --dry-run` prints the result without writing a file or publishing anything; the published 0.1.0 was 16 files, 49.7 kB packed and 170.9 kB unpacked (npm's own output when it was published), and the dry run for 0.1.1 lists the same 16 files, 58.2 kB packed and 210.6 kB unpacked (the skill grew from 42.6 kB to 60.5 kB and is in the package twice). The dry run for `ihateposting` 1.0.0 (2026-11-19) lists the same 16 files, 59.2 kB packed and 212.1 kB unpacked (the new name is shorter, the changelog longer):
 
 ```text
 CHANGELOG.md
 LICENSE
 README.md
 SKILL.md
-bin/ihateposting-agent.mjs
+bin/ihateposting.mjs
 package.json
 skills/ihateposting/SKILL.md
 src/api.mjs
@@ -488,35 +581,40 @@ The numbers move a little whenever a document changes; the list should not. Left
 
 ### The package name
 
-The package and the command are both `ihateposting-agent` (the owner's choice, 2026-11-14). The live iHatePosting app already has a command line of its own on npm, called `ihateposting`, and this package does not replace it: the two keep different names. Two fields in `package.json` carry the name, and they are separate things:
+The package and the command are both `ihateposting` (the owner's decision of 2026-11-19; from 2026-11-14 until then both were `ihateposting-agent`). `ihateposting` is an older package of the owner's: its versions 0.1.0 to 0.6.0 are the live app's own command line, and this program is its next version, 1.0.0 (the owner's answer "Replace it"), and **this package replaces it as the newest version**: once 1.0.0 is published as `latest`, `npm install -g ihateposting` and `npm update -g ihateposting` give this program. npm keeps every published version as it is, so the old ones stay installable by their number (`npm install -g ihateposting@0.6.0`; the registry's policy page says registry data is immutable, https://docs.npmjs.com/policies/unpublish, read 2026-11-19). `ihateposting-agent` (`0.0.0-stage`, 0.1.0 and 0.1.1) was left alone on npm: not deprecated, not unpublished, and no new version of it is made (the owner's answer "Leave it alone"). Unpublishing it was not possible anyway: after 72 hours npm's policy allows it only when no other package depends on it, it had fewer than 300 downloads over the last week and it has a single owner, and `ihateposting-agent` had 452 downloads in the week 2026-11-11 to 2026-11-17 (npm's own count, which includes mirrors and scanners). Two fields in `package.json` carry the name, and they are separate things:
 
 | Field | What it decides | Value now |
 | --- | --- | --- |
-| `name` | What people type after `npm install` | `ihateposting-agent` |
-| `bin` | What people type to run the program | `ihateposting-agent` (pointing at `bin/ihateposting-agent.mjs`) |
+| `name` | What people type after `npm install` | `ihateposting` |
+| `bin` | What people type to run the program | `ihateposting` (pointing at `bin/ihateposting.mjs`) |
 
 #### Check the name before you publish
 
 ```bash
-npm view ihateposting-agent
+npm view ihateposting versions dist-tags
 ```
 
-On 2026-11-14 this answered `E404` ("404 Not Found - GET https://registry.npmjs.org/ihateposting-agent - Not found"), which is what npm answers for a name nobody has published (read only; npm's own page about that answer was not read, unverified). A name can be taken at any time, so **run it again right before you publish**. The version stays 0.1.0.
+On 2026-11-19 the registry listed eight versions, 0.1.0 to 0.6.0, `latest` 0.6.0 and one maintainer, the owner's account. The number in `package.json` (1.0.0) is not among them. Run the command again right before you publish: a published `name@version` can never be used again, even after an unpublish.
 
-#### The live app's two npm packages are not touched
+#### What replacing the old command line means
 
-Both were read only, on 2026-11-14, with `npm view`:
+Read from the old package's published files (0.6.0, packed and unpacked; installed only into a throwaway folder to ask it for its version, never signed in or used) and from this program's code. It replaces a different program, not an older build of this one:
 
-- `ihateposting` is the command line of the live app (versions 0.1.0 to 0.6.0, `latest` is 0.6.0; "Post to 14 social platforms from your terminal, your CI, or your AI agent."; its `bin` is `ihateposting`; MIT; published by the owner's npm account).
-- `ihateposting-mcp` is a second package of the live app (latest 0.12.9 then; "MCP server for iHatePosting"; its `bin` is `ihateposting-mcp`). **This repository has no such package and does not publish one**: its MCP server is the hosted one at `https://app.ihateposting.com/api/mcp/oauth`, so there is nothing here to install or run locally.
+- **Different commands.** The old one has `login <key>`, `logout`, `whoami`, `accounts`, `platforms`, `boards`, `posts`, `upload`, `post "text" --to ...` and `skill`; this one has the reference's commands (`auth:login`, `posts:create`, `integrations:list` and so on). A word that is not a command is accepted and does nothing, with exit code 0, as in the reference (the owner chose to keep it that way on 2026-11-19), so an old script that runs `ihateposting post ...` ends without an error and without a post.
+- **Different servers.** The old one talks to `https://ihateposting.com` unless told otherwise; this one talks to `https://app.ihateposting.com/api`. A key, or a value of `IHATEPOSTING_API_URL`, meant for one is therefore the wrong value for the other (not tried with a real old key).
+- **The same folder, different files.** The old one keeps its key and address in `~/.ihateposting/config.json` (the folder is created with mode 0700 and the file with 0600; its `logout` removes only that file). This one keeps `~/.ihateposting/credentials.json`. Neither reads or removes the other's file.
+- **The same variables, in another order.** Both read `IHATEPOSTING_API_KEY` and `IHATEPOSTING_API_URL` (this one also reads `IHATEPOSTING_AUTH_SERVER`). The old one lets the variable win over its stored key; this one lets the stored sign-in win over the variable.
+- **Different Node and dependencies.** The old one asks for Node 18 or newer and has no dependencies; this one asks for 20 or newer and installs `yargs` and `node-fetch`. The old `ihateposting/commands` and `ihateposting/skill` imports are gone.
+- **The live app still says the old thing.** Its own command-line card says `npm install -g ihateposting` and `ihateposting login <key>` (`apps/web/src/components/app/cli-setup.tsx` in a read-only copy of the old app's repository, read on 2026-11-19), and its MCP server's upload hint says `ihateposting upload` (`packages/mcp/src/tools.ts`, same copy; whether the published `ihateposting-mcp` 0.12.9 has the same text was not checked). Once 1.0.0 is `latest`, those instructions install this program. That is a difference from the live app, accepted by the owner when he chose "Replace it"; when the live app's own texts change is the live app's side.
+- **The old program stays reachable.** Anyone who needs it installs `ihateposting@0.6.0` (or an older number).
 
-Publishing this repository never writes to either of them: the name is `ihateposting-agent`. Where the two command lines meet on one computer (read from the source of `ihateposting` 0.6.0, packed and unpacked, never run or installed):
+#### The live app's MCP package is not touched
 
-- **Both can be installed together.** The commands have different names (`ihateposting` and `ihateposting-agent`), so npm links two different files. This was not tried here (unverified); the case that would clash, two packages offering one command name, is the one this naming avoids (with two stand-in packages in a throwaway prefix, npm 11.19.1 on Windows, the second `npm install -g` stopped with "EEXIST", and `--force` overwrote the command).
-- **The same folder, different files.** `ihateposting` keeps its key and address in `~/.ihateposting/config.json` (the folder is created with mode 0700 and the file with 0600; its `logout` removes only that file). This tool keeps `~/.ihateposting/credentials.json`. Neither reads or removes the other's file.
-- **The same variables.** Both read `IHATEPOSTING_API_KEY` and `IHATEPOSTING_API_URL`; this tool also reads `IHATEPOSTING_AUTH_SERVER`. A variable exported for one is seen by the other.
-- **Different addresses.** `ihateposting` talks to `https://ihateposting.com` unless told otherwise; this tool talks to `https://app.ihateposting.com/api`. A value of `IHATEPOSTING_API_URL` meant for one is therefore the wrong address for the other.
-- **Different Node.** `ihateposting` asks for Node 18 or newer; this tool asks for 20 or newer.
+`ihateposting-mcp` is a second package of the live app (latest 0.12.9, read from the registry on 2026-11-19; "MCP server for iHatePosting"; its `bin` is `ihateposting-mcp`). **This repository has no such package and does not publish one**: its MCP server is the hosted one at `https://app.ihateposting.com/mcp/oauth`, so there is nothing here to install or run locally.
+
+#### Two names on one computer
+
+`ihateposting` (this program) and `ihateposting-agent` (the same program as 0.1.1, still on npm) can be installed together: their commands have different names, so npm links two different files. A package that offered a command that another global package already owns would stop npm with EEXIST (tried on 2026-11-19 with two stand-in packages in a throwaway prefix, npm 11.19.1 on Windows: the second `npm install -g` stopped with "EEXIST: file already exists" and the first package's command kept running). That is why the package has one command, `ihateposting`, and not also `ihateposting-agent` (the owner's answer, 2026-11-19: "`ihateposting` only").
 
 #### If the name were taken
 
@@ -525,32 +623,32 @@ The command can stay the same while the package gets another name, because `bin`
 ```json
 {
   "name": "your-other-name",
-  "bin": { "ihateposting-agent": "bin/ihateposting-agent.mjs" }
+  "bin": { "ihateposting": "bin/ihateposting.mjs" }
 }
 ```
 
-People would then run `npm install -g your-other-name` and still type `ihateposting-agent`. The other route is a scoped name, which belongs to your npm user or organization:
+People would then run `npm install -g your-other-name` and still type `ihateposting`. The other route is a scoped name, which belongs to your npm user or organization:
 
 ```json
 {
-  "name": "@your-scope/ihateposting-agent",
-  "bin": { "ihateposting-agent": "bin/ihateposting-agent.mjs" }
+  "name": "@your-scope/ihateposting",
+  "bin": { "ihateposting": "bin/ihateposting.mjs" }
 }
 ```
 
 ```bash
-npm install -g @your-scope/ihateposting-agent
+npm install -g @your-scope/ihateposting
 ```
 
 A scoped package is private by default; `npm publish --access public` (which the workflow already passes) makes it public. Changing the name touches more than `package.json`:
 
 - the install lines in `README.md`, `SKILL.md` (and its two copies), `QUICK_START.md`, `HOW_TO_RUN.md` and the other guides;
-- `test/package.test.mjs`, which asserts that the name is `ihateposting-agent`;
-- the plugin manifests: their `name` is the plugin's own (`ihateposting`), not the npm package's, so it stays; only the marketplaces' `name` (`ihateposting-agent`) is the install line's second half.
+- `test/package.test.mjs`, which asserts that the name is `ihateposting`;
+- the plugin manifests: their `name` is the plugin's own (`ihateposting`), not the npm package's, so it stays; only the marketplaces' `name` (`ihateposting`) is the install line's second half.
 
 ### The sign-in's server is the iHatePosting app
 
-`ihateposting-agent auth:login` does not talk to a service of its own. It talks to the app, with the default address `https://app.ihateposting.com/api`:
+`ihateposting auth:login` does not talk to a service of its own. It talks to the app, with the default address `https://app.ihateposting.com/api`:
 
 - `POST /device/code` (so `https://app.ihateposting.com/api/device/code`) and `POST /device/token` give out and exchange the code;
 - the pages `/device` (where a person types the code) and `/oauth/authorize` (where they approve) are what a person sees in the browser.
@@ -603,7 +701,7 @@ After a change to `SKILL.md` on `main`, open the Actions tab, choose "Sync the p
 
 ### Submissions: getting listed in each place
 
-The sections above put `ihateposting-agent` on npm. This section is about the other places a person can find the tool: directories, marketplaces and registries. **Nothing in this repository submits anything, signs in anywhere or changes a setting**: every step below is yours, on the place's own website, signed in as you. What is written here was read from the official pages named in each place on 2026-11-15. Rules in this area change often, so read the page again before you submit. "Unverified" means it could not be confirmed; "second-hand" means a helper read the page and it was not read again. The copy-paste packs for the four submissions the owner asked to have ready (Cursor Marketplace, the Claude plugin portal, DeepSeek Harness and the xAI marketplace), with the order to go in, are in `SUBMISSIONS.md`.
+The sections above put `ihateposting` on npm. This section is about the other places a person can find the tool: directories, marketplaces and registries. **Nothing in this repository submits anything, signs in anywhere or changes a setting**: every step below is yours, on the place's own website, signed in as you. What is written here was read from the official pages named in each place on 2026-11-15. Rules in this area change often, so read the page again before you submit. "Unverified" means it could not be confirmed; "second-hand" means a helper read the page and it was not read again. The copy-paste packs for the four submissions the owner asked to have ready (Cursor Marketplace, the Claude plugin portal, DeepSeek Harness and the xAI marketplace), with the order to go in, are in `SUBMISSIONS.md`.
 
 #### What must be live first
 
@@ -622,9 +720,10 @@ What was **not** tried: a real sign-in, a real MCP session (that needs a key or 
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" https://app.ihateposting.com/api/mcp/oauth
+curl -s -o /dev/null -w "%{http_code}\n" https://app.ihateposting.com/mcp/oauth
 ```
 
-401 means the route exists and wants a sign-in; 404 means it is not there.
+401 means the route exists and wants a sign-in; 404 means it is not there. This section and its table are the probes of 2026-11-15 on the app host's earlier path `/api/mcp/oauth`, kept as they were (that path still answered 401 on 2026-11-19 at 17:23). Since 2026-11-19 the connector's sign-in address in our files is `https://app.ihateposting.com/mcp/oauth` (no `/api`), which answered **404** on that day until Shakti routes it to the new backend; the two listings already submitted keep `https://ihateposting.com/mcp/oauth` in their own portals. Check the new address before any submission; 401 then means the route exists and wants a sign-in.
 
 | Place | What is still missing |
 | --- | --- |
@@ -669,7 +768,7 @@ Not prepared, because nothing was asked for them: Muse, Perplexity, Manus, Cue, 
 | Terms of service | https://ihateposting.com/terms |
 | Support page | https://ihateposting.com/contact (and your company's support address) |
 | Logo | `assets/logo.png`: a square PNG, 198 by 198 pixels. OpenAI wants a square of 48 to 4096 pixels; Anthropic's icon size is unverified |
-| Hosted server | `https://app.ihateposting.com/api/mcp/oauth` (sign-in with OAuth; the address with a key in a header is `https://app.ihateposting.com/api/mcp`, which OpenAI's portal cannot use: it has no API-key sign-in) |
+| Hosted server | `https://app.ihateposting.com/mcp/oauth` (sign-in with OAuth; the address with a key in a header is `https://app.ihateposting.com/mcp`, which OpenAI's portal cannot use: it has no API-key sign-in) |
 
 The four URLs above (website, support, privacy, terms) all answered 200 on ihateposting.com on 2026-11-15; the same privacy and terms paths on `app.ihateposting.com` answered 404 at 08:17 UTC, which is not a blocker: these `ihateposting.com` addresses are the ones every submission uses (the owner's decision of 2026-11-15).
 
@@ -677,18 +776,18 @@ The four URLs above (website, support, privacy, terms) all answered 200 on ihate
 
 Three names were offered (iHatePosting Agent, iHatePosting for Agents, iHatePosting App) and the owner answered "No preference". He then chose the display name himself ("Display name : iHatePosting", 2026-11-15), so the display name is `iHatePosting`, the same as the live app's listings. The slug of the NEW Claude connector is `ihateposting-agent` (the live app's connector holds `ihateposting`) and the MCP Registry entry keeps its old name `com.ihateposting/mcp` and gets a new version, `0.13.0` (the owner's decision of 2026-11-16, after a first draft that used a new name, `com.ihateposting/agent`). The descriptions keep the old wording, in the shape of the reference's listings: no sentence tells the new listing from the live app's (the owner's decision of 2026-11-15). Where a place's rules or a reviewer might need one, the place is listed below for the owner instead of a sentence being written. The owner can veto any of this at any time; the manifests and these packs then change together.
 
-The identifiers keep the owner's earlier choices (his answer "Back to ihateposting", 2026-11-15, after a first version of this change had renamed them too): the plugin is `ihateposting` in the Claude, Cursor, Grok and ChatGPT manifests, the Gemini extension is `ihateposting`, the skill is `ihateposting` in `skills/ihateposting`, the marketplaces are `ihateposting-agent`, the install line is `/plugin install ihateposting@ihateposting-agent`, the DeepSeek package is `dsh-ihateposting`, and the npm package and the command are `ihateposting-agent`.
+The identifiers keep the owner's earlier choices (his answer "Back to ihateposting", 2026-11-15, after a first version of this change had renamed them too): the plugin is `ihateposting` in the Claude, Cursor, Grok and ChatGPT manifests, the Gemini extension is `ihateposting`, the skill is `ihateposting` in `skills/ihateposting`, the marketplaces are `ihateposting` (they were `ihateposting-agent` until the owner's answer "all should be ihateposting" of 2026-11-19), the install line is `/plugin install ihateposting@ihateposting`, the DeepSeek package is `dsh-ihateposting`, and the npm package and the command are `ihateposting` (since the same answer; before it the package was `ihateposting-agent`, still on npm at 0.1.1).
 
 Checked on 2026-11-15 against each place's rules and against what exists. The new connector's slug is free (the Claude connector directory's page for `ihateposting-agent` "doesn't exist"; the registry name `com.ihateposting/agent` was free too on 2026-11-15, but the draft no longer uses it), and ChatGPT's display name is 18 characters of at most 30, with no "MCP" or "Plugin" (the directory cannot be searched from outside, so a clash there is only found at submission). Because the plugin and the extension are called `ihateposting` again, these places can refuse it. For each, what happens and the one fallback ready (the same everywhere: **`ihateposting-agent`**, free at every place checked, with the display name `iHatePosting Agent` unchanged):
 
-- **The Claude plugin portal**: the portal blocks a name another organization already uses ("Name is taken") and holds a look-alike for a reviewer ("Name may be confused with an existing listing"). The older plugin of that name is in the live app's own repository, the same publisher's, so a block is not expected, but the portal's check runs only at Validate, signed in (unverified). If it refuses: submit under `ihateposting-agent`; the plugin's name is permanent once published, so the install line becomes `ihateposting-agent@ihateposting-agent` and the manifest, the entry, the READMEs and the tests change together.
+- **The Claude plugin portal**: the portal blocks a name another organization already uses ("Name is taken") and holds a look-alike for a reviewer ("Name may be confused with an existing listing"). The older plugin of that name is in the live app's own repository, the same publisher's, so a block is not expected, but the portal's check runs only at Validate, signed in (unverified). If it refuses: submit under `ihateposting-agent`; the plugin's name is permanent once published, so the install line becomes `ihateposting-agent@ihateposting` and the manifest, the entry, the READMEs and the tests change together.
 - **ChatGPT**: the live app's plugin is called iHatePosting; OpenAI treats a new MCP host as a new plugin, and a clash can only be found at submission. If it refuses the `name`: submit as `ihateposting-agent` (the display name stays `iHatePosting Agent`).
 - **cursor.directory**: a page `/plugins/ihateposting` exists and is the live app's plugin (read on 2026-11-15: "14 social networks", its own MCP server named `ihateposting` and one skill), so a new listing of that name collides with it; how the site treats a duplicate is unknown (it has a "Submit a plugin" form; not tried). If it refuses: `ihateposting-agent` (the page for it answered 404).
 - **The Cursor Marketplace**: nothing is taken (its pages for `ihateposting` and for `ihateposting-agent` both answered "Marketplace Plugin Not Found" in the in-app browser on 2026-11-15, with a page that exists as the control). If it refuses: `ihateposting-agent`.
 - **Gemini**: the extension is `ihateposting`, the name of the manifest in the live app's older repository, and Gemini uses the manifest's `name` to identify an extension on a person's machine, so installing both would collide (whether the second is refused or replaces the first is unverified). If it refuses, or the gallery shows a clash: `ihateposting-agent` (that name differs from the repository's name `iHatePosting-Agent` only in capitals; Gemini's reference says it expects an extension's name to match its directory name, and whether an install from the repository's address cares is unverified).
 - **skills.sh and ClawHub**: the skill is `ihateposting`, also the name of a skill in the live app's older skill repository, which skills.sh lists (it has no slug to reserve: a skill is addressed as `owner/repo/skill`). Whether installing both into one agent overwrites the first is unverified. ClawHub's API answered 404 for `ihateposting` and for `ihateposting-agent`, so its slug is free; if it refuses: `ihateposting-agent`. A skill's name has to match its folder, so renaming the skill means renaming `skills/ihateposting` and its copies too, and `sync-skill.yml` names that folder.
 - **The xAI marketplace**: `ihateposting` is not in its catalog (36 plugins read); if a reviewer objects: `ihateposting-agent` (also not there).
-- **DeepSeek's npm package, `dsh-ihateposting`**: free on npm; the package name `ihateposting-agent` is this program's own, so the plugin cannot use it. Fallback: `dsh-ihateposting-agent` (free: 404).
+- **DeepSeek's npm package, `dsh-ihateposting`**: free on npm; the package name `ihateposting` is this program's own, so the plugin cannot use it. Fallback: `dsh-ihateposting-agent` (free: 404).
 - **The MCP Registry** is not affected by the display name: its entry keeps the name `com.ihateposting/mcp` and gets a new version. **The Claude connector directory is affected by the display name** (see below): the new connector takes the slug `ihateposting-agent` (the old one holds `ihateposting`), which the form accepted, but the portal refused the display name `iHatePosting`.
 
 The display name `iHatePosting` is the same as the live app's listings. What each place's rules say about that (what was read, or "unverified"):
@@ -739,7 +838,7 @@ npm pack --dry-run
 npm publish --access public
 ```
 
-This is a second package: it needs your npm login and 2FA, like the first (the owner wants it published by hand). **Version 0.1.0 cannot be changed once it is on npm**, so read `npm pack --dry-run` and the plugin's README first: since 2026-11-15 the plugin follows the settings of the other project's DeepSeek plugin (the variable, an inline key, the API address and a skill switch; no key means a warning, not a refusal to load) and no longer ships the 42 kB skill copy. Its version is kept equal to the main one by a test, and `package.json` already has the `repository.directory` field npm uses for a package inside a repository. The community list is a pull request on another organisation's repository (second-hand: one YAML file per plugin): only with your yes. `SUBMISSIONS.md` has the whole pack.
+This is a second package: it needs your npm login and 2FA, like the first (the owner wants it published by hand). **Version 0.1.0 cannot be changed once it is on npm**, so read `npm pack --dry-run` and the plugin's README first: since 2026-11-15 the plugin follows the settings of the other project's DeepSeek plugin (the variable, an inline key, the API address and a skill switch; no key means a warning, not a refusal to load) and no longer ships the 42 kB skill copy. Its version is kept equal to the main one by a test; since 2026-11-19 its default `baseUrl` is `https://app.ihateposting.com` (the key address has no `/api`), so the published 0.1.1 and this copy differ in that value: a new version is needed once the `/api` key addresses stop (your step). `package.json` already has the `repository.directory` field npm uses for a package inside a repository. The community list is a pull request on another organisation's repository (second-hand: one YAML file per plugin): only with your yes. `SUBMISSIONS.md` has the whole pack.
 
 #### ClawHub
 
@@ -748,15 +847,15 @@ clawhub login
 clawhub skill publish ./skills/ihateposting --slug ihateposting
 ```
 
-Read https://docs.openclaw.ai/clawhub/publishing.md for the other options first. A new release stays pending until automated security checks pass. The skill's `SKILL.md` front matter declares `requires.env` as `IHATEPOSTING_API_URL` only and no program, while the skill's text uses `IHATEPOSTING_API_KEY` and the `ihateposting-agent` command; ClawHub's skill-format page says declared requirements must match real use (second-hand), so a mismatch may be flagged. The skill's `homepage` line also still names the site's `/ai-agents` page, which describes the old setup.
+Read https://docs.openclaw.ai/clawhub/publishing.md for the other options first. A new release stays pending until automated security checks pass. The skill's `SKILL.md` front matter declares `requires.env` as `IHATEPOSTING_API_URL` only and no program, while the skill's text uses `IHATEPOSTING_API_KEY` and the `ihateposting` command; ClawHub's skill-format page says declared requirements must match real use (second-hand), so a mismatch may be flagged. The skill's `homepage` line also still names the site's `/ai-agents` page, which describes the old setup.
 
 **The ClawHub skill (the owner's decisions of 2026-11-16: his own GitHub account, and the same front matter as the reference project's published skill, read from ClawHub's public API the same day).** ClawHub's checks flag a skill whose front matter does not match what the skill really uses, and the reference project changed its published skill after publishing to declare its key, so the skill is not published from `skills/ihateposting` as it is. A folder named `ihateposting`, kept outside the repositories, holds `SKILL.md`, the repository skill's text byte for byte with the same front matter except one value: `requires.env` lists both `IHATEPOSTING_API_URL` and `IHATEPOSTING_API_KEY` (**required**, as in the reference project's published copy, although the code sign-in works without a key; whether ClawHub or OpenClaw then treats a person who only signs in as missing a requirement is unverified), with no `primaryEnv`, no `envVars` and no `install` entry (the reference project's copy has none, and the owner chose to match it). The front matter keeps the repository skill's single-line JSON `metadata`, which ClawHub accepted for the reference project's skill. Version 1.0.0 also held 13 of this repository's guides next to `SKILL.md` (as the reference project publishes its own guides); ClawHub's scan then called it suspicious (SkillSpector CRITICAL with 61 issues, ClawScan suspicious, the npm-publishing guidance of this file among its concerns), so the owner chose version 1.0.1 with `SKILL.md` only, which ClawHub marked clean (ClawScan clean; SkillSpector still suspicious with 4 issues, rated HIGH: the documented post deletion and the stored credentials). Not declared: `jq`, which the skill's shell examples use but nothing depends on. Steps, the owner's, in his own window: `npm i -g clawhub` (`clawhub.cmd` in Windows PowerShell), `clawhub login` (a one-time code and a GitHub sign-in; the GitHub account must be old enough for the upload gate, its age is not stated), `clawhub skill publish <the copy's folder> --slug ihateposting --name iHatePosting --version 1.0.1 --changelog "..." --dry-run`, then the same without `--dry-run`. ClawHub publishes every skill under **MIT-0**, which differs from this repository's MIT, and a new release stays pending until its checks (ClawScan, SkillSpector, A.I.G) pass; both versions took about 12 to 20 minutes. A held or blocked release stays visible to the owner in the ClawHub dashboard, `clawhub scan download <slug> --version <version>` fetches its report, and a published version cannot be changed, so a fix is the next version (a new skill starts at `1.0.0`).
 
-**The ClawHub plugin (a bundle plugin; the owner's decision of 2026-11-16).** ClawHub offers two plugin kinds: a code plugin, which is native OpenClaw code, and a bundle, a content pack in the Claude, Codex or Cursor layout. This repository has no OpenClaw code, so the owner published a bundle made from `plugins/claude-ihateposting` as `ihateposting-agent` (ClawHub's skills and plugins share one name space and `ihateposting` is the skill; `ihateposting-agent` is also the marketplaces' and the npm package's name), display name `iHatePosting`, under the same public handle. The folder, kept outside the repositories, is that plugin folder with five changes: the skill's front matter lists the key as required as above, the README's first heading is `# iHatePosting`, the manifest has a `skills` field (`./skills/`) and the version `0.1.3`, and two files are added: a `package.json` (`name`, `version`, `description`, `type`, `license`, `repository` and `homepage`, with no `openclaw` block, so ClawHub keeps reading the folder as a Claude bundle) and the catalog icon `assets/icon.png`, a copy of `logo.png` (the only path ClawHub takes an icon from). The first version, 0.1.1, had no `skills` field and ClawHub then listed no skill inside the bundle. Commands: `clawhub package publish <the folder> --family bundle-plugin --bundle-format claude --name ihateposting-agent --display-name iHatePosting --version 0.1.3` with `--dry-run` first; `--version` is required because ClawHub does not read it from a bundle's manifest. `clawhub package validate` refused the first folder, which had no `package.json`, and passed the 0.1.3 folder (`Plugin Inspector: PASS`, 0 breakages, 0 warnings); it writes a `reports/` folder into the package folder, which must be deleted before publishing, because a publish would send those files too. ClawHub made 0.1.2 public about 12 minutes after the submission: scan clean (A.I.G 0 findings, ClawScan clean, SkillSpector not run on bundles) and the skill listed inside it; its dashboard warned about 0.1.1, and still about 0.1.2, that the package has no `package.json` (a warning, not an error: the plugin stayed visible). Version 0.1.3, which adds the `package.json` and the icon, was public about 10 minutes after its submission (read from ClawHub's public record and pages on 2026-11-16): scan clean (A.I.G 0 findings; the language-model check rated every dimension ok, verdict benign; the page's Security audit reads Pass), the dashboard's warning gone, the listing summary taken from the `package.json` `description` (for 0.1.1 and 0.1.2 it came from the README), the skill listed inside the bundle, and the icon served by ClawHub with the same bytes as `logo.png` and shown in the Plugins catalog row (the header of the plugin's own page, seen signed out, shows none). The page offers `openclaw plugins install clawhub:ihateposting-agent@latest`; whether OpenClaw then loads the bundled skill is unverified, and the README the page shows is the Claude plugin's, with Claude Code's install lines.
+**The ClawHub plugin (a bundle plugin; the owner's decision of 2026-11-16).** ClawHub offers two plugin kinds: a code plugin, which is native OpenClaw code, and a bundle, a content pack in the Claude, Codex or Cursor layout. This repository has no OpenClaw code, so the owner published a bundle made from `plugins/claude-ihateposting` as `ihateposting-agent` (ClawHub's skills and plugins share one name space and `ihateposting` is the skill; `ihateposting-agent` was also the marketplaces' and the npm package's name until 2026-11-19), display name `iHatePosting`, under the same public handle. The folder, kept outside the repositories, is that plugin folder with five changes: the skill's front matter lists the key as required as above, the README's first heading is `# iHatePosting`, the manifest has a `skills` field (`./skills/`) and the version `0.1.3`, and two files are added: a `package.json` (`name`, `version`, `description`, `type`, `license`, `repository` and `homepage`, with no `openclaw` block, so ClawHub keeps reading the folder as a Claude bundle) and the catalog icon `assets/icon.png`, a copy of `logo.png` (the only path ClawHub takes an icon from). The first version, 0.1.1, had no `skills` field and ClawHub then listed no skill inside the bundle. Commands: `clawhub package publish <the folder> --family bundle-plugin --bundle-format claude --name ihateposting-agent --display-name iHatePosting --version 0.1.3` with `--dry-run` first; `--version` is required because ClawHub does not read it from a bundle's manifest. `clawhub package validate` refused the first folder, which had no `package.json`, and passed the 0.1.3 folder (`Plugin Inspector: PASS`, 0 breakages, 0 warnings); it writes a `reports/` folder into the package folder, which must be deleted before publishing, because a publish would send those files too. ClawHub made 0.1.2 public about 12 minutes after the submission: scan clean (A.I.G 0 findings, ClawScan clean, SkillSpector not run on bundles) and the skill listed inside it; its dashboard warned about 0.1.1, and still about 0.1.2, that the package has no `package.json` (a warning, not an error: the plugin stayed visible). Version 0.1.3, which adds the `package.json` and the icon, was public about 10 minutes after its submission (read from ClawHub's public record and pages on 2026-11-16): scan clean (A.I.G 0 findings; the language-model check rated every dimension ok, verdict benign; the page's Security audit reads Pass), the dashboard's warning gone, the listing summary taken from the `package.json` `description` (for 0.1.1 and 0.1.2 it came from the README), the skill listed inside the bundle, and the icon served by ClawHub with the same bytes as `logo.png` and shown in the Plugins catalog row (the header of the plugin's own page, seen signed out, shows none). The page offers `openclaw plugins install clawhub:ihateposting-agent@latest`; whether OpenClaw then loads the bundled skill is unverified, and the README the page shows is the Claude plugin's, with Claude Code's install lines.
 
 #### Official MCP Registry
 
-`server.json` in the repository's root is a **draft** for a new version, `0.13.0`, of the existing registry entry `com.ihateposting/mcp` (the owner's decision of 2026-11-16: one entry, the name kept, clients move to the new server; the entry's versions went up to 0.12.9 on 2026-11-15, from the old package `ihateposting-mcp`, its repository `agent-skill`). The name fits the registry's name pattern. Versions cannot be changed afterwards, and `0.13.0` is above `0.12.9`: the registry's versioning page (read on 2026-11-16) says a published version is immutable and that the latest version is chosen by semantic-version order, so the new version becomes the latest (what happens to a plain lower version published later is not stated there, which is why the number is above the old one). Publishing it **replaces what the entry shows**: its remotes become the new server's two addresses and its repository this one. The registry accepted a new version of the existing name with another repository (see below); `mcp-publisher validate` had passed on a copy first. The namespace's ownership proof is a file served at `https://ihateposting.com/.well-known/mcp-registry-auth` (if the old entry was proven by DNS instead, that record is the one); keep serving it there. Steps: https://modelcontextprotocol.io/registry/quickstart (`mcp-publisher login`, then `mcp-publisher publish`, which reads `server.json` in the folder you run it in).
+`server.json` in the repository's root is a **draft** for a new version, `0.13.1` (the owner's choice of 2026-11-19; `0.13.0` is the version published on 2026-11-16), of the existing registry entry `com.ihateposting/mcp` (the owner's decision of 2026-11-16: one entry, the name kept, clients move to the new server; the entry's versions went up to 0.12.9 on 2026-11-15, from the old package `ihateposting-mcp`, its repository `agent-skill`). The name fits the registry's name pattern. Versions cannot be changed afterwards, and `0.13.1` is above `0.12.9`: the registry's versioning page (read on 2026-11-16) says a published version is immutable and that the latest version is chosen by semantic-version order, so the new version becomes the latest (what happens to a plain lower version published later is not stated there, which is why the number is above the old one). Publishing it **replaces what the entry shows**: its remotes become the new server's two addresses and its repository this one. The registry accepted a new version of the existing name with another repository (see below); `mcp-publisher validate` had passed on a copy first. Since 2026-11-19 `server.json` lists `https://app.ihateposting.com/mcp/oauth` as the OAuth remote and `https://app.ihateposting.com/mcp` as the key remote, so it no longer matches what 0.13.0 published; the registry's versions cannot be changed, so a new version was needed before the change shows there, and the owner chose 0.13.1 on 2026-11-19. Publishing it is his own step, after Shakti's routing (step 6 of "Publishing 1.0.0" at the top of this page). The namespace's ownership proof is a file served at `https://ihateposting.com/.well-known/mcp-registry-auth` (if the old entry was proven by DNS instead, that record is the one); keep serving it there. Steps: https://modelcontextprotocol.io/registry/quickstart (`mcp-publisher login`, then `mcp-publisher publish`, which reads `server.json` in the folder you run it in).
 
 **Published (the owner, 2026-11-16, 10:27 UTC).** `mcp-publisher publish` answered "Successfully published" for `com.ihateposting/mcp` version 0.13.0. The public registry then listed 12 versions with 0.13.0 as the latest (`isLatest` true; 0.12.9, published 2026-11-13, no longer is), its repository `https://github.com/iHatePostingOrg/iHatePosting-Agent`, the two remotes `https://app.ihateposting.com/api/mcp/oauth` and `https://app.ihateposting.com/api/mcp` (an `Authorization` header marked secret) and no package. The proof was a **DNS TXT record** on `ihateposting.com` (`v=MCPv1; k=ed25519; p=<public key>`) made with a new Ed25519 key, because nobody could find the private key behind the older proof file (`https://ihateposting.com/.well-known/mcp-registry-auth`, which was left as it is, so whatever uses that key still works); the login was `mcp-publisher login dns --domain ihateposting.com --private-key <the key>`. The new private key is kept by the owner outside every repository and is never committed. The record reached the domain's own nameservers at once, while public resolvers can keep the old list of TXT records for up to its 4-hour TTL; the registry's own check accepted it on the first try. Keep the record and the key for the next version.
 

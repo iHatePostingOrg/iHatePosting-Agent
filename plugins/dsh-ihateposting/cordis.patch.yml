@@ -13,7 +13,7 @@
 #   apiKeyEnv  the variable that holds the key (default IHATEPOSTING_API_KEY); the
 #              key is made under Settings > Agents / Dev in iHatePosting
 #   apiKey     the key itself, for an override in a patch file; prefer the variable
-#   baseUrl    the API address (default https://app.ihateposting.com/api); the MCP
+#   baseUrl    the app's address (default https://app.ihateposting.com); the MCP
 #              endpoint is this address followed by /mcp
 #   skill      register the iHatePosting skill (default true)
 #
@@ -24,7 +24,7 @@
       name: dsh-ihateposting
       config:
         apiKeyEnv: IHATEPOSTING_API_KEY
-        baseUrl: https://app.ihateposting.com/api
+        baseUrl: https://app.ihateposting.com
     - id: ihateposting-mcp
       name: '@deepseek-ai/dsh-mcp-client'
       inject: [ihateposting]

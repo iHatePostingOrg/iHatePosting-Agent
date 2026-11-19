@@ -3,7 +3,7 @@
   "name": "com.ihateposting/mcp",
   "title": "iHatePosting",
   "description": "Draft, schedule and publish social posts, upload media and list posts across 15 platforms.",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "websiteUrl": "https://ihateposting.com",
   "repository": {
     "url": "https://github.com/iHatePostingOrg/iHatePosting-Agent",
@@ -12,11 +12,11 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://app.ihateposting.com/api/mcp/oauth"
+      "url": "https://app.ihateposting.com/mcp/oauth"
     },
     {
       "type": "streamable-http",
-      "url": "https://app.ihateposting.com/api/mcp",
+      "url": "https://app.ihateposting.com/mcp",
       "headers": [
         {
           "name": "Authorization",

@@ -5,7 +5,7 @@ This folder is the package that is uploaded to OpenAI's plugin directory (https:
 | File | What it is |
 | --- | --- |
 | `plugin.json` | The listing (name, descriptions, URLs, icons), the five positive and three negative review cases, and the release notes, in the portable Agent Plugins format. |
-| `mcp.json` | The one hosted server, `https://app.ihateposting.com/api/mcp/oauth`, signed into with OAuth (dynamic client registration). |
+| `mcp.json` | The one hosted server, `https://app.ihateposting.com/mcp/oauth`, signed into with OAuth (dynamic client registration). |
 | `skills/` | Four skills that tell the model how to use the server's tools: `get-started`, `schedule-posts`, `manage-scheduled-posts`, `create-post-media`. |
 | `assets/` | `logo.png` and `icon.png`: the repository's logo, square, 198 by 198 pixels. |
 

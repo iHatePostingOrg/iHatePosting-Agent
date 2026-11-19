@@ -4,38 +4,38 @@ There are several ways to run the CLI, depending on your needs.
 
 ## Option 1: Direct Execution (Quick Test) ⚡
 
-The file at `bin/ihateposting-agent.mjs` runs as it is: there is no build step. Install its two dependencies once (`npm install`) and it is ready!
+The file at `bin/ihateposting.mjs` runs as it is: there is no build step. Install its two dependencies once (`npm install`) and it is ready!
 
 ```bash
 # From the repository root
-node bin/ihateposting-agent.mjs --help
+node bin/ihateposting.mjs --help
 
-# Or run it directly (it has a shebang; on macOS and Linux run chmod +x bin/ihateposting-agent.mjs once first)
-./bin/ihateposting-agent.mjs --help
+# Or run it directly (it has a shebang; on macOS and Linux run chmod +x bin/ihateposting.mjs once first)
+./bin/ihateposting.mjs --help
 
 # Example command
 export IHATEPOSTING_API_KEY=your_key
-node bin/ihateposting-agent.mjs posts:list
+node bin/ihateposting.mjs posts:list
 ```
 
 ## Option 2: Link Globally (Recommended for Development) 🔗
 
-This creates a global `ihateposting-agent` command you can use anywhere:
+This creates a global `ihateposting` command you can use anywhere:
 
 ```bash
 # From the repository root
 npm link
 
 # Now you can use it anywhere!
-ihateposting-agent --help
-ihateposting-agent posts:list
-ihateposting-agent posts:create -c "Hello!" -s "2024-12-31T12:00:00Z" -i "x-123"
+ihateposting --help
+ihateposting posts:list
+ihateposting posts:create -c "Hello!" -s "2024-12-31T12:00:00Z" -i "x-123"
 
 # To unlink later
-npm unlink -g ihateposting-agent
+npm unlink -g ihateposting
 ```
 
-**After linking, you can use `ihateposting-agent` from any directory!**
+**After linking, you can use `ihateposting` from any directory!**
 
 ## Option 3: Use pnpm Filter (From Root) 📦
 
@@ -47,11 +47,11 @@ From npm:
 
 ```bash
 # Install globally
-npm install -g ihateposting-agent
+npm install -g ihateposting
 
 # Or use with npx (no install)
-npx ihateposting-agent --help
-npx ihateposting-agent posts:list
+npx ihateposting --help
+npx ihateposting posts:list
 ```
 
 ## Quick Setup Guide
@@ -79,24 +79,24 @@ echo 'export IHATEPOSTING_API_KEY=your_api_key' >> ~/.bashrc
 
 **For quick testing:**
 ```bash
-node bin/ihateposting-agent.mjs --help
+node bin/ihateposting.mjs --help
 ```
 
 **For regular use (recommended):**
 ```bash
 npm link
-ihateposting-agent --help
+ihateposting --help
 ```
 
 ## Troubleshooting
 
-### "Command not found: ihateposting-agent"
+### "Command not found: ihateposting"
 
 If you linked globally but still get this error:
 
 ```bash
 # Check if it's linked
-which ihateposting-agent
+which ihateposting
 
 # If not found, try linking again (from the repository root)
 npm link
@@ -117,7 +117,7 @@ export IHATEPOSTING_API_KEY=your_key
 echo $IHATEPOSTING_API_KEY
 ```
 
-You can sign in with `ihateposting-agent auth:login` instead.
+You can sign in with `ihateposting auth:login` instead.
 
 ### Permission Denied
 
@@ -125,10 +125,10 @@ If you get permission errors:
 
 ```bash
 # Make the file executable
-chmod +x bin/ihateposting-agent.mjs
+chmod +x bin/ihateposting.mjs
 
 # Then try again
-./bin/ihateposting-agent.mjs --help
+./bin/ihateposting.mjs --help
 ```
 
 ### Rebuild After Changes
@@ -142,8 +142,8 @@ If you linked globally, the changes will be reflected immediately (no need to re
 ### Test Help Command
 
 ```bash
-ihateposting-agent --help
-ihateposting-agent posts:create --help
+ihateposting --help
+ihateposting posts:create --help
 ```
 
 Help and version need no key and send no request.
@@ -154,10 +154,10 @@ Help and version need no key and send no request.
 export IHATEPOSTING_API_KEY=your_key
 
 # List integrations
-ihateposting-agent integrations:list
+ihateposting integrations:list
 
 # Create a test post (a draft, so nothing is published)
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Test post from CLI" \
   -s "2024-12-31T12:00:00Z" \
   -t draft \
@@ -178,21 +178,21 @@ There is nothing to rebuild: the program runs the files in `src/` as they are.
 
 ```bash
 # If linked globally
-ihateposting-agent --help
+ihateposting --help
 
 # Or direct execution
-node bin/ihateposting-agent.mjs --help
+node bin/ihateposting.mjs --help
 ```
 
 ### 4. Watch Mode (Auto-rebuild)
 
-There is no watch mode and nothing to wait for: with `npm link` in place, run `ihateposting-agent` again after each change.
+There is no watch mode and nothing to wait for: with `npm link` in place, run `ihateposting` again after each change.
 
 ## Environment Variables
 
 ### Required
 
-- `IHATEPOSTING_API_KEY` - Your iHatePosting API key (required for every command that talks to the server, unless you signed in with `ihateposting-agent auth:login`)
+- `IHATEPOSTING_API_KEY` - Your iHatePosting API key (required for every command that talks to the server, unless you signed in with `ihateposting auth:login`)
 
 ### Optional
 
@@ -224,7 +224,7 @@ Create a convenient alias:
 
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
-alias ihp='ihateposting-agent'
+alias ihp='ihateposting'
 
 # Now you can use
 ihp posts:list
@@ -250,23 +250,23 @@ npm publish --access public
 
 ```bash
 # Global install
-npm install -g ihateposting-agent
+npm install -g ihateposting
 
 # Project-specific
-npm install ihateposting-agent
-npx ihateposting-agent --help
+npm install ihateposting
+npx ihateposting --help
 ```
 
 ## Summary of Methods
 
 | Method | Command | Use Case |
 |--------|---------|----------|
-| **Direct Node** | `node bin/ihateposting-agent.mjs` | Quick testing, nothing installed globally |
-| **Direct Execution** | `./bin/ihateposting-agent.mjs` | Same as above, slightly shorter (needs `chmod +x` on macOS and Linux) |
-| **Global Link** | `ihateposting-agent` (after `npm link`) | **Recommended** for development |
+| **Direct Node** | `node bin/ihateposting.mjs` | Quick testing, nothing installed globally |
+| **Direct Execution** | `./bin/ihateposting.mjs` | Same as above, slightly shorter (needs `chmod +x` on macOS and Linux) |
+| **Global Link** | `ihateposting` (after `npm link`) | **Recommended** for development |
 | **pnpm Filter** | Not available | No workspace in this repository |
-| **npm Global** | `ihateposting-agent` (after `npm i -g ihateposting-agent`) | Installed from npm |
-| **npx** | `npx ihateposting-agent` | One-off usage without installing |
+| **npm Global** | `ihateposting` (after `npm i -g ihateposting`) | Installed from npm |
+| **npx** | `npx ihateposting` | One-off usage without installing |
 
 ## Recommended Setup
 
@@ -283,14 +283,14 @@ npm link
 export IHATEPOSTING_API_KEY=your_key
 
 # 4. Test
-ihateposting-agent --help
-ihateposting-agent integrations:list
+ihateposting --help
+ihateposting integrations:list
 
 # 5. Start using!
-ihateposting-agent posts:create -c "My first post" -s "2024-12-31T12:00:00Z" -t draft -i "x-123"
+ihateposting posts:create -c "My first post" -s "2024-12-31T12:00:00Z" -t draft -i "x-123"
 ```
 
-Now you can use `ihateposting-agent` from anywhere! 🚀
+Now you can use `ihateposting` from anywhere! 🚀
 
 ## Sections that were in this file before it followed the reference
 
@@ -300,7 +300,7 @@ This page now follows the reference page's headings (the owner's decision, 2026-
 
 This page covers every way to start the command line, how to set it up, what to check when it will not start, how to test it, and how to work on its code. For a first draft post, go to [QUICK_START.md](QUICK_START.md). For a tour of every command, go to [examples/COMMAND_LINE_GUIDE.md](examples/COMMAND_LINE_GUIDE.md).
 
-The program is plain JavaScript in ES modules, for Node.js 20 or newer (`node --version`). Nothing is compiled: the file you edit is the file that runs. `bin/ihateposting-agent.mjs` has one job, to import `src/index.mjs`.
+The program is plain JavaScript in ES modules, for Node.js 20 or newer (`node --version`). Nothing is compiled: the file you edit is the file that runs. `bin/ihateposting.mjs` has one job, to import `src/index.mjs`.
 
 ### 5. From a packed tarball
 
@@ -326,7 +326,7 @@ Each command that talks to the server asks the same question, in this order:
    ```text
    ❌ Error: No authentication found.
    Options:
-     1. OAuth2: ihateposting-agent auth:login
+     1. OAuth2: ihateposting auth:login
      2. API Key: export IHATEPOSTING_API_KEY=your_api_key
    ```
 
@@ -341,13 +341,13 @@ For a staging copy or a development server, the address is whatever serves the `
 ```bash
 export IHATEPOSTING_API_URL="http://localhost:3000"       # example: a development server on this machine
 export IHATEPOSTING_API_KEY="<a key from that server's workspace>"
-node bin/ihateposting-agent.mjs integrations:list
+node bin/ihateposting.mjs integrations:list
 ```
 
 **With the device code:**
 
 ```bash
-node bin/ihateposting-agent.mjs auth:login --auth-server http://localhost:3000
+node bin/ihateposting.mjs auth:login --auth-server http://localhost:3000
 ```
 
 The token and the API address the server names are saved.
@@ -356,7 +356,7 @@ To keep a development sign-in apart from your real one, start the program with a
 
 ```bash
 HOME="$(mktemp -d)" IHATEPOSTING_API_URL="http://localhost:3000" IHATEPOSTING_API_KEY="<dev key>" \
-  node bin/ihateposting-agent.mjs auth:status
+  node bin/ihateposting.mjs auth:status
 ```
 
 In PowerShell, set `$env:USERPROFILE` to a temporary folder for the session instead. `auth:logout` removes whatever is saved in the current home folder.
@@ -372,8 +372,8 @@ Two cautions when you pick an address:
 | --- | --- |
 | `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'yargs' imported from ...` (or `'node-fetch'`) | The dependencies are missing. Run `npm install` in the clone. |
 | A syntax error from Node as soon as it starts | Node is older than 20. Check `node --version`. |
-| `ihateposting-agent: command not found` after `npm link` | The folder npm links into is not on your `PATH`. `npm prefix -g` shows where it is (`<prefix>/bin` on macOS and Linux, `<prefix>` itself on Windows); add that to `PATH`, open a new terminal and try again. |
-| `Permission denied` for `./bin/ihateposting-agent.mjs` | Run it with `node` in front, or `chmod +x bin/ihateposting-agent.mjs`. |
+| `ihateposting: command not found` after `npm link` | The folder npm links into is not on your `PATH`. `npm prefix -g` shows where it is (`<prefix>/bin` on macOS and Linux, `<prefix>` itself on Windows); add that to `PATH`, open a new terminal and try again. |
+| `Permission denied` for `./bin/ihateposting.mjs` | Run it with `node` in front, or `chmod +x bin/ihateposting.mjs`. |
 | `❌ Error: No authentication found.` | Nobody is signed in. Run `auth:login`, or set `IHATEPOSTING_API_KEY`. |
 | `❌ Failed to ...: Request failed: API Error (401): ...` | The server refused the key or token. Sign in again (`auth:login`) or fix the key. |
 | Your key seems to be ignored | A saved sign-in wins over the environment. `auth:status` tells which one is used; `auth:logout` lets the key count. |
@@ -453,7 +453,7 @@ Two things to know before you run them:
 ### Working on the code
 
 1. **Edit** a file in `src/`. The wiring (names, options, defaults, checks, help) is `src/index.mjs`; each command's handler is in `src/commands/`; the HTTP calls are in `src/api.mjs`.
-2. **Run it.** With `npm link` in place, just run `ihateposting-agent ...`. Otherwise `node bin/ihateposting-agent.mjs ...`. There is no build and no watch mode, so there is nothing to wait for.
+2. **Run it.** With `npm link` in place, just run `ihateposting ...`. Otherwise `node bin/ihateposting.mjs ...`. There is no build and no watch mode, so there is nothing to wait for.
 3. **Test it.** Run the test file nearest to the change (`node --test test/cli.test.mjs`). A change that alters what a person sees (a header line, a message, a default) needs its test changed in the same step.
 4. **Look at the package.** `npm pack --dry-run` lists what would be published. Adding a source file does not require a `package.json` change, because `src` is included as a folder.
 5. **Run `npm test`** before you commit. It includes the planted-faults check.
@@ -463,7 +463,7 @@ Adding a command usually touches these places: `src/index.mjs` (the command, its
 ### On a server or in CI
 
 - There is no browser, so use a key, not `auth:login`. Store it in the system's secret store and expose it as `IHATEPOSTING_API_KEY` for the one job that needs it.
-- Install with `npm install -g ihateposting-agent`, or run `npx ihateposting-agent <command>` (both need the package to be published).
+- Install with `npm install -g ihateposting`, or run `npx ihateposting <command>` (both need the package to be published).
 - Every failure ends with exit code `1`, so a script can stop on `set -e` or test `$?`.
 - Nothing is retried and nothing times out. Wrap the call in your system's `timeout` and decide yourself whether to try again after a `429` or a server error.
 - Start with drafts (`-t draft`): nothing is published until a post's status is changed to `schedule`.
@@ -484,8 +484,8 @@ iHatePosting is also an MCP server, at two addresses that differ in how you sign
 
 | Address | Sign-in |
 | --- | --- |
-| `https://app.ihateposting.com/api/mcp/oauth` | a browser sign-in, started by the MCP client |
-| `https://app.ihateposting.com/api/mcp` | your workspace key as `Authorization: Bearer <key>` |
+| `https://app.ihateposting.com/mcp/oauth` | a browser sign-in, started by the MCP client |
+| `https://app.ihateposting.com/mcp` | your workspace key as `Authorization: Bearer <key>` |
 
 ### About the sign-in server
 
@@ -494,7 +494,7 @@ The server that hands out codes is built into the iHatePosting app. It lives at 
 `IHATEPOSTING_AUTH_SERVER`, or the flag `--auth-server <address>` (the flag wins), points `auth:login` at another server that has the same routes, for example a development copy of the app:
 
 ```bash
-ihateposting-agent auth:login --auth-server http://localhost:3000
+ihateposting auth:login --auth-server http://localhost:3000
 ```
 
 `IHATEPOSTING_API_URL` does not change where `auth:login` goes. A server that wants to work with the program has to answer like this:

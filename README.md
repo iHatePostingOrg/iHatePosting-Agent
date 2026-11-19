@@ -32,14 +32,14 @@ npx skills add iHatePostingOrg/iHatePosting-Agent
 
 ```bash
 /plugin marketplace add iHatePostingOrg/iHatePosting-Agent
-/plugin install ihateposting@ihateposting-agent
+/plugin install ihateposting@ihateposting
 ```
 
 ### Grok Build plugin
 
 This repo carries its own `.grok-plugin/plugin.json` manifest and `.grok-plugin/marketplace.json` catalog, so it can be added as a marketplace source directly.
 
-The Grok plugin also bundles the hosted iHatePosting MCP server (`https://app.ihateposting.com/api/mcp/oauth`) via the `mcpServers` field in `.grok-plugin/plugin.json` — you'll be asked to sign in to iHatePosting on first connection; no token or local install needed. The Claude Code plugin is skill-only and does not register an MCP server; the Cursor plugin registers the same hosted server.
+The Grok plugin also bundles the hosted iHatePosting MCP server (`https://app.ihateposting.com/mcp/oauth`) via the `mcpServers` field in `.grok-plugin/plugin.json` — you'll be asked to sign in to iHatePosting on first connection; no token or local install needed. The Claude Code plugin is skill-only and does not register an MCP server; the Cursor plugin registers the same hosted server.
 
 ### Cursor plugin
 
@@ -54,7 +54,7 @@ This repo ships a [Cursor plugin](https://cursor.com/docs/reference/plugins) man
 
   then restart Cursor or run **Developer: Reload Window**.
 
-The plugin exposes the `ihateposting` skill, which drives the `ihateposting-agent` CLI (the CLI handles media uploads, which is required for image/video posts). Make sure the CLI is installed (`npm install -g ihateposting-agent`) and authenticated (`ihateposting-agent auth:login` or `export IHATEPOSTING_API_KEY=...`) before asking the agent to post.
+The plugin exposes the `ihateposting` skill, which drives the `ihateposting` CLI (the CLI handles media uploads, which is required for image/video posts). Make sure the CLI is installed (`npm install -g ihateposting`) and authenticated (`ihateposting auth:login` or `export IHATEPOSTING_API_KEY=...`) before asking the agent to post.
 
 ### Gemini CLI extension
 
@@ -64,7 +64,7 @@ This repo is a [Gemini CLI extension](https://geminicli.com/docs/extensions/) (`
 gemini extensions install https://github.com/iHatePostingOrg/iHatePosting-Agent
 ```
 
-It installs the hosted iHatePosting MCP server (`https://app.ihateposting.com/api/mcp/oauth`). Gemini CLI opens a browser to sign in to iHatePosting on first use; run `/mcp auth ihateposting` to re-authenticate.
+It installs the hosted iHatePosting MCP server (`https://app.ihateposting.com/mcp/oauth`). Gemini CLI opens a browser to sign in to iHatePosting on first use; run `/mcp auth ihateposting` to re-authenticate.
 
 ### Qwen Code
 
@@ -99,9 +99,9 @@ The iHatePosting CLI provides a command-line interface to the iHatePosting API, 
 ### From npm (Recommended)
 
 ```bash
-npm install -g ihateposting-agent
+npm install -g ihateposting
 # or
-pnpm install -g ihateposting-agent
+pnpm install -g ihateposting
 ```
 
 ---
@@ -113,7 +113,7 @@ pnpm install -g ihateposting-agent
 Authenticate using the device flow — no client ID or secret needed:
 
 ```bash
-ihateposting-agent auth:login
+ihateposting auth:login
 ```
 
 This will:
@@ -123,15 +123,15 @@ This will:
 
 ```bash
 # Check current auth status (verifies credentials are still valid)
-ihateposting-agent auth:status
+ihateposting auth:status
 
 # Remove stored credentials
-ihateposting-agent auth:logout
+ihateposting auth:logout
 ```
 
 #### Self-Hosting the Auth Server
 
-By default, `ihateposting-agent auth:login` uses the sign-in routes of the iHatePosting app (`https://app.ihateposting.com/api`). The OAuth2 device flow server is part of the app, so there is no separate server to host; another server that answers the same routes can be named with `IHATEPOSTING_AUTH_SERVER` or `--auth-server`.
+By default, `ihateposting auth:login` uses the sign-in routes of the iHatePosting app (`https://app.ihateposting.com/api`). The OAuth2 device flow server is part of the app, so there is no separate server to host; another server that answers the same routes can be named with `IHATEPOSTING_AUTH_SERVER` or `--auth-server`.
 
 ### Option 2: API Key
 
@@ -155,30 +155,30 @@ export IHATEPOSTING_API_URL=https://your-custom-api.com
 
 **List all connected integrations**
 ```bash
-ihateposting-agent integrations:list
-ihateposting-agent integrations:list --group "customer-id"
+ihateposting integrations:list
+ihateposting integrations:list --group "customer-id"
 ```
 
 Returns integration IDs, provider names, and metadata. Use `--group` to return only the channels assigned to a specific group (customer).
 
 **List all groups (customers)**
 ```bash
-ihateposting-agent integrations:groups
+ihateposting integrations:groups
 ```
 
 Returns all groups (customers) for your organization as `{id, name}`. Use a group's `id` with `integrations:list --group` to filter channels.
 
 **Get integration settings schema**
 ```bash
-ihateposting-agent integrations:settings <integration-id>
+ihateposting integrations:settings <integration-id>
 ```
 
 Returns character limits, required settings, and available tools for fetching dynamic data.
 
 **Trigger integration tools**
 ```bash
-ihateposting-agent integrations:trigger <integration-id> <method-name>
-ihateposting-agent integrations:trigger <integration-id> <method-name> -d '{"key":"value"}'
+ihateposting integrations:trigger <integration-id> <method-name>
+ihateposting integrations:trigger <integration-id> <method-name> -d '{"key":"value"}'
 ```
 
 Fetch dynamic data like Pinterest boards, Slack and Discord channels, LinkedIn company pages, etc.
@@ -186,13 +186,13 @@ Fetch dynamic data like Pinterest boards, Slack and Discord channels, LinkedIn c
 **Examples:**
 ```bash
 # Get Pinterest boards
-ihateposting-agent integrations:trigger pinterest-123 boards
+ihateposting integrations:trigger pinterest-123 boards
 
 # Get Slack channels
-ihateposting-agent integrations:trigger slack-456 channels
+ihateposting integrations:trigger slack-456 channels
 
 # Find a LinkedIn company page to tag, by its exact vanity name
-ihateposting-agent integrations:trigger linkedin-789 mention -d '{"query":"microsoft"}'
+ihateposting integrations:trigger linkedin-789 mention -d '{"query":"microsoft"}'
 ```
 
 ---
@@ -201,22 +201,22 @@ ihateposting-agent integrations:trigger linkedin-789 mention -d '{"query":"micro
 
 **Simple scheduled post**
 ```bash
-ihateposting-agent posts:create -c "Content" -s "2024-12-31T12:00:00Z" -i "integration-id"
+ihateposting posts:create -c "Content" -s "2024-12-31T12:00:00Z" -i "integration-id"
 ```
 
 **Draft post**
 ```bash
-ihateposting-agent posts:create -c "Content" -s "2024-12-31T12:00:00Z" -t draft -i "integration-id"
+ihateposting posts:create -c "Content" -s "2024-12-31T12:00:00Z" -t draft -i "integration-id"
 ```
 
 **Post with media**
 ```bash
-ihateposting-agent posts:create -c "Content" -m "img1.jpg,img2.jpg" -s "2024-12-31T12:00:00Z" -i "integration-id"
+ihateposting posts:create -c "Content" -m "img1.jpg,img2.jpg" -s "2024-12-31T12:00:00Z" -i "integration-id"
 ```
 
 **Post with comments** (each comment can have its own media)
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" -m "main.jpg" \
   -c "First comment" -m "comment1.jpg" \
   -c "Second comment" -m "comment2.jpg,comment3.jpg" \
@@ -226,12 +226,12 @@ ihateposting-agent posts:create \
 
 **Multi-platform post**
 ```bash
-ihateposting-agent posts:create -c "Content" -s "2024-12-31T12:00:00Z" -i "x-id,linkedin-id,facebook-id"
+ihateposting posts:create -c "Content" -s "2024-12-31T12:00:00Z" -i "x-id,linkedin-id,facebook-id"
 ```
 
 **Platform-specific settings**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Content" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{"board":"1234567890"}' \
@@ -240,7 +240,7 @@ ihateposting-agent posts:create \
 
 **Complex post from JSON file**
 ```bash
-ihateposting-agent posts:create --json post.json
+ihateposting posts:create --json post.json
 ```
 
 **Options:**
@@ -261,30 +261,30 @@ ihateposting-agent posts:create --json post.json
 
 **List posts**
 ```bash
-ihateposting-agent posts:list
-ihateposting-agent posts:list --startDate "2024-01-01T00:00:00Z" --endDate "2024-12-31T23:59:59Z"
-ihateposting-agent posts:list --customer "customer-id"
+ihateposting posts:list
+ihateposting posts:list --startDate "2024-01-01T00:00:00Z" --endDate "2024-12-31T23:59:59Z"
+ihateposting posts:list --customer "customer-id"
 ```
 
 Defaults to last 30 days to next 30 days if dates not specified. Each returned post includes its current `settings` (returned as a JSON string — `JSON.parse` it). The intended workflow is `posts:list` (read current settings) → `posts:settings` (patch them).
 
 **Delete post**
 ```bash
-ihateposting-agent posts:delete <post-id>
+ihateposting posts:delete <post-id>
 ```
 
 **Change post status (draft ↔ schedule)**
 ```bash
-ihateposting-agent posts:status <post-id> --status draft
-ihateposting-agent posts:status <post-id> --status schedule
+ihateposting posts:status <post-id> --status draft
+ihateposting posts:status <post-id> --status schedule
 ```
 
 Move a scheduled post back to a draft, or promote a draft into the publishing queue. Switching to `draft` also terminates any workflow that's already running for the post, so it won't publish. Switching to `schedule` queues the post for publishing at its stored date.
 
 **Update a post's provider-specific settings**
 ```bash
-ihateposting-agent posts:settings <post-id> --settings '{"content_posting_method":"DIRECT_POST"}'
-ihateposting-agent posts:settings <post-id> --settings '{"board":"1234567890","title":"My title"}'
+ihateposting posts:settings <post-id> --settings '{"content_posting_method":"DIRECT_POST"}'
+ihateposting posts:settings <post-id> --settings '{"board":"1234567890","title":"My title"}'
 ```
 
 Patches a post's settings server-side. The backend **merges** the object — only the keys you pass change, everything else is preserved — so pass a partial object, not the full settings blob. Only **DRAFT/QUEUE** (unpublished) posts can be updated; published posts are rejected. Pass the **main post id**, not a comment id. Do **not** include `__type` — the backend adds it automatically from the integration.
@@ -295,16 +295,16 @@ Patches a post's settings server-side. The backend **merges** the object — onl
 
 **Get platform analytics**
 ```bash
-ihateposting-agent analytics:platform <integration-id>
-ihateposting-agent analytics:platform <integration-id> -d 30
+ihateposting analytics:platform <integration-id>
+ihateposting analytics:platform <integration-id> -d 30
 ```
 
 Returns metrics like followers, impressions, and engagement over time for a specific integration/channel. The `-d` flag specifies the number of days to look back (default: 7).
 
 **Get post analytics**
 ```bash
-ihateposting-agent analytics:post <post-id>
-ihateposting-agent analytics:post <post-id> -d 30
+ihateposting analytics:post <post-id>
+ihateposting analytics:post <post-id> -d 30
 ```
 
 Returns metrics like likes, comments, shares, and impressions for a specific published post.
@@ -313,13 +313,13 @@ Returns metrics like likes, comments, shares, and impressions for a specific pub
 
 ```bash
 # 1. List available content from the provider
-ihateposting-agent posts:missing <post-id>
+ihateposting posts:missing <post-id>
 
 # 2. Connect the correct content to the post
-ihateposting-agent posts:connect <post-id> --release-id "7321456789012345678"
+ihateposting posts:connect <post-id> --release-id "7321456789012345678"
 
 # 3. Analytics will now work
-ihateposting-agent analytics:post <post-id>
+ihateposting analytics:post <post-id>
 ```
 
 ---
@@ -330,14 +330,14 @@ Some platforms (e.g. TikTok) don't return a post ID immediately after publishing
 
 **List available content from the provider**
 ```bash
-ihateposting-agent posts:missing <post-id>
+ihateposting posts:missing <post-id>
 ```
 
 Returns an array of `{id, url}` items representing recent content from the provider. Returns an empty array if the provider doesn't support this feature, which is the case for every platform today, so find the id on the platform itself and pass it to `posts:connect`.
 
 **Connect a post to its published content**
 ```bash
-ihateposting-agent posts:connect <post-id> --release-id "<content-id>"
+ihateposting posts:connect <post-id> --release-id "<content-id>"
 ```
 
 ---
@@ -346,7 +346,7 @@ ihateposting-agent posts:connect <post-id> --release-id "<content-id>"
 
 **Upload file and get URL**
 ```bash
-ihateposting-agent upload <file-path>
+ihateposting upload <file-path>
 ```
 
 **⚠️ IMPORTANT: Upload Files Before Posting**
@@ -354,7 +354,7 @@ ihateposting-agent upload <file-path>
 You **must** upload media files to iHatePosting before using them in posts. Many platforms (especially TikTok, Instagram, and YouTube) require verified/trusted URLs and will reject external links.
 
 **Workflow:**
-1. Upload your file using `ihateposting-agent upload`
+1. Upload your file using `ihateposting upload`
 2. Extract the returned URL
 3. Use that URL in your post's `-m` parameter
 
@@ -365,19 +365,19 @@ You **must** upload media files to iHatePosting before using them in posts. Many
 **Example:**
 ```bash
 # 1. Upload the file first
-RESULT=$(ihateposting-agent upload video.mp4 | tail -n +2)   # tail skips the header line
+RESULT=$(ihateposting upload video.mp4 | tail -n +2)   # tail skips the header line
 MEDIA_PATH=$(echo "$RESULT" | jq -r '.path')
 
 # 2. Use the iHatePosting URL in your post
-ihateposting-agent posts:create -c "Check out my video!" -s "2024-12-31T12:00:00Z" -m "$MEDIA_PATH" -i "tiktok-id"
+ihateposting posts:create -c "Check out my video!" -s "2024-12-31T12:00:00Z" -m "$MEDIA_PATH" -i "tiktok-id"
 ```
 
 **Adjust media to the platforms' limits**
 
 `--adjust` is accepted (it is off by default), but iHatePosting does no adjusting: the file is used as uploaded and every upload is ready at once.
 ```bash
-ihateposting-agent upload video.mp4 --adjust
-ihateposting-agent media:status <id>       # "ready" straight away
+ihateposting upload video.mp4 --adjust
+ihateposting media:status <id>       # "ready" straight away
 ```
 
 Because the status is always `ready`, there is nothing to wait for before publishing a post with this `path`.
@@ -386,9 +386,9 @@ Because the status is always `ready`, there is nothing to wait for before publis
 
 Files already in your media library do not need uploading again. List them (newest first, 18 per page) and reuse a file's `path`:
 ```bash
-ihateposting-agent media:list
-ihateposting-agent media:list -s banner    # filter by original file name (case-insensitive)
-ihateposting-agent media:list -p 2         # page number, starting at 1
+ihateposting media:list
+ihateposting media:list -s banner    # filter by original file name (case-insensitive)
+ihateposting media:list -p 2         # page number, starting at 1
 ```
 
 Returns an object with `pages` (the total page count) and `results`, a list of files with `id`, `name`, `originalName`, `path` (the URL to reuse in a post) and `createdAt`.
@@ -405,14 +405,14 @@ Returns an object with `pages` (the total page count) and `results`, a list of f
 ### Pinterest
 ```bash
 # Get your boards (the id of a board is required)
-ihateposting-agent integrations:trigger pinterest-id boards
+ihateposting integrations:trigger pinterest-id boards
 
 # Upload the picture FIRST (required!)
-IMAGE=$(ihateposting-agent upload image.jpg | tail -n +2)
+IMAGE=$(ihateposting upload image.jpg | tail -n +2)
 IMAGE_URL=$(echo "$IMAGE" | jq -r '.path')
 
 # Pin it to a board
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Pin description" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{"board":"1234567890","title":"Pin Title"}' \
@@ -423,11 +423,11 @@ ihateposting-agent posts:create \
 ### YouTube
 ```bash
 # Upload video FIRST (required!)
-VIDEO=$(ihateposting-agent upload video.mp4 | tail -n +2)
+VIDEO=$(ihateposting upload video.mp4 | tail -n +2)
 VIDEO_URL=$(echo "$VIDEO" | jq -r '.path')
 
 # Post with uploaded video URL
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Video description" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{"title":"Video Title","type":"public","tags":[{"value":"tech","label":"Tech"}]}' \
@@ -438,11 +438,11 @@ ihateposting-agent posts:create \
 ### TikTok
 ```bash
 # Upload video FIRST (TikTok only accepts verified URLs!)
-VIDEO=$(ihateposting-agent upload video.mp4 | tail -n +2)
+VIDEO=$(ihateposting upload video.mp4 | tail -n +2)
 VIDEO_URL=$(echo "$VIDEO" | jq -r '.path')
 
 # Post with uploaded video URL
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Video caption #fyp" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{"content_posting_method":"DIRECT_POST","privacy_level":"PUBLIC_TO_EVERYONE","duet":true,"stitch":true,"comment":true,"autoAddMusic":"no","brand_content_toggle":false,"brand_organic_toggle":false}' \
@@ -453,10 +453,10 @@ ihateposting-agent posts:create \
 ### LinkedIn
 ```bash
 # A LinkedIn Page is a channel of its own: find the page in your channels
-ihateposting-agent integrations:list
+ihateposting integrations:list
 
 # Post as the page, with the page's channel id
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Company announcement" \
   -s "2024-12-31T12:00:00Z" \
   -i "linkedin-page-id"
@@ -465,7 +465,7 @@ ihateposting-agent posts:create \
 ### X (Twitter)
 ```bash
 # Create thread
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Thread 1/3 🧵" \
   -c "Thread 2/3" \
   -c "Thread 3/3" \
@@ -474,7 +474,7 @@ ihateposting-agent posts:create \
   -i "x-id"
 
 # With reply settings
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Tweet content" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{"who_can_reply_post":"everyone"}' \
@@ -484,11 +484,11 @@ ihateposting-agent posts:create \
 ### Instagram
 ```bash
 # Upload image FIRST (Instagram requires verified URLs!)
-IMAGE=$(ihateposting-agent upload image.jpg | tail -n +2)
+IMAGE=$(ihateposting upload image.jpg | tail -n +2)
 IMAGE_URL=$(echo "$IMAGE" | jq -r '.path')
 
 # Regular post
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Caption #hashtag" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{"post_type":"post"}' \
@@ -496,10 +496,10 @@ ihateposting-agent posts:create \
   -i "instagram-id"
 
 # Story (upload first)
-STORY=$(ihateposting-agent upload story.jpg | tail -n +2)
+STORY=$(ihateposting upload story.jpg | tail -n +2)
 STORY_URL=$(echo "$STORY" | jq -r '.path')
 
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Story" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{"post_type":"story"}' \
@@ -528,7 +528,7 @@ This allows AI agents to adapt to different platforms without hardcoded knowledg
 For complex posts with multiple platforms and settings:
 
 ```bash
-ihateposting-agent posts:create --json complex-post.json
+ihateposting posts:create --json complex-post.json
 ```
 
 JSON structure:
@@ -561,7 +561,7 @@ JSON structure:
 Every command prints JSON for easy parsing, after one header line (`posts:missing`, `media:list` and `media:status` print the JSON alone; `posts:delete` prints only its header line). Skip the header line with `tail -n +2`:
 
 ```bash
-INTEGRATIONS=$(ihateposting-agent integrations:list | tail -n +2)
+INTEGRATIONS=$(ihateposting integrations:list | tail -n +2)
 X_ID=$(echo "$INTEGRATIONS" | jq -r '.[] | select(.identifier=="x") | .id')
 ```
 
@@ -572,7 +572,7 @@ Comments are automatically converted to threads/replies based on platform:
 - **Instagram**: First comment
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" \
   -c "Comment 1" \
   -c "Comment 2" \
@@ -586,11 +586,11 @@ ihateposting-agent posts:create \
 ### Pinterest Pin with Board
 ```bash
 #!/bin/bash
-PINTEREST_ID=$(ihateposting-agent integrations:list | tail -n +2 | jq -r '.[] | select(.identifier=="pinterest") | .id')
-BOARDS=$(ihateposting-agent integrations:trigger "$PINTEREST_ID" boards | tail -n +2)
+PINTEREST_ID=$(ihateposting integrations:list | tail -n +2 | jq -r '.[] | select(.identifier=="pinterest") | .id')
+BOARDS=$(ihateposting integrations:trigger "$PINTEREST_ID" boards | tail -n +2)
 BOARD_ID=$(echo "$BOARDS" | jq -r '.output[0].id')
 
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "My pin description" \
   -s "2024-12-31T12:00:00Z" \
   --settings "{\"board\":\"$BOARD_ID\",\"title\":\"Pin Title\"}" \
@@ -601,10 +601,10 @@ ihateposting-agent posts:create \
 ### YouTube Video Upload
 ```bash
 #!/bin/bash
-VIDEO=$(ihateposting-agent upload video.mp4 | tail -n +2)
+VIDEO=$(ihateposting upload video.mp4 | tail -n +2)
 VIDEO_PATH=$(echo "$VIDEO" | jq -r '.path')
 
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Video description..." \
   -s "2024-12-31T12:00:00Z" \
   --settings '{"title":"My Video","type":"public","tags":[{"value":"tech","label":"Tech"}]}' \
@@ -615,7 +615,7 @@ ihateposting-agent posts:create \
 ### Multi-Platform Campaign
 ```bash
 #!/bin/bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Same content everywhere" \
   -s "2024-12-31T12:00:00Z" \
   -m "image.jpg" \
@@ -629,7 +629,7 @@ DATES=("2024-02-14T09:00:00Z" "2024-02-15T09:00:00Z" "2024-02-16T09:00:00Z")
 CONTENT=("Monday motivation 💪" "Tuesday tips 💡" "Wednesday wisdom 🧠")
 
 for i in "${!DATES[@]}"; do
-  ihateposting-agent posts:create \
+  ihateposting posts:create \
     -c "${CONTENT[$i]}" \
     -s "${DATES[$i]}" \
     -i "x-id"
@@ -691,7 +691,7 @@ The CLI interacts with these iHatePosting API endpoints:
 | `IHATEPOSTING_API_URL` | No | `https://app.ihateposting.com/api` | Custom API endpoint |
 | `IHATEPOSTING_AUTH_SERVER` | No | `https://app.ihateposting.com/api` | Custom auth server URL |
 
-*Either OAuth2 (via `ihateposting-agent auth:login`) or `IHATEPOSTING_API_KEY` is required.
+*Either OAuth2 (via `ihateposting auth:login`) or `IHATEPOSTING_API_KEY` is required.
 
 ---
 
@@ -706,7 +706,7 @@ The CLI provides clear error messages with exit codes:
 
 | Error | Solution |
 |-------|----------|
-| `Not authenticated` | Run `ihateposting-agent auth:login` or set `IHATEPOSTING_API_KEY` |
+| `Not authenticated` | Run `ihateposting auth:login` or set `IHATEPOSTING_API_KEY` |
 | `Integration not found` | Run `integrations:list` to get valid IDs |
 | `startDate must be a valid ISO 8601 date string` | Use ISO 8601 format: `"2024-12-31T12:00:00Z"` |
 | A setting is refused (for example `title must be longer than or equal to 1 characters`) | Check `integrations:settings` for required fields |
@@ -722,7 +722,7 @@ The CLI provides clear error messages with exit codes:
 
 ```
 bin/
-└── ihateposting-agent.mjs      # Entry point (a shebang line and one import)
+└── ihateposting.mjs      # Entry point (a shebang line and one import)
 src/
 ├── index.mjs             # CLI entry point with yargs
 ├── api.mjs               # IHatePostingAPI client class
@@ -745,7 +745,7 @@ SKILL.md                  # AI agent reference
 ```bash
 npm install        # Install the two dependencies (yargs and node-fetch)
 npm test           # Run the tests (the planted-fault check takes about twenty minutes)
-node bin/ihateposting-agent.mjs --help   # Run the CLI from a clone
+node bin/ihateposting.mjs --help   # Run the CLI from a clone
 ```
 
 ### Building
@@ -758,49 +758,49 @@ The CLI has no build step: it is plain JavaScript (ES modules) that runs as it i
 
 ```bash
 # Authentication
-ihateposting-agent auth:login                                              # OAuth2 device flow
-ihateposting-agent auth:status                                             # Check auth
-ihateposting-agent auth:logout                                             # Remove credentials
+ihateposting auth:login                                              # OAuth2 device flow
+ihateposting auth:status                                             # Check auth
+ihateposting auth:logout                                             # Remove credentials
 export IHATEPOSTING_API_KEY=your_key                                 # Or use API key
 
 # Discovery
-ihateposting-agent integrations:list                           # List integrations
-ihateposting-agent integrations:list --group "<group-id>"      # List integrations in a group
-ihateposting-agent integrations:groups                         # List groups (customers)
-ihateposting-agent integrations:settings <id>                  # Get settings
-ihateposting-agent integrations:trigger <id> <method> -d '{}'  # Fetch data
+ihateposting integrations:list                           # List integrations
+ihateposting integrations:list --group "<group-id>"      # List integrations in a group
+ihateposting integrations:groups                         # List groups (customers)
+ihateposting integrations:settings <id>                  # Get settings
+ihateposting integrations:trigger <id> <method> -d '{}'  # Fetch data
 
 # Posting (date is required)
-ihateposting-agent posts:create -c "text" -s "2024-12-31T12:00:00Z" -i "id"                    # Simple
-ihateposting-agent posts:create -c "text" -s "2024-12-31T12:00:00Z" -t draft -i "id"          # Draft
-ihateposting-agent posts:create -c "text" -m "img.jpg" -s "2024-12-31T12:00:00Z" -i "id"      # With media
-ihateposting-agent posts:create -c "main" -c "comment" -s "2024-12-31T12:00:00Z" -i "id"      # With comment
-ihateposting-agent posts:create -c "text" -s "2024-12-31T12:00:00Z" --settings '{}' -i "id"   # Platform-specific
-ihateposting-agent posts:create --json file.json                                               # Complex
+ihateposting posts:create -c "text" -s "2024-12-31T12:00:00Z" -i "id"                    # Simple
+ihateposting posts:create -c "text" -s "2024-12-31T12:00:00Z" -t draft -i "id"          # Draft
+ihateposting posts:create -c "text" -m "img.jpg" -s "2024-12-31T12:00:00Z" -i "id"      # With media
+ihateposting posts:create -c "main" -c "comment" -s "2024-12-31T12:00:00Z" -i "id"      # With comment
+ihateposting posts:create -c "text" -s "2024-12-31T12:00:00Z" --settings '{}' -i "id"   # Platform-specific
+ihateposting posts:create --json file.json                                               # Complex
 
 # Management
-ihateposting-agent posts:list                                  # List posts
-ihateposting-agent posts:delete <id>                          # Delete post
-ihateposting-agent posts:status <id> --status draft           # Move to draft (stops workflow)
-ihateposting-agent posts:status <id> --status schedule        # Queue draft for publishing
-ihateposting-agent posts:settings <id> --settings '{}'        # Patch a post's settings (merged; DRAFT/QUEUE only)
-ihateposting-agent upload <file>                              # Upload media
-ihateposting-agent upload <file> --adjust                     # Accepted; no adjusting is done here
-ihateposting-agent media:status <id>                          # Check an --adjust upload
-ihateposting-agent media:list -s <name>                       # Find already uploaded media to reuse
+ihateposting posts:list                                  # List posts
+ihateposting posts:delete <id>                          # Delete post
+ihateposting posts:status <id> --status draft           # Move to draft (stops workflow)
+ihateposting posts:status <id> --status schedule        # Queue draft for publishing
+ihateposting posts:settings <id> --settings '{}'        # Patch a post's settings (merged; DRAFT/QUEUE only)
+ihateposting upload <file>                              # Upload media
+ihateposting upload <file> --adjust                     # Accepted; no adjusting is done here
+ihateposting media:status <id>                          # Check an --adjust upload
+ihateposting media:list -s <name>                       # Find already uploaded media to reuse
 
 # Analytics
-ihateposting-agent analytics:platform <id>                    # Platform analytics (7 days)
-ihateposting-agent analytics:platform <id> -d 30             # Platform analytics (30 days)
-ihateposting-agent analytics:post <id>                        # Post analytics (7 days)
-ihateposting-agent analytics:post <id> -d 30                 # Post analytics (30 days)
+ihateposting analytics:platform <id>                    # Platform analytics (7 days)
+ihateposting analytics:platform <id> -d 30             # Platform analytics (30 days)
+ihateposting analytics:post <id>                        # Post analytics (7 days)
+ihateposting analytics:post <id> -d 30                 # Post analytics (30 days)
 # If analytics:post returns {"missing": true}, resolve it:
-ihateposting-agent posts:missing <id>                         # List provider content
-ihateposting-agent posts:connect <id> --release-id "<rid>"    # Connect content to post
+ihateposting posts:missing <id>                         # List provider content
+ihateposting posts:connect <id> --release-id "<rid>"    # Connect content to post
 
 # Help
-ihateposting-agent --help                                     # Show help
-ihateposting-agent posts:create --help                        # Command help
+ihateposting --help                                     # Show help
+ihateposting posts:create --help                        # Command help
 ```
 
 ---

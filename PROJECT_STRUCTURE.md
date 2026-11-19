@@ -6,20 +6,20 @@ The iHatePosting CLI is a complete command-line interface package for interactin
 
 This repository holds five things:
 
-1. **The command line**, `ihateposting-agent`: plain JavaScript ES modules (`bin/` and `src/`) that sign in, list channels, read each platform's rules, upload media, create and manage posts and read analytics, all through iHatePosting's public API.
+1. **The command line**, `ihateposting`: plain JavaScript ES modules (`bin/` and `src/`) that sign in, list channels, read each platform's rules, upload media, create and manage posts and read analytics, all through iHatePosting's public API.
 2. **The skill**, `SKILL.md`: the text that teaches an AI agent which commands to run and in which order.
 3. **Plugin folders** that register the skill, and iHatePosting's hosted MCP server where the tool supports it, with Claude Code, Cursor, Grok Build, Gemini CLI and DeepSeek Harness.
 4. **Tests** that run the real program against fake servers on your own computer.
 5. **Documents and examples**: this page and its neighbours, and sample post bodies and scripts.
 
-The package name and the command are the same: `ihateposting-agent`. The licence is MIT. There is no build step, no bundler, no TypeScript and no monorepo: one `package.json` at the root, two runtime dependencies, Node.js 20 or newer.
+The package name and the command are the same: `ihateposting`. The licence is MIT. There is no build step, no bundler, no TypeScript and no monorepo: one `package.json` at the root, two runtime dependencies, Node.js 20 or newer.
 
 ## Directory Structure
 
 ```
 iHatePosting-Agent/
 ├── bin/
-│   └── ihateposting-agent.mjs        # Entry point: a shebang line and one import of src/index.mjs
+│   └── ihateposting.mjs        # Entry point: a shebang line and one import of src/index.mjs
 │
 ├── src/                              # Source code
 │   ├── index.mjs                     # Main CLI entry point
@@ -129,12 +129,12 @@ iHatePosting-Agent/
 
 ### Source Files
 
-#### `bin/ihateposting-agent.mjs`
+#### `bin/ihateposting.mjs`
 - Two lines: `#!/usr/bin/env node` and `import "../src/index.mjs";`
 - This is what `package.json`'s `bin` points at, so it is the file npm links when someone installs the package
 
 #### `src/index.mjs`
-- Main entry point for the CLI (`bin/ihateposting-agent.mjs` imports it)
+- Main entry point for the CLI (`bin/ihateposting.mjs` imports it)
 - Uses `yargs` for command parsing
 - Defines all available commands and their options
 - Contains help text and usage examples
@@ -209,9 +209,9 @@ iHatePosting-Agent/
 ### Configuration Files
 
 #### `package.json`
-- Package name: `ihateposting-agent`
-- Version: `0.1.1`
-- Executable bin: `ihateposting-agent` → `bin/ihateposting-agent.mjs`
+- Package name: `ihateposting`
+- Version: `1.0.0`
+- Executable bin: `ihateposting` → `bin/ihateposting.mjs`
 - Scripts: `test`, `chatgpt-plugin:zip`
 - Files that are published: `bin`, `src`, `SKILL.md`, `skills`, `README.md`, `CHANGELOG.md` and `LICENSE`
 - Repository and metadata information
@@ -307,22 +307,22 @@ There is no build step: the CLI is plain JavaScript (ES modules) that runs as it
 
 ### Development Build
 
-- Nothing to watch or rebuild: you edit `src/...` and run `node bin/ihateposting-agent.mjs`
+- Nothing to watch or rebuild: you edit `src/...` and run `node bin/ihateposting.mjs`
 - A linked command (`npm link`) sees the change at once
-- The tests start `bin/ihateposting-agent.mjs` as a child process, so they run the code a person runs
+- The tests start `bin/ihateposting.mjs` as a child process, so they run the code a person runs
 
 ### Production Build
 
 There is none:
 
 1. `npm pack` copies `bin`, `src`, the skill, README, CHANGELOG and LICENSE as they are
-2. `npm install -g ihateposting-agent` puts the same files on disk and links `bin`
+2. `npm install -g ihateposting` puts the same files on disk and links `bin`
 
 ### Output
 
 - No `dist/` folder, no bundle and no source map are made
-- The program that runs is the program you wrote: `bin/ihateposting-agent.mjs` and the nine files of `src/`
-- The package packed for npm: 16 files, 49.7 kB for the published 0.1.0, 58.2 kB in the 0.1.1 dry run
+- The program that runs is the program you wrote: `bin/ihateposting.mjs` and the nine files of `src/`
+- The package packed for npm: 16 files, 49.7 kB for the first published version (0.1.0, under the package's former name), 58.2 kB in the 0.1.1 dry run, 59.2 kB in the 1.0.0 dry run
 
 ## Commands Architecture
 
@@ -344,7 +344,7 @@ Response / Error
 Output to console
 ```
 
-1. `bin/ihateposting-agent.mjs` imports `src/index.mjs`, which builds the command line and parses `process.argv`.
+1. `bin/ihateposting.mjs` imports `src/index.mjs`, which builds the command line and parses `process.argv`.
 2. yargs picks the command, applies defaults, runs `.check()` and calls the handler. A refusal at this stage prints the command's usage and the reason on standard error and ends with exit code `1`; no request has been made.
 3. The handler calls `getConfig()`. Nobody signed in ends the program with `1` before any request.
 4. The handler builds its data (for `posts:create`, the body made from `-c`, `-m`, `--alt`, `-i`, `--date`, `--type`, `--delay`, `--shortLink` and `--settings`) and calls one `IHatePostingAPI` method.
@@ -558,7 +558,7 @@ The owner runs it by hand, from their own computer, signed in to npm with two-fa
 - `plugins/`, `.claude-plugin/`, `.cursor-plugin/`, `.grok-plugin/`, `gemini-extension.json`, `mcp.json`, `server.json`, `assets/` and `scripts/` - Plugin folders, manifests and helper files
 - The guides (`PROJECT_STRUCTURE.md` and the other Markdown files) and `.github/`
 
-The published 0.1.0 was 16 files, 49.7 kB packed and 170.9 kB unpacked (npm's own output when it was published); the 0.1.1 dry run gives 16 files, 58.2 kB packed and 210.6 kB unpacked. `plugins/dsh-ihateposting/` is a separate package with its own `files` list that this package's release does not publish.
+The published 0.1.0 was 16 files, 49.7 kB packed and 170.9 kB unpacked (npm's own output when it was published); the 0.1.1 dry run gives 16 files, 58.2 kB packed and 210.6 kB unpacked, and the 1.0.0 dry run of `ihateposting` gives 16 files, 59.2 kB packed and 212.1 kB unpacked. `plugins/dsh-ihateposting/` is a separate package with its own `files` list that this package's release does not publish.
 
 ## Testing
 
@@ -566,16 +566,16 @@ The published 0.1.0 was 16 files, 49.7 kB packed and 170.9 kB unpacked (npm's ow
 
 ```bash
 # Test help
-node bin/ihateposting-agent.mjs --help
+node bin/ihateposting.mjs --help
 
 # Test without a key or a saved sign-in (should error)
-node bin/ihateposting-agent.mjs posts:list
+node bin/ihateposting.mjs posts:list
 
 # Test with a key (requires valid key)
-IHATEPOSTING_API_KEY=test node bin/ihateposting-agent.mjs integrations:list
+IHATEPOSTING_API_KEY=test node bin/ihateposting.mjs integrations:list
 ```
 
-A saved sign-in wins over the variable: run `node bin/ihateposting-agent.mjs auth:logout` first to test the key.
+A saved sign-in wins over the variable: run `node bin/ihateposting.mjs auth:logout` first to test the key.
 
 ### Automated Testing
 
@@ -633,14 +633,14 @@ None of these is scheduled. They are today's behaviour, kept on purpose to match
 
 All of them name the version, and all of them must carry the same one (`test/package.test.mjs` checks it).
 
-- `.claude-plugin/marketplace.json` and `plugins/claude-ihateposting/`: Claude Code. The marketplace is named `ihateposting-agent` and the plugin `ihateposting` (install: `ihateposting@ihateposting-agent`). The entry's source is the relative path `./plugins/claude-ihateposting`, a folder of its own that holds the plugin's manifest, a README, the licence, the logo and the skill (a copy); it has no `bin/`, because claude.ai and Cowork refuse a plugin that has one. There is no MCP entry.
+- `.claude-plugin/marketplace.json` and `plugins/claude-ihateposting/`: Claude Code. The marketplace is named `ihateposting` and the plugin `ihateposting` (install: `ihateposting@ihateposting`). The entry's source is the relative path `./plugins/claude-ihateposting`, a folder of its own that holds the plugin's manifest, a README, the licence, the logo and the skill (a copy); it has no `bin/`, because claude.ai and Cowork refuse a plugin that has one. There is no MCP entry.
 - `.cursor-plugin/` and `.grok-plugin/`: `plugin.json` (the skill and the logo; the Grok one also points at its folder's own `mcp.json`, while Cursor finds the root `mcp.json` by itself) and `marketplace.json`.
 - `gemini-extension.json`: Gemini CLI. It names only the hosted MCP server, as `httpUrl`.
 - `mcp.json`: the same server for any client that reads an `mcp.json`.
 - `plugins/chatgpt-ihateposting/`: the package for OpenAI's plugin directory (ChatGPT and Codex). It talks to the hosted server only, so its skills never use the command line. `npm run chatgpt-plugin:zip` checks it and builds the ZIP the owner uploads; `PUBLISHING.md` ("Submissions") has the steps.
-- `plugins/dsh-ihateposting/`: DeepSeek Harness. Its `cordis.patch.yml` adds a row that loads the plugin (four settings: the variable that holds the key, an inline key, the API address and a skill switch; it provides the service `ihateposting` and registers a short skill, and with no key it only warns) and a row for an MCP client that reads the address and the `Authorization: Bearer <key>` header from that service (by default `https://app.ihateposting.com/api/mcp`). Its README says what was and was not verified, including that it has never run inside a real Harness.
+- `plugins/dsh-ihateposting/`: DeepSeek Harness. Its `cordis.patch.yml` adds a row that loads the plugin (four settings: the variable that holds the key, an inline key, the app's address and a skill switch; it provides the service `ihateposting` and registers a short skill, and with no key it only warns) and a row for an MCP client that reads the address and the `Authorization: Bearer <key>` header from that service (by default `https://app.ihateposting.com/mcp`). Its README says what was and was not verified, including that it has never run inside a real Harness.
 
-The Cursor, Grok, Gemini and `mcp.json` entries use `https://app.ihateposting.com/api/mcp/oauth`, which signs a person in through the browser.
+The Cursor, Grok, Gemini and `mcp.json` entries use `https://app.ihateposting.com/mcp/oauth`, which signs a person in through the browser.
 
 ### The app's sign-in routes
 
@@ -648,7 +648,7 @@ The Cursor, Grok, Gemini and `mcp.json` entries use `https://app.ihateposting.co
 
 ### The hosted MCP server
 
-Not used by the command line, but named by the manifests: `https://app.ihateposting.com/api/mcp/oauth` (browser sign-in) and `https://app.ihateposting.com/api/mcp` (a key as a bearer token).
+Not used by the command line, but named by the manifests: `https://app.ihateposting.com/mcp/oauth` (browser sign-in) and `https://app.ihateposting.com/mcp` (a key as a bearer token).
 
 ### AI agent tools
 

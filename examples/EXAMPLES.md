@@ -34,7 +34,7 @@ The iHatePosting API supports a rich post structure:
 ### Basic Post
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Hello World!" \
   -s "2026-12-31T12:00:00Z" -t draft \
   -i "x-123"
@@ -43,7 +43,7 @@ ihateposting-agent posts:create \
 ### Post with Multiple Images
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Check out these images!" \
   -m "https://media.example/uploads/img1.jpg,https://media.example/uploads/img2.jpg,https://media.example/uploads/img3.jpg" \
   -s "2026-12-31T12:00:00Z" -t draft \
@@ -53,7 +53,7 @@ ihateposting-agent posts:create \
 ### Post with Comments (Simple)
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post content" \
   -c "First comment" \
   -c "Second comment" \
@@ -65,7 +65,7 @@ ihateposting-agent posts:create \
 ### Scheduled Post
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Future post" \
   -s "2026-12-31T12:00:00Z" \
   -i "x-123,linkedin-456"
@@ -82,7 +82,7 @@ For complex posts with comments that have their own media, use JSON files:
 **File:** `post-with-comments.json`
 
 ```bash
-ihateposting-agent posts:create --json examples/post-with-comments.json
+ihateposting posts:create --json examples/post-with-comments.json
 ```
 
 This creates:
@@ -95,7 +95,7 @@ This creates:
 **File:** `multi-platform-post.json`
 
 ```bash
-ihateposting-agent posts:create --json examples/multi-platform-post.json
+ihateposting posts:create --json examples/multi-platform-post.json
 ```
 
 This creates:
@@ -109,7 +109,7 @@ All dated for the same time (as drafts) with platform-specific content and media
 **File:** `thread-post.json`
 
 ```bash
-ihateposting-agent posts:create --json examples/thread-post.json
+ihateposting posts:create --json examples/thread-post.json
 ```
 
 This creates a 5-part X thread, with each tweet having its own image and a 2-minute delay between tweets.
@@ -237,7 +237,7 @@ Live event updates with media:
 Before creating posts, get your integration IDs:
 
 ```bash
-ihateposting-agent integrations:list
+ihateposting integrations:list
 ```
 
 Output (after one header line; abridged, with placeholder values):
@@ -268,7 +268,7 @@ Use these IDs in your `integration.id` fields.
 
 for file in posts/*.json; do
   echo "Creating post from $file..."
-  ihateposting-agent posts:create --json "$file"
+  ihateposting posts:create --json "$file"
   sleep 2
 done
 ```
@@ -296,7 +296,7 @@ cat > thread.json << 'EOF'
 EOF
 
 # Post using the JSON file
-ihateposting-agent posts:create --json thread.json
+ihateposting posts:create --json thread.json
 ```
 
 ## Error Handling
@@ -304,7 +304,7 @@ ihateposting-agent posts:create --json thread.json
 Common errors and solutions:
 
 1. **Invalid integration ID** - Run `integrations:list` to get valid IDs
-2. **Invalid image path** - Ensure images were uploaded to iHatePosting first (`ihateposting-agent upload`) and use the `path` it printed
+2. **Invalid image path** - Ensure images were uploaded to iHatePosting first (`ihateposting upload`) and use the `path` it printed
 3. **Missing required fields** - Check that `type`, `date`, `shortLink`, `tags`, and `posts` are all present
 4. **Invalid date format** - Use ISO 8601 format: `YYYY-MM-DDTHH:mm:ssZ`
 
@@ -320,12 +320,12 @@ Common errors and solutions:
 
 - **Placeholders.** `x-123`, `media-123` and `https://media.example/...` are not real. Replace every one before you send a file.
 - **Drafts.** Every sample has `"type": "draft"`, and every script sends drafts. A draft is kept but not published.
-- **Nothing signs in for you.** Sign in first (`ihateposting-agent auth:login`) or export `IHATEPOSTING_API_KEY` in your own shell, and check with `ihateposting-agent auth:status`. From a clone that is not linked, write `node bin/ihateposting-agent.mjs` where the examples say `ihateposting-agent`.
+- **Nothing signs in for you.** Sign in first (`ihateposting auth:login`) or export `IHATEPOSTING_API_KEY` in your own shell, and check with `ihateposting auth:status`. From a clone that is not linked, write `node bin/ihateposting.mjs` where the examples say `ihateposting`.
 
 ### Before you send a sample
 
-1. Replace the channel ids with ids from `ihateposting-agent integrations:list`.
-2. Upload the pictures and videos (`ihateposting-agent upload ./photo.png`) and put what comes back in `id` and `path`. `posts:create` uploads nothing.
+1. Replace the channel ids with ids from `ihateposting integrations:list`.
+2. Upload the pictures and videos (`ihateposting upload ./photo.png`) and put what comes back in `id` and `path`. `posts:create` uploads nothing.
 3. Read the channel's rules (`integrations:settings <id>`) and keep the text under its `maxLength`.
 4. Change `date` to a time you mean.
 5. Fill in what the platform needs: a Pinterest board, a TikTok privacy level, a YouTube title.
@@ -339,7 +339,7 @@ Common errors and solutions:
 Replace the three `path` addresses with what `upload` printed for your pictures. Alt texts are optional; leave `alt` out for a picture that needs none. This is the sample to copy when an alt text contains a comma, because `--alt` on the command line splits at commas and a file does not.
 
 ```bash
-ihateposting-agent posts:create --json post-with-comments-and-media.json
+ihateposting posts:create --json post-with-comments-and-media.json
 ```
 
 #### multi-platform-with-settings.json: one announcement, four channels
@@ -365,7 +365,7 @@ Two settings deserve a look before you send it:
 - `content_posting_method` is `DIRECT_POST`, which publishes the video itself once the post is scheduled. The other method, `UPLOAD`, only hands the video to the account's inbox in the TikTok app for a person to finish. Change a waiting post's method without editing the file:
 
 ```bash
-ihateposting-agent posts:settings post-123 --settings '{"content_posting_method":"UPLOAD"}'
+ihateposting posts:settings post-123 --settings '{"content_posting_method":"UPLOAD"}'
 ```
 
 #### youtube-video.json: a YouTube video
@@ -377,25 +377,25 @@ ihateposting-agent posts:settings post-123 --settings '{"content_posting_method"
 [pinterest-pin.json](pinterest-pin.json) is a pin with a picture, a description, a title and a link. Pinterest needs a **board**, and it is the numeric id, not the board's name. Ask the channel for its boards:
 
 ```bash
-ihateposting-agent integrations:trigger pinterest-123 boards
+ihateposting integrations:trigger pinterest-123 boards
 ```
 
 Copy the `value` of the board you want into `settings.board`.
 
 ### The scripts
 
-These are Bash scripts (on Windows, Git Bash or WSL). They are not marked executable in git, so start them with `bash`. Every one explains itself in comments, holds no key, deletes nothing and makes drafts only. `basic-usage.sh` and `command-line-examples.sh` are the plain ones: they call `ihateposting-agent` as it is written and read only `IHATEPOSTING_API_KEY`. The three others start with `set -euo pipefail` and read ids from environment variables. `AGENT` says how to start the program; it defaults to `ihateposting-agent`. From a clone:
+These are Bash scripts (on Windows, Git Bash or WSL). They are not marked executable in git, so start them with `bash`. Every one explains itself in comments, holds no key, deletes nothing and makes drafts only. `basic-usage.sh` and `command-line-examples.sh` are the plain ones: they call `ihateposting` as it is written and read only `IHATEPOSTING_API_KEY`. The three others start with `set -euo pipefail` and read ids from environment variables. `AGENT` says how to start the program; it defaults to `ihateposting`. From a clone:
 
 ```bash
 cd examples
-AGENT="node ../bin/ihateposting-agent.mjs" X_CHANNEL_ID=x-123 bash draft-from-flags.sh
+AGENT="node ../bin/ihateposting.mjs" X_CHANNEL_ID=x-123 bash draft-from-flags.sh
 ```
 
 The program's path in `AGENT` must not contain spaces, because the scripts split it into words.
 
 #### basic-usage.sh: a first tour
 
-[basic-usage.sh](basic-usage.sh) checks that `IHATEPOSTING_API_KEY` is set, lists the channels, makes one draft dated an hour ahead and lists the posts. Replace `x-123` in it with the id of one of your channels (step 1 prints them) before you run it. It calls `ihateposting-agent` as it is written, so from a clone link the program first (`npm link`) or edit the command.
+[basic-usage.sh](basic-usage.sh) checks that `IHATEPOSTING_API_KEY` is set, lists the channels, makes one draft dated an hour ahead and lists the posts. Replace `x-123` in it with the id of one of your channels (step 1 prints them) before you run it. It calls `ihateposting` as it is written, so from a clone link the program first (`npm link`) or edit the command.
 
 ```bash
 bash basic-usage.sh
@@ -468,7 +468,7 @@ CHANNEL="x-123"
 i=0
 while IFS= read -r line; do
   i=$((i + 1))
-  ihateposting-agent posts:create -c "$line" -s "2030-01-0${i}T09:00:00Z" -t draft -i "$CHANNEL"
+  ihateposting posts:create -c "$line" -s "2030-01-0${i}T09:00:00Z" -t draft -i "$CHANNEL"
 done <<'LIST'
 Monday: a tip about tidy shelves
 Tuesday: a customer story
@@ -496,7 +496,7 @@ const body = {
 };
 require("node:fs").writeFileSync("announcement.json", JSON.stringify(body, null, 2));
 '
-ihateposting-agent posts:create --json announcement.json
+ihateposting posts:create --json announcement.json
 ```
 
 #### Checking a body file before you send it
@@ -510,7 +510,7 @@ For the sample this prints `draft 2026-12-15T10:00:00Z 1 channel(s)`. A file tha
 #### Upload a video and wait until it is ready
 
 ```bash
-ihateposting-agent upload ./clip.mp4 --adjust
+ihateposting upload ./clip.mp4 --adjust
 ```
 
 Copy the `id` it printed, then ask until the server says the adjusting is done, giving up after about five minutes:
@@ -518,7 +518,7 @@ Copy the `id` it printed, then ask until the server says the adjusting is done, 
 ```bash
 ID="media-123"
 for attempt in $(seq 1 30); do
-  if ihateposting-agent media:status "$ID" | grep -q '"ready"'; then
+  if ihateposting media:status "$ID" | grep -q '"ready"'; then
     echo "ready"
     break
   fi
@@ -532,8 +532,8 @@ Then use the `path` that `upload` printed in your post. (The status words `proce
 #### Pick a board, then pin
 
 ```bash
-ihateposting-agent integrations:trigger pinterest-123 boards
-ihateposting-agent posts:create -c "Ten tips for tidy shelves" -m "https://media.example/uploads/shelves.png" \
+ihateposting integrations:trigger pinterest-123 boards
+ihateposting posts:create -c "Ten tips for tidy shelves" -m "https://media.example/uploads/shelves.png" \
   --settings '{"board":"1234567890","title":"Tidy shelves"}' -s "2030-01-01T09:00:00Z" -t draft -i "pinterest-123"
 ```
 
@@ -542,17 +542,17 @@ Slack and Discord work the same way with `integrations:trigger <id> channels`: t
 #### Review the drafts and schedule one
 
 ```bash
-ihateposting-agent posts:list
-ihateposting-agent posts:status post-123 --status schedule
+ihateposting posts:list
+ihateposting posts:status post-123 --status schedule
 ```
 
-`posts:list` shows the window from 30 days ago to 30 days ahead; widen it with `--startDate` and `--endDate` for drafts dated further out. There is no command that edits a post's text or date. To change those, check the id twice, run `ihateposting-agent posts:delete post-123` (it cannot be undone from here) and make the post again. To stop a queued post without losing it, use `posts:status post-123 --status draft` instead.
+`posts:list` shows the window from 30 days ago to 30 days ahead; widen it with `--startDate` and `--endDate` for drafts dated further out. There is no command that edits a post's text or date. To change those, check the id twice, run `ihateposting posts:delete post-123` (it cannot be undone from here) and make the post again. To stop a queued post without losing it, use `posts:status post-123 --status draft` instead.
 
 #### A weekly snapshot of analytics
 
 ```bash
 for ID in x-123 bluesky-123 pinterest-123; do
-  ihateposting-agent analytics:platform "$ID" -d 7 | tail -n +2 > "analytics-$ID.json"
+  ihateposting analytics:platform "$ID" -d 7 | tail -n +2 > "analytics-$ID.json"
 done
 ```
 
@@ -561,8 +561,8 @@ done
 #### A post whose analytics are "missing"
 
 ```bash
-ihateposting-agent analytics:post post-123            # {"missing": true}
-ihateposting-agent posts:missing post-123             # the platform's recent content
-ihateposting-agent posts:connect post-123 --release-id "7321456789012345678"
-ihateposting-agent analytics:post post-123            # now it has numbers
+ihateposting analytics:post post-123            # {"missing": true}
+ihateposting posts:missing post-123             # the platform's recent content
+ihateposting posts:connect post-123 --release-id "7321456789012345678"
+ihateposting analytics:post post-123            # now it has numbers
 ```

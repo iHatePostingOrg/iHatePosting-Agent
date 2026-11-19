@@ -6,7 +6,7 @@
 # runs only when the variables it needs are set, so you can try one at a time.
 #
 # Variables (all optional; set the ones for the examples you want)
-#   AGENT                 How to start the program (default: ihateposting-agent).
+#   AGENT                 How to start the program (default: ihateposting).
 #   POST_DATE             ISO 8601 date for the drafts (default: a fixed example date).
 #   X_CHANNEL_ID          id of an X channel                  -> thread, comments with media, alt text
 #   MEDIA_URL_1, _2       addresses returned by `upload`      -> used by the media examples
@@ -20,7 +20,7 @@
 
 set -euo pipefail
 
-AGENT="${AGENT:-ihateposting-agent}"
+AGENT="${AGENT:-ihateposting}"
 POST_DATE="${POST_DATE:-2026-12-15T10:00:00Z}"
 
 # agent: run the program with the arguments given ($AGENT is unquoted on purpose; see basic-usage.sh).

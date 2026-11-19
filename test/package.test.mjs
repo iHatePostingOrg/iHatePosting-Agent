@@ -25,48 +25,54 @@ const PLATFORM_KEYWORDS = ["x", "twitter", "linkedin", "facebook", "instagram", 
 /** The commands the program itself lists in its help (so a command added to the program and not to the skill is found). */
 async function commandsOfTheProgram() {
   const { stdout } = await run(["--help"]);
-  return [...stdout.matchAll(/^ {2}ihateposting-agent (\S+)/gm)].map((m) => m[1]);
+  return [...stdout.matchAll(/^ {2}ihateposting (\S+)/gm)].map((m) => m[1]);
 }
 
 describe("the package", () => {
   it("is MIT, plain JavaScript for Node 20, with the two libraries the command line is built on and a command named like the package", () => {
-    assert.equal(pkg.name, "ihateposting-agent");
+    assert.equal(pkg.name, "ihateposting");
     assert.equal(pkg.license, "MIT");
     assert.equal(pkg.type, "module");
     assert.match(pkg.engines.node, /20/);
     assert.deepEqual(Object.keys(pkg.dependencies).sort(), ["node-fetch", "yargs"]);
     assert.deepEqual(pkg.devDependencies ?? {}, {});
-    assert.deepEqual(Object.keys(pkg.bin), ["ihateposting-agent"]);
-    assert.ok(fs.existsSync(path.join(ROOT, pkg.bin["ihateposting-agent"])));
-    assert.ok(read(pkg.bin["ihateposting-agent"]).startsWith("#!/usr/bin/env node\n"));
+    assert.deepEqual(Object.keys(pkg.bin), ["ihateposting"]);
+    assert.ok(fs.existsSync(path.join(ROOT, pkg.bin.ihateposting)));
+    assert.ok(read(pkg.bin.ihateposting).startsWith("#!/usr/bin/env node\n"));
+    assert.equal(fs.existsSync(path.join(ROOT, "bin", "ihateposting-agent.mjs")), false, "the old bin file is back");
     assert.ok(read("LICENSE").includes("MIT License"));
   });
 
-  it("is called ihateposting-agent everywhere a person installs or runs it, never by the name of the live app's own command line, and no guide promises a local ihateposting-mcp package", () => {
-    // Owner, 2026-11-14: "Both ihateposting-agent". The live app's own packages on npm, `ihateposting` and `ihateposting-mcp`, are not replaced and not offered here.
+  it("is called ihateposting everywhere a person installs or runs it, the old name ihateposting-agent only where its history is told, and no guide promises a local ihateposting-mcp package", () => {
+    // Owner, 2026-11-19: the program moved from the npm package `ihateposting-agent` into the older package `ihateposting` ("all should be ihateposting"): 1.0.0 replaces the live app's old
+    // command line (0.1.0 to 0.6.0 of that name stay on npm by their number), and `ihateposting-agent` was left alone on npm. The live app's other package, `ihateposting-mcp`, is not replaced
+    // and not offered here.
     const guides = fs.readdirSync(ROOT).filter((f) => f.endsWith(".md")).concat(fs.readdirSync(path.join(ROOT, "examples")).map((f) => `examples/${f}`), ["skills/ihateposting/SKILL.md"]);
+    // The old name stays where the history of the move, of the old package or of a listing's slug is told: the changelog and the two guides for the owner.
+    const HISTORY = new Set(["CHANGELOG.md", "PUBLISHING.md", "SUBMISSIONS.md"]);
     for (const file of guides) {
       const text = read(file);
-      assert.doesNotMatch(text, /(?:npm|pnpm|yarn) (?:install|add|i)(?: -g| --global)? ihateposting(?![-\w])/, `${file} installs the live app's own package`);
-      assert.doesNotMatch(text, /npx ihateposting(?![-\w])/, `${file} runs the live app's own package`);
-      assert.doesNotMatch(text, /bin\/ihateposting\.mjs/, `${file} names a file that is not there`);
+      if (!HISTORY.has(file)) assert.doesNotMatch(text, /ihateposting-agent/, `${file} still names the old package`);
+      assert.doesNotMatch(text, /(?:npm|pnpm|yarn) (?:install|add|i)(?: -g| --global)? ihateposting-agent(?![-\w])/, `${file} installs the old package${HISTORY.has(file) ? " (the history may name it, not tell people to install it)" : ""}`);
+      assert.doesNotMatch(text, /npx ihateposting-agent(?![-\w])/, `${file} runs the old package`);
+      if (!HISTORY.has(file)) assert.doesNotMatch(text, /bin\/ihateposting-agent\.mjs/, `${file} names a file that is not there`);
       if (file !== "PUBLISHING.md") assert.doesNotMatch(text, /ihateposting-mcp/, `${file} names a package of the live app that this repository does not have`);
     }
-    assert.match(read("README.md"), /npm install -g ihateposting-agent\n/);
-    assert.match(read("QUICK_START.md"), /npm install -g ihateposting-agent\n/);
+    assert.match(read("README.md"), /npm install -g ihateposting\n/);
+    assert.match(read("QUICK_START.md"), /npm install -g ihateposting\n/);
     const publishing = read("PUBLISHING.md");
     assert.match(publishing, /^# Publishing the iHatePosting CLI to npm$/m);
-    assert.match(publishing, /^\| `name` \| What people type after `npm install` \| `ihateposting-agent` \|$/m);
-    assert.match(publishing, /^\| `bin` \| What people type to run the program \| `ihateposting-agent` \(pointing at `bin\/ihateposting-agent\.mjs`\) \|$/m);
-    assert.match(publishing, /npm view ihateposting-agent/);
-    assert.match(publishing, /this package does not replace it/);
+    assert.match(publishing, /^\| `name` \| What people type after `npm install` \| `ihateposting` \|$/m);
+    assert.match(publishing, /^\| `bin` \| What people type to run the program \| `ihateposting` \(pointing at `bin\/ihateposting\.mjs`\) \|$/m);
+    assert.match(publishing, /npm view ihateposting(?![-\w])/);
+    assert.match(publishing, /this package replaces it as the newest version/);
     assert.match(publishing, /This repository has no such package and does not publish one/);
   });
 
   it("holds exactly what `npm pack` would ship: the commands, the skill, the docs, the licence; no test, key or plugin folder", () => {
     const listed = JSON.parse(execFileSync(process.platform === "win32" ? "npm.cmd" : "npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], { cwd: ROOT, encoding: "utf8", shell: process.platform === "win32" }));
     const files = listed[0].files.map((f) => f.path.replaceAll("\\", "/")).sort();
-    for (const needed of ["bin/ihateposting-agent.mjs", "src/index.mjs", "src/api.mjs", "src/config.mjs", "src/constants.mjs", "src/commands/auth.mjs", "src/commands/posts.mjs", "src/commands/integrations.mjs", "src/commands/analytics.mjs", "src/commands/upload.mjs", "SKILL.md", "skills/ihateposting/SKILL.md", "README.md", "CHANGELOG.md", "LICENSE", "package.json"]) assert.ok(files.includes(needed), `${needed} is not in the package`);
+    for (const needed of ["bin/ihateposting.mjs", "src/index.mjs", "src/api.mjs", "src/config.mjs", "src/constants.mjs", "src/commands/auth.mjs", "src/commands/posts.mjs", "src/commands/integrations.mjs", "src/commands/analytics.mjs", "src/commands/upload.mjs", "SKILL.md", "skills/ihateposting/SKILL.md", "README.md", "CHANGELOG.md", "LICENSE", "package.json"]) assert.ok(files.includes(needed), `${needed} is not in the package`);
     for (const file of files) assert.ok(!/^(test|\.|PUBLISHING|assets|mcp\.json|gemini|plugins|examples)/.test(file) && !/credentials|\.env/.test(file), `${file} should not be shipped`);
     assert.ok(!files.some((f) => /login-page|loopback/.test(f)), "the old loopback sign-in page is back");
   });
@@ -122,7 +128,7 @@ describe("the skill", () => {
     const root = read("SKILL.md");
     const forTheClaudeDirectory = root
       .replace('metadata: {"openclaw":{"emoji":"📬","requires":{"bins":[],"env":["IHATEPOSTING_API_URL"]}}}', 'metadata:\n  openclaw:\n    emoji: "📬"\n    requires:\n      env:\n        - IHATEPOSTING_API_URL')
-      .replace("npm release: https://www.npmjs.com/package/ihateposting-agent\n", "");
+      .replace("npm release: https://www.npmjs.com/package/ihateposting\n", "");
     assert.notEqual(forTheClaudeDirectory, root, "the two replacements found nothing to change in the skill");
     assert.equal(read("plugins/claude-ihateposting/skills/ihateposting/SKILL.md"), forTheClaudeDirectory, "the Claude Code plugin's copy of the skill is not the skill with its two changes (sync-skill.yml does not write to it)");
     const frontMatter = read("plugins/claude-ihateposting/skills/ihateposting/SKILL.md").match(/^---\n([\s\S]*?)\n---\n/)[1];
@@ -138,8 +144,9 @@ describe("the skill", () => {
     const commands = await commandsOfTheProgram();
     assert.equal(commands.length, 19, `the help lists ${commands.join(", ")}`);
     const text = read("SKILL.md");
-    for (const name of commands) assert.ok(text.includes(`ihateposting-agent ${name}`), `${name} is not in the skill`);
-    const named = new Set([...text.matchAll(/ihateposting-agent ([a-z]+(?::[a-z]+)?)(?=[\s`"'<]|$)/g)].map((m) => m[1]));
+    for (const name of commands) assert.ok(text.includes(`ihateposting ${name}`), `${name} is not in the skill`);
+    // Every command but `upload` is written `group:name`; a bare word after "ihateposting" is prose (the "ihateposting cli github:" line, the plugin's name), not a command.
+    const named = new Set([...text.matchAll(/ihateposting ([a-z]+:[a-z]+|upload)(?=[\s`"'<]|$)/g)].map((m) => m[1]));
     for (const name of named) assert.ok(commands.includes(name) || ["--help", "--version"].includes(name), `the skill names "${name}", which is no command`);
   });
 
@@ -169,7 +176,7 @@ describe("the skill", () => {
     }
     // The commands are the ones the program has; the live packages' commands are not here.
     const text = read("SKILL.md");
-    for (const foreign of ["whoami", "upload:url", "notifications:", "groups:list", "login <key>"]) assert.ok(!text.includes(`ihateposting-agent ${foreign}`) && !text.includes(`ihateposting ${foreign}`), `the skill names "${foreign}"`);
+    for (const foreign of ["whoami", "upload:url", "notifications:", "groups:list", "login <key>"]) assert.ok(!text.includes(`ihateposting ${foreign}`), `the skill names "${foreign}"`);
   });
 
   it("ships the two workflows, written to run only when started by hand (never on a release, a push or a pull request), that check the version asked for, and never hold a secret", () => {
@@ -205,17 +212,19 @@ describe("the plugin folders", () => {
   it("are valid JSON, name the package, and point at files that exist", () => {
     for (const file of [CLAUDE_PLUGIN, ".claude-plugin/marketplace.json", ".cursor-plugin/plugin.json", ".cursor-plugin/marketplace.json", ".cursor-plugin/mcp.json", ".grok-plugin/plugin.json", ".grok-plugin/marketplace.json", ".grok-plugin/mcp.json", "gemini-extension.json", "mcp.json"]) assert.ok(json(file), file);
     // The plugin and the Gemini extension keep the name "ihateposting" (the owner's answer of 2026-11-15, "Back to ihateposting"); the marketplaces, the npm package and the command are
-    // "ihateposting-agent", so the install is `ihateposting@ihateposting-agent`. (The skill keeps its own name, `ihateposting`, and so does its folder.)
+    // "ihateposting" too (the owner's answer of 2026-11-19, "all should be ihateposting"), so the install is `ihateposting@ihateposting`. (The skill keeps its own name, `ihateposting`,
+    // and so does its folder.)
     for (const file of [CLAUDE_PLUGIN, ".cursor-plugin/plugin.json", ".grok-plugin/plugin.json", "gemini-extension.json"]) assert.equal(json(file).name, "ihateposting", file);
     for (const file of [".claude-plugin/marketplace.json", ".cursor-plugin/marketplace.json", ".grok-plugin/marketplace.json"]) {
-      assert.equal(json(file).name, "ihateposting-agent", `${file}: the marketplace's own name`);
+      assert.equal(json(file).name, "ihateposting", `${file}: the marketplace's own name`);
       assert.equal(json(file).plugins[0].name, "ihateposting", `${file}: the plugin entry's name`);
     }
     // Claude Code installs by the entry's name, so the entry and the plugin's own manifest must agree.
     assert.equal(json(".claude-plugin/marketplace.json").plugins[0].name, json(CLAUDE_PLUGIN).name);
     assert.equal(json(".cursor-plugin/marketplace.json").plugins[0].name, json(".cursor-plugin/plugin.json").name);
-    assert.match(read("README.md"), /\/plugin install ihateposting@ihateposting-agent\n/);
-    assert.doesNotMatch(read("README.md"), /\/plugin install ihateposting-agent@/);
+    assert.match(read("README.md"), /\/plugin install ihateposting@ihateposting\n/);
+    assert.doesNotMatch(read("README.md"), /\/plugin install ihateposting@ihateposting-agent/, "the install line names the old marketplace");
+    assert.doesNotMatch(read("README.md"), /\/plugin install ihateposting-agent@/, "the plugin was renamed in an install line");
     for (const file of [".cursor-plugin/plugin.json", ".grok-plugin/plugin.json"]) for (const skill of json(file).skills) assert.ok(fs.existsSync(path.join(ROOT, skill, "SKILL.md")), `${file}: ${skill}`);
     for (const file of [".cursor-plugin/plugin.json", ".grok-plugin/plugin.json"]) assert.ok(fs.existsSync(path.join(ROOT, json(file).logo)), `${file}: its logo`);
     // The logo is the app's current "i" mark as a real PNG (a stale heart SVG was shipped once and the owner caught it), not a text file with a picture's name.
@@ -229,12 +238,12 @@ describe("the plugin folders", () => {
   });
 
   it("all point the hosted MCP server at the app's sign-in address", () => {
-    const server = { type: "http", url: "https://app.ihateposting.com/api/mcp/oauth" };
+    const server = { type: "http", url: "https://app.ihateposting.com/mcp/oauth" };
     for (const file of [".cursor-plugin/mcp.json", "mcp.json"]) assert.deepEqual(json(file), { ihateposting: server }, file);
     // The Grok plugin's file is wrapped in `mcpServers`, as the standard `.mcp.json` is: xAI's own index tool (scripts/plugin_catalog.py) reads only that form, so a flat file would show the
     // plugin without its MCP server in the marketplace's component index (owner, 2026-11-16).
     assert.deepEqual(json(".grok-plugin/mcp.json"), { mcpServers: { ihateposting: server } }, ".grok-plugin/mcp.json");
-    assert.equal(json("gemini-extension.json").mcpServers.ihateposting.httpUrl, "https://app.ihateposting.com/api/mcp/oauth");
+    assert.equal(json("gemini-extension.json").mcpServers.ihateposting.httpUrl, "https://app.ihateposting.com/mcp/oauth");
   });
 
   it("hold no key, token or email address of a person, except the author's one address in the places that name an author", () => {

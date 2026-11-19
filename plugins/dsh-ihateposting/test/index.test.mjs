@@ -16,7 +16,7 @@ const pkg = JSON.parse(read("package.json"));
 
 const FAKE_KEY = "test-key-0123456789-not-real";
 const OTHER_KEY = "other-key-9876543210-not-real";
-const DEFAULT_MCP = "https://app.ihateposting.com/api/mcp";
+const DEFAULT_MCP = "https://app.ihateposting.com/mcp";
 /** The tools the hosted server has (apps/backend/src/mcp/mcp-tools.ts of the app). */
 const SERVER_TOOLS = ["integrationList", "groupList", "integrationSchema", "triggerTool", "integrationSchedulePostTool", "postsListTool", "postSettingsTool", "deletePostTool", "uploadFromUrlTool", "mediaListTool", "mediaStatusTool", "uploadWidgetTool", "uploadWidgetTicketTool", "uploadWidgetStatusTool"];
 
@@ -139,7 +139,7 @@ describe("cordis.patch.yml", () => {
 
   it("configures the first row with the variable and the default address, and nothing else", () => {
     const first = patchLines.slice(1, patchLines.indexOf("    - id: ihateposting-mcp"));
-    assert.deepEqual(first.slice(2), ["      config:", "        apiKeyEnv: IHATEPOSTING_API_KEY", "        baseUrl: https://app.ihateposting.com/api"]);
+    assert.deepEqual(first.slice(2), ["      config:", "        apiKeyEnv: IHATEPOSTING_API_KEY", "        baseUrl: https://app.ihateposting.com"]);
   });
 
   it("makes the MCP row inject the service and read the address and the headers from it, over streamable HTTP, as a server named ihateposting", () => {
@@ -159,8 +159,8 @@ describe("cordis.patch.yml", () => {
     assert.ok(!text.includes("process.env"), "the patch reads the environment");
     assert.ok(!text.includes("Authorization") && !text.includes("Bearer"), "the patch builds the header");
     assert.ok(!text.includes("disabled"), "a row is switched off by a key check");
-    assert.deepEqual(text.match(/https?:\/\/\S+/g), ["https://app.ihateposting.com/api"]);
-    assert.ok(!read("cordis.patch.yml").includes("/api/mcp/oauth"), "the browser sign-in address is wired");
+    assert.deepEqual(text.match(/https?:\/\/\S+/g), ["https://app.ihateposting.com"]);
+    assert.ok(!read("cordis.patch.yml").includes("/mcp/oauth"), "the browser sign-in address is wired");
   });
 });
 
@@ -174,13 +174,13 @@ describe("the plugin (lib/index.js)", { skip: skipIfNoHook }, async () => {
     assert.equal(plugin.name, pkg.name);
     assert.equal(plugin.SERVICE_NAME, "ihateposting");
     assert.equal(plugin.DEFAULT_KEY_VARIABLE, "IHATEPOSTING_API_KEY");
-    assert.equal(plugin.DEFAULT_BASE_URL, "https://app.ihateposting.com/api");
+    assert.equal(plugin.DEFAULT_BASE_URL, "https://app.ihateposting.com");
     assert.equal(typeof plugin.apply, "function");
   });
 
   describe("the settings schema", () => {
     it("fills the four defaults when nothing is given", () => {
-      for (const given of [undefined, {}]) assert.deepEqual(plugin.Config(given), { apiKeyEnv: "IHATEPOSTING_API_KEY", apiKey: "", baseUrl: "https://app.ihateposting.com/api", skill: true });
+      for (const given of [undefined, {}]) assert.deepEqual(plugin.Config(given), { apiKeyEnv: "IHATEPOSTING_API_KEY", apiKey: "", baseUrl: "https://app.ihateposting.com", skill: true });
     });
 
     it("keeps what is given and fills the rest", () => {
@@ -192,14 +192,14 @@ describe("the plugin (lib/index.js)", { skip: skipIfNoHook }, async () => {
     });
 
     it("takes a null, as a missing value, for the default (the library does)", () => {
-      const defaults = { apiKeyEnv: "IHATEPOSTING_API_KEY", apiKey: "", baseUrl: "https://app.ihateposting.com/api", skill: true };
+      const defaults = { apiKeyEnv: "IHATEPOSTING_API_KEY", apiKey: "", baseUrl: "https://app.ihateposting.com", skill: true };
       assert.deepEqual(plugin.Config(null), defaults);
       assert.deepEqual(plugin.Config({ baseUrl: null, skill: null }), defaults);
     });
   });
 
   describe("resolveConnection", () => {
-    const settings = (over = {}) => ({ apiKeyEnv: "IHATEPOSTING_API_KEY", apiKey: "", baseUrl: "https://app.ihateposting.com/api", ...over });
+    const settings = (over = {}) => ({ apiKeyEnv: "IHATEPOSTING_API_KEY", apiKey: "", baseUrl: "https://app.ihateposting.com", ...over });
 
     it("reads the key from the named variable and builds the address and the header", () => {
       const c = plugin.resolveConnection(settings(), { IHATEPOSTING_API_KEY: FAKE_KEY });
@@ -240,11 +240,11 @@ describe("the plugin (lib/index.js)", { skip: skipIfNoHook }, async () => {
 
     it("makes the MCP address from the API address: trailing slashes dropped, `/mcp` added once, a plain host and an empty setting handled", () => {
       const url = (baseUrl) => plugin.resolveConnection(settings({ baseUrl }), {}).url;
-      assert.equal(url("https://app.ihateposting.com/api"), DEFAULT_MCP);
-      assert.equal(url("https://app.ihateposting.com/api/"), DEFAULT_MCP);
-      assert.equal(url("https://app.ihateposting.com/api///"), DEFAULT_MCP);
-      assert.equal(url("https://app.ihateposting.com/api/mcp"), DEFAULT_MCP);
-      assert.equal(url("https://app.ihateposting.com/api/mcp/"), DEFAULT_MCP);
+      assert.equal(url("https://app.ihateposting.com"), DEFAULT_MCP);
+      assert.equal(url("https://app.ihateposting.com/"), DEFAULT_MCP);
+      assert.equal(url("https://app.ihateposting.com///"), DEFAULT_MCP);
+      assert.equal(url("https://app.ihateposting.com/mcp"), DEFAULT_MCP);
+      assert.equal(url("https://app.ihateposting.com/mcp/"), DEFAULT_MCP);
       assert.equal(url("  https://self.example  "), "https://self.example/mcp");
       assert.equal(url(""), DEFAULT_MCP);
       assert.equal(url(undefined), DEFAULT_MCP);
@@ -399,7 +399,7 @@ describe("the real @deepseek-ai/schemastery", { skip: realSchemastery ? false : 
   it("is what the plugin's settings schema is made with, and validates the same way", async () => {
     const real = await import("@deepseek-ai/schemastery");
     assert.equal(real.isStandIn, undefined, "the stand-in was loaded although the real package can be found");
-    assert.deepEqual(plugin.Config({}), { apiKeyEnv: "IHATEPOSTING_API_KEY", apiKey: "", baseUrl: "https://app.ihateposting.com/api", skill: true });
+    assert.deepEqual(plugin.Config({}), { apiKeyEnv: "IHATEPOSTING_API_KEY", apiKey: "", baseUrl: "https://app.ihateposting.com", skill: true });
     assert.throws(() => plugin.Config({ skill: "yes" }));
     assert.throws(() => plugin.Config({ apiKeyEnv: 5 }));
   });
@@ -466,9 +466,9 @@ describe("README.md", () => {
   const readme = read("README.md");
 
   it("documents the four settings with their defaults, and the keyless behaviour with its consequence", () => {
-    for (const setting of ["`apiKeyEnv` | `IHATEPOSTING_API_KEY`", "`apiKey` | `''`", "`baseUrl` | `https://app.ihateposting.com/api`", "`skill` | `true`"]) assert.ok(readme.includes(setting), `the settings table lacks ${setting}`);
+    for (const setting of ["`apiKeyEnv` | `IHATEPOSTING_API_KEY`", "`apiKey` | `''`", "`baseUrl` | `https://app.ihateposting.com`", "`skill` | `true`"]) assert.ok(readme.includes(setting), `the settings table lacks ${setting}`);
     assert.match(readme, /Without a key[\s\S]*warning[\s\S]*401[\s\S]*registers no tools[\s\S]*keeps booting/);
-    assert.ok(readme.includes("https://app.ihateposting.com/api/mcp"));
+    assert.ok(readme.includes("https://app.ihateposting.com/mcp"));
     assert.ok(!/refuses to load|is not loading because/.test(readme), "the old rule is still described");
   });
 

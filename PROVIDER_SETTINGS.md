@@ -7,7 +7,7 @@ The iHatePosting CLI supports platform-specific settings for each integration. D
 ### Method 1: Command Line Flags
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Your content" \
   -s "2024-12-31T12:00:00Z" \
   --settings '<json-settings>' \
@@ -17,7 +17,7 @@ ihateposting-agent posts:create \
 ### Method 2: JSON File
 
 ```bash
-ihateposting-agent posts:create --json post-with-settings.json
+ihateposting posts:create --json post-with-settings.json
 ```
 
 In the JSON file, specify settings per integration:
@@ -52,7 +52,7 @@ In the JSON file, specify settings per integration:
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Video description here" \
   -m "video.mp4" \
   -s "2024-12-31T12:00:00Z" \
@@ -87,7 +87,7 @@ ihateposting-agent posts:create \
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Tweet content" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{
@@ -98,7 +98,7 @@ ihateposting-agent posts:create \
 
 **With Community:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Community tweet" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{
@@ -118,7 +118,7 @@ A LinkedIn Page is a channel of its own (`linkedin-page`) and takes the same set
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "LinkedIn post" \
   -m "img1.jpg,img2.jpg,img3.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -139,7 +139,7 @@ ihateposting-agent posts:create \
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Instagram post" \
   -m "photo.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -151,7 +151,7 @@ ihateposting-agent posts:create \
 
 **Story Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Story content" \
   -m "story-image.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -193,7 +193,7 @@ The eight settings marked (required) below must always be sent, even where the a
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "TikTok video description" \
   -m "video.mp4" \
   -s "2024-12-31T12:00:00Z" \
@@ -224,7 +224,7 @@ A body file for it is in [examples/tiktok-video.json](examples/tiktok-video.json
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Facebook post" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{
@@ -244,7 +244,7 @@ ihateposting-agent posts:create \
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Pin description" \
   -m "pin-image.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -262,7 +262,7 @@ ihateposting-agent posts:create \
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Patch notes are up" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{
@@ -280,7 +280,7 @@ ihateposting-agent posts:create \
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Release is out" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{
@@ -301,7 +301,7 @@ ihateposting-agent posts:create \
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Release notes are out" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{
@@ -327,7 +327,7 @@ A post holds text and, optionally, one picture.
 
 **Example:**
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Our new opening hours" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{
@@ -380,7 +380,7 @@ For complex settings, it's easier to use JSON files:
 ```
 
 ```bash
-ihateposting-agent posts:create --json pinterest-pin.json
+ihateposting posts:create --json pinterest-pin.json
 ```
 
 ### YouTube Example
@@ -420,7 +420,7 @@ ihateposting-agent posts:create --json pinterest-pin.json
 ```
 
 ```bash
-ihateposting-agent posts:create --json youtube-video.json
+ihateposting posts:create --json youtube-video.json
 ```
 
 ### Multi-Platform with Different Settings
@@ -481,7 +481,7 @@ ihateposting-agent posts:create --json youtube-video.json
 To find the correct provider type for your integration:
 
 ```bash
-ihateposting-agent integrations:list
+ihateposting integrations:list
 ```
 
 This will show the `identifier` field for each integration; it tells you which of the sections above applies. The settings never carry it: the server reads it from the channel. (Do not confuse it with the integration's `id`, which is what you pass to `-i`.)
@@ -512,10 +512,10 @@ This will show the `identifier` field for each integration; it tells you which o
 
 ```bash
 # ❌ Wrong
-ihateposting-agent integrations:list | tail -n +2 | jq '.[] | select(.identifier=="twitter")'  # Should be "x"
+ihateposting integrations:list | tail -n +2 | jq '.[] | select(.identifier=="twitter")'  # Should be "x"
 
 # ✅ Correct
-ihateposting-agent integrations:list | tail -n +2 | jq '.[] | select(.identifier=="x")'
+ihateposting integrations:list | tail -n +2 | jq '.[] | select(.identifier=="x")'
 ```
 
 `posts:create` has no `-p` flag; if a script passes one, it is ignored. The platform comes from the integration id.
@@ -537,7 +537,7 @@ Each platform validates its own settings. Check the error message and refer to t
 **The server is the authority.** This page is a reader's guide, written from the settings schemas the app currently publishes. The schema, the rules and the length limit of your own channel come from
 
 ```bash
-ihateposting-agent integrations:settings <channel-id>
+ihateposting integrations:settings <channel-id>
 ```
 
 Run that first. Its answer can be newer than this page. The page does not repeat the rule texts; where a platform has rules about pictures or videos, only the gist is given, and `output.rules` has the exact words. See [INTEGRATION_SETTINGS_DISCOVERY.md](INTEGRATION_SETTINGS_DISCOVERY.md) for how to read the answer, and [PROVIDER_SETTINGS_SUMMARY.md](PROVIDER_SETTINGS_SUMMARY.md) for one table of everything.
@@ -545,7 +545,7 @@ Run that first. Its answer can be newer than this page. The page does not repeat
 ### Later, on a post that has not gone out
 
 ```bash
-ihateposting-agent posts:settings <post-id> --settings '{"content_posting_method":"DIRECT_POST"}'
+ihateposting posts:settings <post-id> --settings '{"content_posting_method":"DIRECT_POST"}'
 ```
 
 The object you pass is merged into the post's settings: only the keys you name change. The program's help says it works only for posts that have not been published yet (drafts and scheduled posts). What the server does with a published post is its own answer, shown after `API Error (<status>)`.
@@ -618,7 +618,7 @@ The same JSON that works in Bash can arrive mangled in other shells. These resul
 - **`cmd`** accepts the JSON inside double quotes with each inner quote written as `\"`:
 
   ```bat
-  ihateposting-agent posts:create -i pinterest-123 -c "Ten quick tips" -s 2026-12-15T10:00:00Z -t draft --settings "{\"board\":\"1234567890\",\"title\":\"Ten tips\"}"
+  ihateposting posts:create -i pinterest-123 -c "Ten quick tips" -s 2026-12-15T10:00:00Z -t draft --settings "{\"board\":\"1234567890\",\"title\":\"Ten tips\"}"
   ```
 
 - **Windows PowerShell 5.1** is the unreliable one. It removes the double quotes inside the string, which produces exactly the "Failed to parse settings JSON" case, and it splits an argument at spaces when the argument also holds quotes. Writing each inner quote as `\"` (for example with `-replace '"', '\"'`) helps only when the JSON holds no spaces.

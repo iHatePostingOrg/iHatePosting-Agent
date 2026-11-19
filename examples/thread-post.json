@@ -19,7 +19,7 @@
           ]
         },
         {
-          "content": "Step 1: Install the CLI and set your API key\n\nexport IHATEPOSTING_API_KEY=your_key\npnpm install -g ihateposting-agent (2/5)",
+          "content": "Step 1: Install the CLI and set your API key\n\nexport IHATEPOSTING_API_KEY=your_key\npnpm install -g ihateposting (2/5)",
           "image": [
             {
               "id": "media-124",
@@ -29,7 +29,7 @@
           "delay": 2
         },
         {
-          "content": "Step 2: List your connected integrations to get their IDs\n\nihateposting-agent integrations:list (3/5)",
+          "content": "Step 2: List your connected integrations to get their IDs\n\nihateposting integrations:list (3/5)",
           "image": [
             {
               "id": "media-125",
@@ -39,7 +39,7 @@
           "delay": 2
         },
         {
-          "content": "Step 3: Create your first post\n\nihateposting-agent posts:create -c \"Hello World!\" -s \"2026-12-31T12:00:00Z\" -t draft -i \"x-123\" (4/5)",
+          "content": "Step 3: Create your first post\n\nihateposting posts:create -c \"Hello World!\" -s \"2026-12-31T12:00:00Z\" -t draft -i \"x-123\" (4/5)",
           "image": [
             {
               "id": "media-126",

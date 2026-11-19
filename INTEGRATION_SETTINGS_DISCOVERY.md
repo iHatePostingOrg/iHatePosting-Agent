@@ -9,7 +9,7 @@ Get the settings schema, validation rules, and maximum character limits for any 
 ## Usage
 
 ```bash
-ihateposting-agent integrations:settings <integration-id>
+ihateposting integrations:settings <integration-id>
 ```
 
 ## What It Returns
@@ -41,7 +41,7 @@ ihateposting-agent integrations:settings <integration-id>
 ### 1. List Your Integrations
 
 ```bash
-ihateposting-agent integrations:list
+ihateposting integrations:list
 ```
 
 Output:
@@ -73,7 +73,7 @@ Output:
 ### 2. Get Settings for Specific Integration
 
 ```bash
-ihateposting-agent integrations:settings pinterest-abc123
+ihateposting integrations:settings pinterest-abc123
 ```
 
 Output:
@@ -124,7 +124,7 @@ Output:
 Now you know what settings are available and required!
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "My post content" \
   -m "image.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -142,7 +142,7 @@ The numbers below are the ones the app lists at the time of writing; the number 
 ### Pinterest
 
 ```bash
-ihateposting-agent integrations:settings pinterest-abc123
+ihateposting integrations:settings pinterest-abc123
 ```
 
 Returns:
@@ -153,7 +153,7 @@ Returns:
 ### YouTube
 
 ```bash
-ihateposting-agent integrations:settings youtube-def456
+ihateposting integrations:settings youtube-def456
 ```
 
 Returns:
@@ -164,7 +164,7 @@ Returns:
 ### X (Twitter)
 
 ```bash
-ihateposting-agent integrations:settings x-ghi789
+ihateposting integrations:settings x-ghi789
 ```
 
 Returns:
@@ -175,7 +175,7 @@ Returns:
 ### LinkedIn
 
 ```bash
-ihateposting-agent integrations:settings linkedin-jkl012
+ihateposting integrations:settings linkedin-jkl012
 ```
 
 Returns:
@@ -185,7 +185,7 @@ Returns:
 ### TikTok
 
 ```bash
-ihateposting-agent integrations:settings tiktok-mno345
+ihateposting integrations:settings tiktok-mno345
 ```
 
 Returns:
@@ -198,7 +198,7 @@ Returns:
 ### Instagram
 
 ```bash
-ihateposting-agent integrations:settings instagram-pqr678
+ihateposting integrations:settings instagram-pqr678
 ```
 
 Returns:
@@ -211,7 +211,7 @@ Returns:
 Some platforms don't require specific settings:
 
 ```bash
-ihateposting-agent integrations:settings threads-stu901
+ihateposting integrations:settings threads-stu901
 ```
 
 Returns:
@@ -238,10 +238,10 @@ Find out what settings are available before posting:
 
 ```bash
 # What settings does YouTube support?
-ihateposting-agent integrations:settings youtube-123
+ihateposting integrations:settings youtube-123
 
 # What settings does Pinterest support?
-ihateposting-agent integrations:settings pinterest-456
+ihateposting integrations:settings pinterest-456
 ```
 
 ### 2. Validation
@@ -249,7 +249,7 @@ ihateposting-agent integrations:settings pinterest-456
 Check maximum character limits:
 
 ```bash
-ihateposting-agent integrations:settings x-789 | tail -n +2 | jq '.output.maxLength'
+ihateposting integrations:settings x-789 | tail -n +2 | jq '.output.maxLength'
 # Output: 280 (4000 for a channel marked as verified)
 ```
 
@@ -263,7 +263,7 @@ AI agents can call this endpoint to:
 ```bash
 # Get settings schema
 INTEGRATION_ID="your-integration-id"
-SETTINGS=$(ihateposting-agent integrations:settings "$INTEGRATION_ID" | tail -n +2)
+SETTINGS=$(ihateposting integrations:settings "$INTEGRATION_ID" | tail -n +2)
 
 # Extract max length
 MAX_LENGTH=$(echo "$SETTINGS" | jq '.output.maxLength')
@@ -284,10 +284,10 @@ Use the schema to generate UI forms:
 
 ```bash
 # Inspect the settings schema for form generation
-ihateposting-agent integrations:settings pinterest-123 | tail -n +2 | jq '.output.settings'
+ihateposting integrations:settings pinterest-123 | tail -n +2 | jq '.output.settings'
 
 # Extract specific field properties
-ihateposting-agent integrations:settings pinterest-123 | tail -n +2 \
+ihateposting integrations:settings pinterest-123 | tail -n +2 \
   | jq '.output.settings.properties'
 # → board (text, required, digits only)
 # → title (text, up to 100 characters)
@@ -305,19 +305,19 @@ export IHATEPOSTING_API_KEY=your_key
 
 # 1. List integrations
 echo "📋 Available integrations:"
-ihateposting-agent integrations:list
+ihateposting integrations:list
 
 # 2. Get settings for Pinterest
 echo ""
 echo "⚙️  Pinterest settings:"
-SETTINGS=$(ihateposting-agent integrations:settings pinterest-123 | tail -n +2)
+SETTINGS=$(ihateposting integrations:settings pinterest-123 | tail -n +2)
 echo "$SETTINGS" | jq '.output.maxLength'
 echo "$SETTINGS" | jq '.output.settings'
 
 # 3. Create post with correct settings
 echo ""
 echo "📝 Creating post..."
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "My post content" \
   -m "image.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -352,14 +352,14 @@ Returns:
 ### Integration Not Found
 
 ```bash
-ihateposting-agent integrations:settings invalid-id
+ihateposting integrations:settings invalid-id
 # ❌ Failed to get integration settings: Request failed: API Error (<status>): <the server's words>
 ```
 
 ### API Key Not Set
 
 ```bash
-ihateposting-agent integrations:settings pinterest-123
+ihateposting integrations:settings pinterest-123
 # ❌ Error: No authentication found.
 ```
 
@@ -385,7 +385,7 @@ ihateposting-agent integrations:settings pinterest-123
 
 ```bash
 # Discover settings programmatically
-ihateposting-agent integrations:settings pinterest-123
+ihateposting integrations:settings pinterest-123
 
 # See exactly what's required and optional
 # Know the exact character limits
@@ -461,15 +461,15 @@ What the schema cannot say: conditions that depend on another key (for example "
 The header line is not JSON, so drop it before you parse. With `jq`:
 
 ```bash
-ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 | jq '.output.maxLength'
-ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 | jq -r '.output.settings.required? // [] | .[]'
-ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 | jq -r '.output.tools[]?.methodName'
+ihateposting integrations:settings "$CHANNEL_ID" | tail -n +2 | jq '.output.maxLength'
+ihateposting integrations:settings "$CHANNEL_ID" | tail -n +2 | jq -r '.output.settings.required? // [] | .[]'
+ihateposting integrations:settings "$CHANNEL_ID" | tail -n +2 | jq -r '.output.tools[]?.methodName'
 ```
 
 Without `jq`, Node can do the same (Node is already installed if you can run the program):
 
 ```bash
-ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 | node -e '
+ihateposting integrations:settings "$CHANNEL_ID" | tail -n +2 | node -e '
 let s = "";
 process.stdin.on("data", (d) => (s += d)).on("end", () => {
   const out = JSON.parse(s).output;
@@ -482,7 +482,7 @@ process.stdin.on("data", (d) => (s += d)).on("end", () => {
 In PowerShell, skip the first line and join the rest before you parse it:
 
 ```powershell
-$lines = ihateposting-agent integrations:settings $env:CHANNEL_ID
+$lines = ihateposting integrations:settings $env:CHANNEL_ID
 $answer = ($lines | Select-Object -Skip 1) -join "`n" | ConvertFrom-Json
 $answer.output.maxLength
 $answer.output.settings.required
@@ -493,7 +493,7 @@ $answer.output.settings.required
 #### Keeping an answer to compare later
 
 ```bash
-ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 > "settings-$CHANNEL_ID.json"
+ihateposting integrations:settings "$CHANNEL_ID" | tail -n +2 > "settings-$CHANNEL_ID.json"
 ```
 
 Run the command again after the app has been updated and compare the two files with `diff`. A new key, a changed limit or a new rule shows up as a change in the file. The file holds only what the server answered, never your key.
@@ -503,7 +503,7 @@ Run the command again after the app has been updated and compare the two files w
 TikTok is the platform with the most required keys, so it shows why reading the schema first pays off.
 
 ```bash
-ihateposting-agent integrations:settings tiktok-123
+ihateposting integrations:settings tiktok-123
 ```
 
 The answer has this outline (abridged; the `rules`, `maxLength` and `description` texts are your server's):
@@ -540,11 +540,11 @@ What to take from it:
 Then make a draft, and move it forward only after somebody has looked at it:
 
 ```bash
-ihateposting-agent posts:create -i tiktok-123 -c "Thirty seconds on how we pack an order" \
+ihateposting posts:create -i tiktok-123 -c "Thirty seconds on how we pack an order" \
   -m "<path of the uploaded video>" -s 2026-12-15T10:00:00Z -t draft \
   --settings '{"content_posting_method":"DIRECT_POST","privacy_level":"SELF_ONLY","duet":false,"stitch":false,"comment":true,"autoAddMusic":"no","brand_content_toggle":false,"brand_organic_toggle":false}'
 
-ihateposting-agent posts:status <post-id> --status schedule
+ihateposting posts:status <post-id> --status schedule
 ```
 
 ### What you can do with the answer
@@ -554,7 +554,7 @@ Read the answer once per channel, not once per post: `required` says which keys 
 #### Check the length
 
 ```bash
-LIMIT=$(ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).output.maxLength')
+LIMIT=$(ihateposting integrations:settings "$CHANNEL_ID" | tail -n +2 | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).output.maxLength')
 echo "At most $LIMIT characters"
 ```
 
@@ -563,7 +563,7 @@ echo "At most $LIMIT characters"
 This prints every key of the settings schema, marks the required ones with `*`, and shows the allowed values or the type:
 
 ```bash
-ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2 | node -e '
+ihateposting integrations:settings "$CHANNEL_ID" | tail -n +2 | node -e '
 let s = "";
 process.stdin.on("data", (d) => (s += d)).on("end", () => {
   const schema = JSON.parse(s).output.settings;
@@ -590,7 +590,7 @@ CHANNEL_ID="${CHANNEL_ID:?Set CHANNEL_ID to a channel id from integrations:list}
 TEXT="${TEXT:-Ten quick tips for tidy shelves}"
 POST_DATE="${POST_DATE:-2026-12-15T10:00:00Z}"
 
-answer="$(ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2)"
+answer="$(ihateposting integrations:settings "$CHANNEL_ID" | tail -n +2)"
 limit="$(printf '%s' "$answer" | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).output.maxLength')"
 required="$(printf '%s' "$answer" | node -p '(JSON.parse(require("fs").readFileSync(0, "utf8")).output.settings.required || []).join(" ")' 2>/dev/null || true)"
 
@@ -610,7 +610,7 @@ args=(-i "$CHANNEL_ID" -c "$TEXT" -s "$POST_DATE" -t draft)
 if [ -n "${SETTINGS_JSON:-}" ]; then
   args+=(--settings "$SETTINGS_JSON")
 fi
-ihateposting-agent posts:create "${args[@]}"
+ihateposting posts:create "${args[@]}"
 ```
 
 Run it as `CHANNEL_ID=<id> SETTINGS_JSON='{"board":"1234567890"}' bash build-draft.sh`. The shell counts characters its own way and the platform may count differently, so leave room under the limit. [examples/discover-and-draft.sh](examples/discover-and-draft.sh) is a longer script in the same spirit.
@@ -620,7 +620,7 @@ Run it as `CHANNEL_ID=<id> SETTINGS_JSON='{"board":"1234567890"}' bash build-dra
 | What you see | What to check |
 | --- | --- |
 | `❌ Failed to get integration settings: Request failed: API Error (404): ...` | The channel id is not one of your workspace's. In the app's own words the body says the integration was not found (unverified here). Copy the id from `integrations:list` again. |
-| `... API Error (401): ...` | The key was refused. Check it with `ihateposting-agent auth:status`. |
+| `... API Error (401): ...` | The key was refused. Check it with `ihateposting auth:status`. |
 | `❌ Error: No authentication found.` | Nobody is signed in. Run `auth:login`, or export `IHATEPOSTING_API_KEY`. The request was not sent. |
 | The usage text, then `Not enough non-option arguments: got 0, need at least 1` | You left out the channel id. |
 | `❌ Failed to get integration settings: Request failed: request to <address> failed, reason: ...` | The address could not be reached. Check `IHATEPOSTING_API_URL` and your network. The program does not retry. |

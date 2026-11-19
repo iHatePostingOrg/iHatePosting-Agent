@@ -12,7 +12,7 @@ import { ROOT, tempDir } from "./helpers.mjs";
 
 const SCRIPT = path.join(ROOT, "scripts", "chatgpt-plugin-zip.mjs");
 const OTHER_PRODUCT = ["Post", "iz"].join(""); // the public repository never names the other product; spelled in two pieces so this file does not either
-const HOSTED = "https://app.ihateposting.com/api/mcp/oauth";
+const HOSTED = "https://app.ihateposting.com/mcp/oauth";
 const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
 const json = (file) => JSON.parse(read(file));
 const walkFiles = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walkFiles(path.join(dir, e.name)) : [path.join(dir, e.name)]));
@@ -107,7 +107,9 @@ describe("the ChatGPT and Codex plugin folder", () => {
     for (const folder of folders) {
       const text = fs.readFileSync(path.join(DEFAULT_SOURCE, "skills", folder, "SKILL.md"), "utf8");
       assert.match(text, new RegExp(`^---\\nname: ${folder}\\ndescription: .+\\n---\\n`), folder);
-      assert.ok(!text.includes("ihateposting-agent") && !text.includes(OTHER_PRODUCT) && !/\bBash\b/.test(text), `${folder} names the command line or another product`);
+      // The command line is called `ihateposting` like the plugin, so it is found by how it is run: one of its commands, or the line that installs it.
+      const RUNS_THE_COMMAND_LINE = /\bihateposting (?:auth:|posts:|integrations:|analytics:|media:|upload\b)|npm (?:install|i)(?: -g)? ihateposting(?![-\w])/;
+      assert.ok(!RUNS_THE_COMMAND_LINE.test(text) && !text.includes(OTHER_PRODUCT) && !/\bBash\b/.test(text), `${folder} names the command line or another product`);
       for (const [, word] of text.matchAll(/`([A-Za-z]+)`/g)) if (/Tool$/.test(word) || ["integrationList", "groupList", "integrationSchema"].includes(word)) assert.ok(KNOWN_TOOLS.includes(word), `${folder} names the tool ${word}, which the server does not have`);
     }
     const all = folders.map((f) => fs.readFileSync(path.join(DEFAULT_SOURCE, "skills", f, "SKILL.md"), "utf8")).join("\n");
@@ -307,7 +309,7 @@ describe("break it: the checks refuse what the portal would reject", () => {
     ["two MCP servers", (d) => editJson(d, "mcp.json", (m) => (m.mcpServers.second = m.mcpServers.ihateposting)), "exactly one MCP server"],
     ["no MCP server", (d) => editJson(d, "mcp.json", (m) => (m.mcpServers = {})), "exactly one MCP server"],
     ["the old SSE transport", (d) => editJson(d, "mcp.json", (m) => (m.mcpServers.ihateposting.type = "sse")), '"streamable-http"'],
-    ["a server over plain http", (d) => editJson(d, "mcp.json", (m) => (m.mcpServers.ihateposting.url = "http://app.ihateposting.com/api/mcp/oauth")), "public https address"],
+    ["a server over plain http", (d) => editJson(d, "mcp.json", (m) => (m.mcpServers.ihateposting.url = "http://app.ihateposting.com/mcp/oauth")), "public https address"],
     ["a server on localhost", (d) => editJson(d, "mcp.json", (m) => (m.mcpServers.ihateposting.url = "https://localhost/mcp")), "public https address"],
     ["a server address with a key in the query", (d) => editJson(d, "mcp.json", (m) => (m.mcpServers.ihateposting.url = `${HOSTED}?key=abc`)), "without a query"],
     ["a header holding a token", (d) => editJson(d, "mcp.json", (m) => (m.mcpServers.ihateposting.headers = { Authorization: "Bearer abc" })), "no headers"],
@@ -437,7 +439,7 @@ describe("server.json (a draft for the official MCP Registry)", () => {
     assert.equal(server.repository.source, "github");
     assert.equal(server.repository.url, json("package.json").repository.url.replace(/^git\+/, "").replace(/\.git$/, ""));
     assert.equal(server.packages, undefined, "this repository has no local MCP package");
-    assert.deepEqual(server.remotes.map((r) => r.url), [HOSTED, "https://app.ihateposting.com/api/mcp"]);
+    assert.deepEqual(server.remotes.map((r) => r.url), [HOSTED, "https://app.ihateposting.com/mcp"]);
     for (const remote of server.remotes) {
       assert.equal(remote.type, "streamable-http");
       assert.equal(new URL(remote.url).protocol, "https:");
@@ -513,9 +515,10 @@ describe("PUBLISHING.md's section on submissions", () => {
     assert.match(section, /whether OpenClaw then loads the bundled skill is unverified/);
     assert.match(section, /with no `primaryEnv`, no `envVars` and no `install` entry/);
     assert.match(section, /ClawHub publishes every skill under \*\*MIT-0\*\*, which differs from this repository's MIT/);
-    assert.match(section, /a \*\*draft\*\* for a new version, `0\.13\.0`, of the existing registry entry `com\.ihateposting\/mcp`.{0,160}the entry's versions went up to 0\.12\.9 on 2026-11-15/);
-    assert.match(section, /`0\.13\.0` is above `0\.12\.9`: the registry's versioning page \(read on 2026-11-16\) says a published version is immutable and that the latest version is chosen by semantic-version order/);
-    assert.equal(json("server.json").version, "0.13.0");
+    // The version is 0.13.1 since the owner's choice of 2026-11-19 (0.13.0, published on 2026-11-16, listed the app host's earlier path /api/mcp/oauth).
+    assert.match(section, /a \*\*draft\*\* for a new version, `0\.13\.1` \(the owner's choice of 2026-11-19; `0\.13\.0` is the version published on 2026-11-16\), of the existing registry entry `com\.ihateposting\/mcp`.{0,160}the entry's versions went up to 0\.12\.9 on 2026-11-15/);
+    assert.match(section, /`0\.13\.1` is above `0\.12\.9`: the registry's versioning page \(read on 2026-11-16\) says a published version is immutable and that the latest version is chosen by semantic-version order/);
+    assert.equal(json("server.json").version, "0.13.1");
     assert.match(section, /The registry accepted a new version of the existing name with another repository \(see below\)/);
     assert.match(section, /\*\*Published \(the owner, 2026-11-16, 10:27 UTC\)\.\*\* `mcp-publisher publish` answered "Successfully published" for `com\.ihateposting\/mcp` version 0\.13\.0/);
     assert.match(section, /with 0\.13\.0 as the latest \(`isLatest` true; 0\.12\.9, published 2026-11-13, no longer is\)/);

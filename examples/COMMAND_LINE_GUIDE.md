@@ -7,7 +7,7 @@ The CLI supports a much more intuitive syntax for creating posts with comments t
 ## Basic Syntax
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "content" -m "media" \
   -c "content" -m "media" \
   -s "2026-12-31T12:00:00Z" -t draft \
@@ -23,14 +23,14 @@ ihateposting-agent posts:create \
 - **Each `-m`**: Media for the corresponding `-c`
 - `-m` is optional (text-only posts/comments)
 - Order matters: `-c` and `-m` are paired in order
-- The file names in these examples (`photo1.jpg` and so on) stand for the `path` that `ihateposting-agent upload` printed: `-m` takes addresses of files that are already uploaded
+- The file names in these examples (`photo1.jpg` and so on) stand for the `path` that `ihateposting upload` printed: `-m` takes addresses of files that are already uploaded
 
 ## Examples
 
 ### 1. Simple Post
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Hello World!" \
   -s "2026-12-31T12:00:00Z" -t draft \
   -i "x-123"
@@ -39,7 +39,7 @@ ihateposting-agent posts:create \
 ### 2. Post with Multiple Images
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Check out these photos!" \
   -m "photo1.jpg,photo2.jpg,photo3.jpg" \
   -s "2026-12-31T12:00:00Z" -t draft \
@@ -52,7 +52,7 @@ ihateposting-agent posts:create \
 ### 3. Post with Comments, Each Having Their Own Media
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post 🚀" \
   -m "main-image1.jpg,main-image2.jpg" \
   -c "First comment 📸" \
@@ -71,7 +71,7 @@ ihateposting-agent posts:create \
 ### 4. Comments Can Contain Semicolons! 🎉
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" \
   -c "First comment; with a semicolon!" \
   -c "Second comment; with multiple; semicolons; works fine!" \
@@ -84,7 +84,7 @@ ihateposting-agent posts:create \
 ### 5. X Thread
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "🧵 Thread about X (1/5)" \
   -m "thread1.jpg" \
   -c "Key point 1 (2/5)" \
@@ -105,7 +105,7 @@ ihateposting-agent posts:create \
 ### 6. Mix: Some with Media, Some Without
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Amazing sunset! 🌅" \
   -m "sunset.jpg" \
   -c "Taken at 6:30 PM" \
@@ -122,7 +122,7 @@ ihateposting-agent posts:create \
 ### 7. Multi-Platform with Same Content
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Big announcement! 🎉" \
   -m "announcement.jpg" \
   -c "More details coming soon..." \
@@ -135,7 +135,7 @@ ihateposting-agent posts:create \
 ### 8. Scheduled Post with Follow-ups
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Product launching today! 🚀" \
   -m "product-hero.jpg,product-features.jpg" \
   -c "Special launch offer: 50% off!" \
@@ -152,7 +152,7 @@ This is the one example without `-t draft`: it is queued and published at its da
 ### 9. Product Tutorial
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Tutorial: How to Use Feature X 📖" \
   -m "tutorial-intro.jpg" \
   -c "Step 1: Open the settings menu" \
@@ -185,7 +185,7 @@ ihateposting-agent posts:create \
 ## How `-c` and `-m` Pair Together
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "First content"  -m "first-media.jpg" \
   -c "Second content" -m "second-media.jpg" \
   -c "Third content"  -m "third-media.jpg" \
@@ -206,7 +206,7 @@ Pair 1 → Main post, Pair 2 → Comment 1, Pair 3 → Comment 2.
 Use `-d` or `--delay` to set the delay (in minutes) between comments:
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" \
   -c "Comment 1" \
   -c "Comment 2" \
@@ -223,11 +223,11 @@ That is 10 minutes between each.
 
 ### ❌ Old Way (Limited)
 
-`ihateposting-agent` has no `--comments` and no `--image` option. The program accepts an option it does not know and does nothing with it (no message), so this command makes a post with only the main text, without the comments and without the image:
+`ihateposting` has no `--comments` and no `--image` option. The program accepts an option it does not know and does nothing with it (no message), so this command makes a post with only the main text, without the comments and without the image:
 
 ```bash
 # Could only do simple comments without custom media
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" \
   --comments "Comment 1;Comment 2;Comment 3" \
   --image "main-image.jpg" \
@@ -243,7 +243,7 @@ ihateposting-agent posts:create \
 ### ✅ New Way (Flexible)
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" -m "main.jpg" \
   -c "Comment 1; with semicolon!" -m "comment1.jpg" \
   -c "Comment 2" -m "comment2.jpg" \
@@ -277,7 +277,7 @@ ihateposting-agent posts:create \
 
 ```bash
 # Generate a thread command with multiple tweets
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Tweet 1/3" \
   -m "img1.jpg" \
   -c "Tweet 2/3" \
@@ -294,13 +294,13 @@ In bash, you may need to escape some characters:
 
 ```bash
 # Single quotes prevent interpolation
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c 'Message with $variables and "quotes"' \
   -s "2026-12-31T12:00:00Z" -t draft \
   -i "x-123"
 
 # Or use backslashes
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Message with \$variables and \"quotes\"" \
   -s "2026-12-31T12:00:00Z" -t draft \
   -i "x-123"
@@ -311,7 +311,7 @@ ihateposting-agent posts:create \
 ### Missing Integration
 
 ```bash
-ihateposting-agent posts:create -c "Post" -m "img.jpg"
+ihateposting posts:create -c "Post" -m "img.jpg"
 # --integrations is required when not using --json
 ```
 
@@ -322,7 +322,7 @@ The program prints the command's usage first, then the reason, and ends with exi
 ### No Content
 
 ```bash
-ihateposting-agent posts:create -i "x-123"
+ihateposting posts:create -i "x-123"
 # Either --content or --json is required
 ```
 
@@ -332,7 +332,7 @@ ihateposting-agent posts:create -i "x-123"
 
 ```bash
 # This is fine! Fewer -m flags than -c flags is allowed
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Post 1" -m "img1.jpg" \
   -c "Post 2" \
   -c "Post 3" -m "img3.jpg" \
@@ -348,7 +348,7 @@ ihateposting-agent posts:create \
 To give `img3.jpg` to Post 3 and nothing to Post 2, hold Post 2's place with an empty `-m ""`:
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Post 1" -m "img1.jpg" \
   -c "Post 2" -m "" \
   -c "Post 3" -m "img3.jpg" \
@@ -363,7 +363,7 @@ ihateposting-agent posts:create \
 
 export IHATEPOSTING_API_KEY=your_key
 
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "🚀 Launching ProductX today!" \
   -m "https://media.example/uploads/hero.jpg,https://media.example/uploads/features.jpg" \
   -c $'🎯 Key Features:\n• AI-powered\n• Cloud-native\n• Open source' \
@@ -389,11 +389,11 @@ echo "✅ Product launch scheduled!"
 
 ### How to read this guide
 
-A guide to `ihateposting-agent`, command by command, with examples you can type. It follows the order you will use the commands in: sign in, find a channel, read its rules, upload media, make a post, look after it, read its numbers.
+A guide to `ihateposting`, command by command, with examples you can type. It follows the order you will use the commands in: sign in, find a channel, read its rules, upload media, make a post, look after it, read its numbers.
 
 How to read it:
 
-- Every command is written `ihateposting-agent ...`. From a clone that is not linked, write `node bin/ihateposting-agent.mjs ...` instead (see [../HOW_TO_RUN.md](../HOW_TO_RUN.md)).
+- Every command is written `ihateposting ...`. From a clone that is not linked, write `node bin/ihateposting.mjs ...` instead (see [../HOW_TO_RUN.md](../HOW_TO_RUN.md)).
 - Ids, dates and addresses are placeholders: `x-123` is a channel, `post-123` a post, `media-123` a file. Replace them with yours.
 - The sample answers have made-up values. Their shape comes from the program's tests and the skill; the live server's exact fields were not checked while writing this guide, so trust your own answers over these.
 - The examples make **drafts** or only read. A draft is kept but not published. The few that schedule a post, change one or delete one say so.
@@ -403,7 +403,7 @@ How to read it:
 #### With a code
 
 ```bash
-ihateposting-agent auth:login
+ihateposting auth:login
 ```
 
 The program asks the sign-in server for a code, prints it in a box with a web address, and tries to open that address in your browser. You type the code (it may already be filled in), approve, and the terminal finishes with `✅ Successfully authenticated!`, the place the sign-in was saved (`~/.ihateposting/credentials.json`) and, when the server sent one, your organization's id. It asks every few seconds while it waits and gives up when the code expires. (The wording comes from the source; this command was not run for the guide, because it needs a real sign-in server.)
@@ -419,7 +419,7 @@ export IHATEPOSTING_API_KEY="<your key>"
 #### Check it
 
 ```bash
-ihateposting-agent auth:status
+ihateposting auth:status
 ```
 
 ```text
@@ -432,7 +432,7 @@ ihateposting-agent auth:status
 
 With a saved sign-in the first lines read `🔐 Authentication method: OAuth2`, then the API address, the first eight characters of the token, the organization and the file. If nobody is signed in it says `❌ Not authenticated.` and shows the two ways. If the server refuses the credentials it says they are expired or invalid. In all three cases the exit code is `0`: `auth:status` reports, it does not fail.
 
-A saved sign-in wins over the key. To use the key, run `ihateposting-agent auth:logout` first.
+A saved sign-in wins over the key. To use the key, run `ihateposting auth:logout` first.
 
 ### 2. How answers look
 
@@ -462,8 +462,8 @@ Nothing is waited out or tried again. A rate limit (`429`) or a server error is 
 Scripts that read the JSON have to skip the header line first:
 
 ```bash
-ihateposting-agent integrations:list | tail -n +2
-ihateposting-agent integrations:list | sed 1d          # the same
+ihateposting integrations:list | tail -n +2
+ihateposting integrations:list | sed 1d          # the same
 ```
 
 #### The same letter, different options
@@ -488,9 +488,9 @@ A **channel** (the program's help says "integration") is one connected account o
 #### List them
 
 ```bash
-ihateposting-agent integrations:list
-ihateposting-agent integrations:list --group "group-1"      # only one customer's channels
-ihateposting-agent integrations:groups                       # the groups (customers) and their ids
+ihateposting integrations:list
+ihateposting integrations:list --group "group-1"      # only one customer's channels
+ihateposting integrations:groups                       # the groups (customers) and their ids
 ```
 
 Each channel has an `id`, a `name`, an `identifier` (its platform: `x`, `bluesky`, `pinterest`, ...) and `disabled`. The platforms are bluesky, mastodon, slack, facebook, telegram, x, linkedin, linkedin-page, tumblr, discord, pinterest, tiktok, youtube, gmb, instagram and threads, as far as your workspace has them connected.
@@ -498,7 +498,7 @@ Each channel has an `id`, a `name`, an `identifier` (its platform: `x`, `bluesky
 #### Read a channel's rules
 
 ```bash
-ihateposting-agent integrations:settings pinterest-123
+ihateposting integrations:settings pinterest-123
 ```
 
 ```text
@@ -520,9 +520,9 @@ Read `output.rules` and `output.maxLength` before you write, and send only the s
 Some settings need a value only the platform knows. A helper fetches it:
 
 ```bash
-ihateposting-agent integrations:trigger pinterest-123 boards
-ihateposting-agent integrations:trigger slack-123 channels
-ihateposting-agent integrations:trigger linkedin-123 mention -d '{"query":"examplecompany"}'
+ihateposting integrations:trigger pinterest-123 boards
+ihateposting integrations:trigger slack-123 channels
+ihateposting integrations:trigger linkedin-123 mention -d '{"query":"examplecompany"}'
 ```
 
 ```text
@@ -535,7 +535,7 @@ ihateposting-agent integrations:trigger linkedin-123 mention -d '{"query":"examp
 ### 4. Media
 
 ```bash
-ihateposting-agent upload ./photo.png
+ihateposting upload ./photo.png
 ```
 
 ```text
@@ -550,16 +550,16 @@ ihateposting-agent upload ./photo.png
 Use the `path` in posts: **`posts:create` never uploads for you**, so `-m` takes addresses of files that are already in the library. Two more things:
 
 ```bash
-ihateposting-agent upload ./clip.mp4 --adjust        # ask the server to fit the file to the platforms' limits
-ihateposting-agent media:status media-123            # {"status": "ready"} when the adjusting is done
+ihateposting upload ./clip.mp4 --adjust        # ask the server to fit the file to the platforms' limits
+ihateposting media:status media-123            # {"status": "ready"} when the adjusting is done
 ```
 
 After `--adjust`, wait until `media:status` says `ready` before you use the path; until then a post would use the original file. Look through what is already uploaded rather than uploading twice:
 
 ```bash
-ihateposting-agent media:list                        # newest first, 18 to a page
-ihateposting-agent media:list -s banner              # names containing "banner"
-ihateposting-agent media:list -s banner -p 2         # the second page
+ihateposting media:list                        # newest first, 18 to a page
+ihateposting media:list -s banner              # names containing "banner"
+ihateposting media:list -s banner -p 2         # the second page
 ```
 
 The file's name is whatever follows the last `/` in the path you typed. On Windows write `C:/pictures/photo.png`, not backslashes. What file types the server accepts is the server's decision: see [../SUPPORTED_FILE_TYPES.md](../SUPPORTED_FILE_TYPES.md).
@@ -593,18 +593,18 @@ A post with one picture, a comment and a setting is turned into this body (the i
 ### 6. Looking after posts
 
 ```bash
-ihateposting-agent posts:list                                   # 30 days back to 30 days ahead
-ihateposting-agent posts:list --startDate "2030-01-01T00:00:00Z" --endDate "2030-01-31T23:59:59Z"
-ihateposting-agent posts:list --customer "group-1"
+ihateposting posts:list                                   # 30 days back to 30 days ahead
+ihateposting posts:list --startDate "2030-01-01T00:00:00Z" --endDate "2030-01-31T23:59:59Z"
+ihateposting posts:list --customer "group-1"
 ```
 
 The answer is the server's list of posts in that window; each has an id. Then:
 
 ```bash
-ihateposting-agent posts:status post-123 --status schedule      # queue a draft
-ihateposting-agent posts:status post-123 --status draft         # take a queued post back
-ihateposting-agent posts:settings post-123 --settings '{"content_posting_method":"DIRECT_POST"}'
-ihateposting-agent posts:delete post-123
+ihateposting posts:status post-123 --status schedule      # queue a draft
+ihateposting posts:status post-123 --status draft         # take a queued post back
+ihateposting posts:settings post-123 --settings '{"content_posting_method":"DIRECT_POST"}'
+ihateposting posts:delete post-123
 ```
 
 The first three print a header line such as `✅ Post post-123 status changed to schedule` and then the server's answer. `posts:settings` merges: only the keys you pass change, and it works only on a post that has not been published. `posts:delete` prints only `✅ Post post-123 deleted successfully!` and cannot be undone from here. There is no command that changes a post's text or date.
@@ -614,16 +614,16 @@ The first three print a header line such as `✅ Post post-123 status changed to
 If analytics for a post answer `{"missing": true}`, iHatePosting never learned which of the platform's own posts it is. Fix it in two steps:
 
 ```bash
-ihateposting-agent posts:missing post-123                                  # the platform's recent content, with ids
-ihateposting-agent posts:connect post-123 --release-id "7321456789012345678"
+ihateposting posts:missing post-123                                  # the platform's recent content, with ids
+ihateposting posts:connect post-123 --release-id "7321456789012345678"
 ```
 
 ### 7. Analytics
 
 ```bash
-ihateposting-agent analytics:platform x-123            # last 7 days
-ihateposting-agent analytics:platform x-123 -d 30      # last 30 days
-ihateposting-agent analytics:post post-123 -d 7
+ihateposting analytics:platform x-123            # last 7 days
+ihateposting analytics:platform x-123 -d 30      # last 30 days
+ihateposting analytics:post post-123 -d 7
 ```
 
 ```text
@@ -641,23 +641,23 @@ Skip the header, then ask `jq`:
 
 ```bash
 # the id of the first Bluesky channel
-BLUESKY_ID=$(ihateposting-agent integrations:list | tail -n +2 | jq -r 'first(.[] | select(.identifier=="bluesky") | .id)')
+BLUESKY_ID=$(ihateposting integrations:list | tail -n +2 | jq -r 'first(.[] | select(.identifier=="bluesky") | .id)')
 
 # the boards of a Pinterest channel
-ihateposting-agent integrations:trigger pinterest-123 boards | tail -n +2 | jq -r '.output[] | "\(.value)\t\(.label)"'
+ihateposting integrations:trigger pinterest-123 boards | tail -n +2 | jq -r '.output[] | "\(.value)\t\(.label)"'
 
 # upload a picture and keep its address
-PICTURE=$(ihateposting-agent upload ./photo.png | tail -n +2 | jq -r '.path')
-ihateposting-agent posts:create -c "Look" -m "$PICTURE" -s "2030-01-01T09:00:00Z" -t draft -i "$BLUESKY_ID"
+PICTURE=$(ihateposting upload ./photo.png | tail -n +2 | jq -r '.path')
+ihateposting posts:create -c "Look" -m "$PICTURE" -s "2030-01-01T09:00:00Z" -t draft -i "$BLUESKY_ID"
 
 # is the text short enough for the channel?
-MAX=$(ihateposting-agent integrations:settings x-123 | tail -n +2 | jq -r '.output.maxLength')
+MAX=$(ihateposting integrations:settings x-123 | tail -n +2 | jq -r '.output.maxLength')
 ```
 
 Check the exit code, not the text, to know whether a command worked:
 
 ```bash
-if ! OUT=$(ihateposting-agent posts:create -c "Hello" -s "2030-01-01T09:00:00Z" -t draft -i "x-123" 2>&1); then
+if ! OUT=$(ihateposting posts:create -c "Hello" -s "2030-01-01T09:00:00Z" -t draft -i "x-123" 2>&1); then
   echo "Failed: $OUT" >&2
   exit 1
 fi
@@ -666,7 +666,7 @@ fi
 For a script that must stop at the first failure, `set -euo pipefail` at the top is enough. Without `jq`, Node reads JSON just as well:
 
 ```bash
-ihateposting-agent upload ./photo.png | tail -n +2 | node -e 'let t="";process.stdin.on("data",d=>t+=d).on("end",()=>console.log(JSON.parse(t).path))'
+ihateposting upload ./photo.png | tail -n +2 | node -e 'let t="";process.stdin.on("data",d=>t+=d).on("end",()=>console.log(JSON.parse(t).path))'
 ```
 
 #### Quoting JSON on the command line

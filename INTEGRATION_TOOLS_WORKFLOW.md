@@ -7,7 +7,7 @@ Some integrations require additional data (like the ids of boards, channels and 
 ### Step 1: List Integrations
 
 ```bash
-ihateposting-agent integrations:list
+ihateposting integrations:list
 ```
 
 Get your integration IDs.
@@ -15,7 +15,7 @@ Get your integration IDs.
 ### Step 2: Get Integration Settings
 
 ```bash
-ihateposting-agent integrations:settings <integration-id>
+ihateposting integrations:settings <integration-id>
 ```
 
 This returns:
@@ -29,7 +29,7 @@ This returns:
 If settings require IDs/data you don't have, use the tools:
 
 ```bash
-ihateposting-agent integrations:trigger <integration-id> <method-name> -d '{"key":"value"}'
+ihateposting integrations:trigger <integration-id> <method-name> -d '{"key":"value"}'
 ```
 
 ### Step 4: Create Post with Complete Settings
@@ -41,7 +41,7 @@ Use the data from Step 3 in your post settings (or, for a company tag, in the po
 ### 1. Get Pinterest Integration Settings
 
 ```bash
-ihateposting-agent integrations:settings pinterest-123
+ihateposting integrations:settings pinterest-123
 ```
 
 **Output:**
@@ -74,7 +74,7 @@ The program prints one header line before the JSON (here `⚙️  Settings for i
 ### 2. Get Boards for the Integration
 
 ```bash
-ihateposting-agent integrations:trigger pinterest-123 boards
+ihateposting integrations:trigger pinterest-123 boards
 ```
 
 **Output:**
@@ -97,10 +97,10 @@ ihateposting-agent integrations:trigger pinterest-123 boards
 
 ### 3. Create Post with Board ID
 
-Pinterest needs at least one picture, so upload it first (`ihateposting-agent upload image.jpg`) and use the `path` it prints for `-m`.
+Pinterest needs at least one picture, so upload it first (`ihateposting upload image.jpg`) and use the `path` it prints for `-m`.
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Check out my project!" \
   -m "<path from upload>" \
   -s "2024-12-31T12:00:00Z" \
@@ -117,7 +117,7 @@ ihateposting-agent posts:create \
 ### 1. Get Slack Settings
 
 ```bash
-ihateposting-agent integrations:settings slack-123
+ihateposting integrations:settings slack-123
 ```
 
 **Output includes tools:**
@@ -136,7 +136,7 @@ ihateposting-agent integrations:settings slack-123
 ### 2. Get Channels
 
 ```bash
-ihateposting-agent integrations:trigger slack-123 channels
+ihateposting integrations:trigger slack-123 channels
 ```
 
 **Output:**
@@ -160,7 +160,7 @@ ihateposting-agent integrations:trigger slack-123 channels
 ### 3. Post to a Specific Channel
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Release is out" \
   -s "2024-12-31T12:00:00Z" \
   -t draft \
@@ -177,7 +177,7 @@ Two different ids are in play: `-i slack-123` is the integration you connected i
 ### 1. Get LinkedIn Settings
 
 ```bash
-ihateposting-agent integrations:settings linkedin-123
+ihateposting integrations:settings linkedin-123
 ```
 
 **Output includes tools:**
@@ -204,7 +204,7 @@ ihateposting-agent integrations:settings linkedin-123
 `mention` takes a `query` (its `dataSchema` says so): the name of the company page as it appears in the page's web address, after `linkedin.com/company/`. The tool's description says it looks the page up by that exact name, so type the name in full.
 
 ```bash
-ihateposting-agent integrations:trigger linkedin-123 mention -d '{"query":"example-company"}'
+ihateposting integrations:trigger linkedin-123 mention -d '{"query":"example-company"}'
 ```
 
 **Output:**
@@ -227,7 +227,7 @@ ihateposting-agent integrations:trigger linkedin-123 mention -d '{"query":"examp
 The tool's `description` in `output.tools` says how to write that mention into the post's text and refers to the `id` and the `label` of the result; follow it exactly, using the values you were given.
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "<the post text, with the company mention written as the tool's description says>" \
   -s "2024-12-31T12:00:00Z" \
   -t draft \
@@ -262,10 +262,10 @@ To post as a company page, use that page's own integration id in `-i` (a LinkedI
 
 ```bash
 # No parameters
-ihateposting-agent integrations:trigger <integration-id> <methodName>
+ihateposting integrations:trigger <integration-id> <methodName>
 
 # With parameters
-ihateposting-agent integrations:trigger <integration-id> <methodName> -d '{"key":"value"}'
+ihateposting integrations:trigger <integration-id> <methodName> -d '{"key":"value"}'
 ```
 
 A tool whose `dataSchema` is empty is called without `-d`.
@@ -298,7 +298,7 @@ For AI agents, this enables dynamic discovery and usage:
 INTEGRATION_ID="your-integration-id"
 
 # 1. Get settings and tools (tail skips the header line)
-SETTINGS=$(ihateposting-agent integrations:settings "$INTEGRATION_ID" | tail -n +2)
+SETTINGS=$(ihateposting integrations:settings "$INTEGRATION_ID" | tail -n +2)
 echo "$SETTINGS" | jq '.output.tools'
 
 # 2. Get the method names of the tools that need no input
@@ -306,12 +306,12 @@ TOOLS=$(echo "$SETTINGS" | jq -r '.output.tools[]? | select((.dataSchema // []) 
 
 # 3. Call tools to get required data
 for METHOD in $TOOLS; do
-  RESULT=$(ihateposting-agent integrations:trigger "$INTEGRATION_ID" "$METHOD" -d '{}' | tail -n +2)
+  RESULT=$(ihateposting integrations:trigger "$INTEGRATION_ID" "$METHOD" -d '{}' | tail -n +2)
   echo "Tool $METHOD returned: $RESULT"
 done
 
 # 4. Create post with complete settings
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Your content" \
   -s "2024-12-31T12:00:00Z" \
   -t draft \
@@ -326,7 +326,7 @@ A tool that lists `dataSchema` entries, such as `mention`, is skipped on purpose
 ### Tool Not Found
 
 ```bash
-ihateposting-agent integrations:trigger pinterest-123 invalidMethod
+ihateposting integrations:trigger pinterest-123 invalidMethod
 # ❌ Failed to trigger tool: Request failed: API Error (404): ...
 ```
 
@@ -335,21 +335,21 @@ The words after the status are the server's. In the app's own words the body say
 ### Missing Required Data
 
 ```bash
-ihateposting-agent integrations:trigger linkedin-123 mention
+ihateposting integrations:trigger linkedin-123 mention
 # (no -d: the program sends {} and shows the server's answer)
 ```
 
 The program does not check what a tool needs. A tool that needs a `query`, called without one, still goes out with nothing to look for, and the answer will not be what you want. If `-d` is not valid JSON, nothing is sent:
 
 ```bash
-ihateposting-agent integrations:trigger linkedin-123 mention -d '{query:example-company}'
+ihateposting integrations:trigger linkedin-123 mention -d '{query:example-company}'
 # ❌ Failed to parse data JSON: ...
 ```
 
 ### Integration Not Found
 
 ```bash
-ihateposting-agent integrations:trigger invalid-id boards
+ihateposting integrations:trigger invalid-id boards
 # ❌ Failed to trigger tool: Request failed: API Error (404): ...
 ```
 
@@ -372,13 +372,13 @@ INTEGRATION_ID="pinterest-123"
 
 # 1. Get settings
 echo "📋 Getting settings..."
-SETTINGS=$(ihateposting-agent integrations:settings "$INTEGRATION_ID" | tail -n +2)
+SETTINGS=$(ihateposting integrations:settings "$INTEGRATION_ID" | tail -n +2)
 echo "$SETTINGS" | jq '.output.tools'
 
 # 2. Get boards
 echo ""
 echo "🏷️  Getting boards..."
-BOARDS=$(ihateposting-agent integrations:trigger "$INTEGRATION_ID" boards | tail -n +2)
+BOARDS=$(ihateposting integrations:trigger "$INTEGRATION_ID" boards | tail -n +2)
 BOARD_ID=$(echo "$BOARDS" | jq -r '.output[0].id')
 BOARD_NAME=$(echo "$BOARDS" | jq -r '.output[0].name')
 
@@ -387,13 +387,13 @@ echo "Selected board: $BOARD_NAME ($BOARD_ID)"
 # 3. Upload the picture the pin needs
 echo ""
 echo "🖼️  Uploading picture..."
-IMAGE=$(ihateposting-agent upload image.jpg | tail -n +2)
+IMAGE=$(ihateposting upload image.jpg | tail -n +2)
 IMAGE_URL=$(echo "$IMAGE" | jq -r '.path')
 
 # 4. Create post (a draft)
 echo ""
 echo "📝 Creating post..."
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "My post content" \
   -m "$IMAGE_URL" \
   -s "2024-12-31T12:00:00Z" \
@@ -427,7 +427,7 @@ These sections come unchanged from this file as it was before it followed the re
 Some settings need a value that only the platform knows: the id of a Pinterest board, of a Slack or Discord room, of a company page you want to tag. You cannot guess those, and copying them from a web page is slow. A **helper** (the program's help says "integration tool") asks the platform for the value on your behalf. You run one with `integrations:trigger`.
 
 ```bash
-ihateposting-agent integrations:trigger <channel-id> <method> [-d '<json>']
+ihateposting integrations:trigger <channel-id> <method> [-d '<json>']
 ```
 
 | Part | Meaning |
@@ -456,7 +456,7 @@ A helper may reach out to the platform on the channel's behalf, so treat a call 
 ### Picking a board by its name
 
 ```bash
-ihateposting-agent integrations:trigger pinterest-123 boards | tail -n +2 | node -e '
+ihateposting integrations:trigger pinterest-123 boards | tail -n +2 | node -e '
 let s = "";
 process.stdin.on("data", (d) => (s += d)).on("end", () => {
   const boards = JSON.parse(s).output;
@@ -469,13 +469,13 @@ process.stdin.on("data", (d) => (s += d)).on("end", () => {
 ### Example: a Discord room
 
 ```bash
-ihateposting-agent integrations:trigger discord-222 channels
+ihateposting integrations:trigger discord-222 channels
 ```
 
 The answer has the same shape: rooms with an `id` and a `name`. As the app describes it, only rooms a post can go to are listed (text, announcement and forum rooms; unverified). Use the id as `channel`:
 
 ```bash
-ihateposting-agent posts:create -i discord-222 -c "Patch notes are up" -s 2026-12-15T10:00:00Z -t draft \
+ihateposting posts:create -i discord-222 -c "Patch notes are up" -s 2026-12-15T10:00:00Z -t draft \
   --settings '{"channel":"1234567890123456789"}'
 ```
 
@@ -486,7 +486,7 @@ Discord room ids are long numbers. Keep them as strings in the JSON, in quotes.
 The answer is a list, so it can hold more than one page. Print the candidates and read them before you copy an id:
 
 ```bash
-ihateposting-agent integrations:trigger linkedin-456 mention -d '{"query":"example-company"}' | tail -n +2 | node -e '
+ihateposting integrations:trigger linkedin-456 mention -d '{"query":"example-company"}' | tail -n +2 | node -e '
 let s = "";
 process.stdin.on("data", (d) => (s += d)).on("end", () => {
   const found = JSON.parse(s).output;
@@ -518,12 +518,12 @@ If a value is not on the list above, no helper will find it. Instead:
 
 ```powershell
 # PowerShell 7
-ihateposting-agent integrations:trigger linkedin-456 mention -d '{"query":"example-company"}'
+ihateposting integrations:trigger linkedin-456 mention -d '{"query":"example-company"}'
 ```
 
 ```bat
 :: cmd
-ihateposting-agent integrations:trigger linkedin-456 mention -d "{\"query\":\"example-company\"}"
+ihateposting integrations:trigger linkedin-456 mention -d "{\"query\":\"example-company\"}"
 ```
 
 Windows PowerShell 5.1 removes the inner double quotes from an argument, and the helper then fails with `Failed to parse data JSON`. Use PowerShell 7 there. Only `mention` needs `-d` among the current helpers, so most calls need no quoting at all.
@@ -533,14 +533,14 @@ Windows PowerShell 5.1 removes the inner double quotes from an argument, and the
 Drop the header line before you parse the answer:
 
 ```bash
-BOARDS_JSON="$(ihateposting-agent integrations:trigger "$CHANNEL_ID" boards | tail -n +2)"
+BOARDS_JSON="$(ihateposting integrations:trigger "$CHANNEL_ID" boards | tail -n +2)"
 printf '%s\n' "$BOARDS_JSON" | jq '.output'
 ```
 
 In PowerShell:
 
 ```powershell
-$lines = ihateposting-agent integrations:trigger $env:CHANNEL_ID boards
+$lines = ihateposting integrations:trigger $env:CHANNEL_ID boards
 $boards = (($lines | Select-Object -Skip 1) -join "`n" | ConvertFrom-Json).output
 $boards | Format-Table id, name
 ```
@@ -555,7 +555,7 @@ set -euo pipefail
 
 CHANNEL_ID="${CHANNEL_ID:?Set CHANNEL_ID to a channel id from integrations:list}"
 
-settings="$(ihateposting-agent integrations:settings "$CHANNEL_ID" | tail -n +2)"
+settings="$(ihateposting integrations:settings "$CHANNEL_ID" | tail -n +2)"
 methods="$(printf '%s' "$settings" | node -e '
 let s = "";
 process.stdin.on("data", (d) => (s += d)).on("end", () => {
@@ -570,7 +570,7 @@ fi
 
 for method in $methods; do
   echo "== $method"
-  ihateposting-agent integrations:trigger "$CHANNEL_ID" "$method"
+  ihateposting integrations:trigger "$CHANNEL_ID" "$method"
 done
 ```
 
@@ -598,7 +598,7 @@ CHANNEL_ID="${CHANNEL_ID:?Set CHANNEL_ID to a channel id from integrations:list}
 METHOD="${METHOD:?Set METHOD to boards or channels}"
 NAME="${NAME:?Set NAME to the name you are looking for}"
 
-ihateposting-agent integrations:trigger "$CHANNEL_ID" "$METHOD" | tail -n +2 | NAME="$NAME" node -e '
+ihateposting integrations:trigger "$CHANNEL_ID" "$METHOD" | tail -n +2 | NAME="$NAME" node -e '
 let s = "";
 process.stdin.on("data", (d) => (s += d)).on("end", () => {
   const list = JSON.parse(s).output;
@@ -618,7 +618,7 @@ Run it as `CHANNEL_ID=slack-111 METHOD=channels NAME=releases bash pick-id.sh`; 
 Board and room ids change rarely. Ask once, keep the answer in a file, and read from the file afterwards:
 
 ```bash
-ihateposting-agent integrations:trigger "$CHANNEL_ID" boards | tail -n +2 > "boards-$CHANNEL_ID.json"
+ihateposting integrations:trigger "$CHANNEL_ID" boards | tail -n +2 > "boards-$CHANNEL_ID.json"
 
 node -e '
 const boards = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).output;
@@ -640,7 +640,7 @@ MEDIA_PATH="${MEDIA_PATH:?Set MEDIA_PATH to the path an upload printed}"
 PIN_TEXT="${PIN_TEXT:-Ten quick tips for tidy shelves}"
 POST_DATE="${POST_DATE:-2026-12-15T10:00:00Z}"
 
-board_id="$(ihateposting-agent integrations:trigger "$CHANNEL_ID" boards | tail -n +2 | BOARD_NAME="$BOARD_NAME" node -e '
+board_id="$(ihateposting integrations:trigger "$CHANNEL_ID" boards | tail -n +2 | BOARD_NAME="$BOARD_NAME" node -e '
 let s = "";
 process.stdin.on("data", (d) => (s += d)).on("end", () => {
   const boards = JSON.parse(s).output;
@@ -655,7 +655,7 @@ case "$board_id" in
     ;;
 esac
 
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -i "$CHANNEL_ID" \
   -c "$PIN_TEXT" \
   -m "$MEDIA_PATH" \

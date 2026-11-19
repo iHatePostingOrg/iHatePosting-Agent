@@ -9,7 +9,7 @@ The CLI supports a **much better** command-line syntax for creating posts with c
 Instead of using semicolon-separated strings (which break when you need semicolons in your content), you can use multiple `-c` and `-m` flags:
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "main post content" -m "media1.png,media2.png" \
   -c "first comment" -m "media3.png" \
   -c "second comment; with semicolon!" -m "media4.png,media5.png" \
@@ -18,14 +18,14 @@ ihateposting-agent posts:create \
   -i "x-123"
 ```
 
-In the examples down to the Summary, a media name such as `media1.png` stands for the address (`path`) that `ihateposting-agent upload` printed: `-m` never uploads a file (see "Pictures and videos are addresses, never local files" at the end of this page). Each of those examples is a draft (`-t draft`) with a date (`-s`), because `posts:create` needs a date.
+In the examples down to the Summary, a media name such as `media1.png` stands for the address (`path`) that `ihateposting upload` printed: `-m` never uploads a file (see "Pictures and videos are addresses, never local files" at the end of this page). Each of those examples is a draft (`-t draft`) with a date (`-s`), because `posts:create` needs a date.
 
 ## The Problem We Solved
 
 ### ❌ Old Approach (Problematic)
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" \
   --comments "Comment 1;Comment 2;Comment 3" \
   -s "2024-12-31T12:00:00Z" \
@@ -44,7 +44,7 @@ This program has no `--comments` option. It ignores an option it does not know, 
 ### ✅ New Approach (Better!)
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" -m "main.jpg" \
   -c "Comment 1; with semicolon!" -m "comment1.jpg" \
   -c "Comment 2" -m "comment2.jpg" \
@@ -67,7 +67,7 @@ ihateposting-agent posts:create \
 The CLI pairs `-c` and `-m` flags in order:
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Content 1" -m "media-for-content-1.jpg" \
   -c "Content 2" -m "media-for-content-2.jpg" \
   -c "Content 3" -m "media-for-content-3.jpg" \
@@ -86,7 +86,7 @@ Each of the three lines is one pair: Pair 1, Pair 2 and Pair 3.
 ### Media is Optional
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Post with media" -m "image.jpg" \
   -c "Comment without media" \
   -c "Another comment" \
@@ -103,7 +103,7 @@ Result:
 ### Multiple Media per Post/Comment
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" -m "img1.jpg,img2.jpg,img3.jpg" \
   -c "Comment" -m "img4.jpg,img5.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -120,7 +120,7 @@ Result:
 ### Example 1: Product Launch
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "🚀 Launching ProductX today!" \
   -m "hero.jpg,features.jpg" \
   -c "⭐ Key features you'll love..." \
@@ -135,7 +135,7 @@ ihateposting-agent posts:create \
 ### Example 2: Twitter Thread
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "🧵 Thread: How to X (1/5)" -m "intro.jpg" \
   -c "Step 1: ... (2/5)" -m "step1.jpg" \
   -c "Step 2: ... (3/5)" -m "step2.jpg" \
@@ -150,7 +150,7 @@ ihateposting-agent posts:create \
 ### Example 3: Tutorial with Screenshots
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Tutorial: Feature X 📖" \
   -m "tutorial-cover.jpg" \
   -c "1. Open settings" \
@@ -167,7 +167,7 @@ ihateposting-agent posts:create \
 ### Example 4: Content with Special Characters
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post about programming" \
   -c "First tip: Use const; avoid var" \
   -c "Second tip: Functions should do one thing; keep it simple" \
@@ -202,7 +202,7 @@ Use `-d` to control the delay between comments:
 
 ```bash
 # 10 minutes between each
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main" \
   -c "Comment 1" \
   -c "Comment 2" \
@@ -234,7 +234,7 @@ ihateposting-agent posts:create \
 
 ```bash
 # Build a multi-post command with media
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" \
   -m "img1.jpg,img2.jpg" \
   -c "Comment; with semicolon!" \
@@ -251,7 +251,7 @@ If you have existing scripts using the old syntax (a `--comments` option and an 
 
 ### Before:
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" \
   --comments "Comment 1;Comment 2" \
   --image "main-image.jpg" \
@@ -262,7 +262,7 @@ ihateposting-agent posts:create \
 
 ### After:
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Main post" -m "main-image.jpg" \
   -c "Comment 1" \
   -c "Comment 2" \
@@ -309,7 +309,7 @@ These sections come unchanged from this file as it was before it followed the re
 
 ### Command line syntax and moving scripts
 
-How a post is written on the command line, how options are spelled, what the program prints, and what to change when you move an existing script to `ihateposting-agent`. Every point is something the program does today; where a result depends on the server, the page says so.
+How a post is written on the command line, how options are spelled, what the program prints, and what to change when you move an existing script to `ihateposting`. Every point is something the program does today; where a result depends on the server, the page says so.
 
 ### How the pairing works
 
@@ -322,7 +322,7 @@ How a post is written on the command line, how options are spelled, what the pro
 
 ```bash
 # the second part has the picture, the first has none
-ihateposting-agent posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft \
+ihateposting posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft \
   -c "Text only" -m "" \
   -c "Reply with a picture" -m "<path>"
 ```
@@ -332,7 +332,7 @@ ihateposting-agent posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft \
 `--alt` follows the same rule as `-m`: one `--alt` per `-c`, with one text per picture, in the order of the addresses.
 
 ```bash
-ihateposting-agent posts:create -i instagram-123 -s 2026-12-15T10:00:00Z -t draft \
+ihateposting posts:create -i instagram-123 -s 2026-12-15T10:00:00Z -t draft \
   -c "Two pictures" -m "<path1>,<path2>" --alt "The team,The cake"
 ```
 
@@ -343,7 +343,7 @@ The texts are split at commas, so an alt text that itself contains a comma canno
 `-d <minutes>` (long form `--delay`) sets the delay between a post and its comments. It is written into every part, and the default is `0`:
 
 ```bash
-ihateposting-agent posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft -d 10 \
+ihateposting posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft -d 10 \
   -c "Main" -c "Comment one" -c "Comment two"
 ```
 
@@ -378,8 +378,8 @@ Examples for each platform are in [examples/](examples/README.md). When the prog
 `-m` takes the addresses of files that are already in your media library. Upload first, then use the `path` the upload printed:
 
 ```bash
-ihateposting-agent upload ./photo.png
-ihateposting-agent posts:create -i x-123 -c "Look" -m "<path from the upload>" -s 2026-12-15T10:00:00Z -t draft
+ihateposting upload ./photo.png
+ihateposting posts:create -i x-123 -c "Look" -m "<path from the upload>" -s 2026-12-15T10:00:00Z -t draft
 ```
 
 `posts:create` never uploads anything. If you write `-m ./photo.png`, the text `./photo.png` is sent as the address, and the server will most likely refuse or ignore it. See [SUPPORTED_FILE_TYPES.md](SUPPORTED_FILE_TYPES.md).
@@ -473,8 +473,8 @@ A before-and-after:
 mytool post -c "Launch day" --comments "Thanks all;Details below" --image launch.png -p x -i x-123
 
 # after
-ihateposting-agent upload ./launch.png
-ihateposting-agent posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft \
+ihateposting upload ./launch.png
+ihateposting posts:create -i x-123 -s 2026-12-15T10:00:00Z -t draft \
   -c "Launch day" -m "<path from the upload>" \
   -c "Thanks all" \
   -c "Details below"

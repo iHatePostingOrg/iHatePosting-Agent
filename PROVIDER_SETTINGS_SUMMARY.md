@@ -32,7 +32,7 @@ These take no settings (no special configuration needed):
 ### Method 1: Command Line
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Content" \
   -s "2024-12-31T12:00:00Z" \
   --settings '<json-settings>' \
@@ -60,7 +60,7 @@ Never include `__type`: the server derives it from the channel.
 ### Pinterest Pin
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Check out this project!" \
   -m "pin-image.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -74,7 +74,7 @@ ihateposting-agent posts:create \
 ### YouTube Video
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Full video description..." \
   -m "video.mp4" \
   -s "2024-12-31T12:00:00Z" \
@@ -92,7 +92,7 @@ ihateposting-agent posts:create \
 ### Twitter/X with Reply Controls
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Important announcement!" \
   -s "2024-12-31T12:00:00Z" \
   --settings '{
@@ -104,7 +104,7 @@ ihateposting-agent posts:create \
 ### LinkedIn Carousel
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Product showcase" \
   -m "img1.jpg,img2.jpg,img3.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -118,7 +118,7 @@ ihateposting-agent posts:create \
 ### Instagram Story
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "Story content" \
   -m "story-image.jpg" \
   -s "2024-12-31T12:00:00Z" \
@@ -131,7 +131,7 @@ ihateposting-agent posts:create \
 ### TikTok Video
 
 ```bash
-ihateposting-agent posts:create \
+ihateposting posts:create \
   -c "TikTok description #fyp" \
   -m "video.mp4" \
   -s "2024-12-31T12:00:00Z" \
@@ -160,7 +160,7 @@ We've created example JSON files for you:
 ## Finding Provider Types
 
 ```bash
-ihateposting-agent integrations:list
+ihateposting integrations:list
 ```
 
 Look at the `identifier` field - this is your provider type! (It is not the integration's `id`, which is what you pass to `-i`.)
@@ -217,7 +217,7 @@ Includes:
 
 ### One page of tables
 
-One page of tables for the details in [PROVIDER_SETTINGS.md](PROVIDER_SETTINGS.md). It is written from the settings schemas the app publishes, so treat it as a guide: for a real channel, `ihateposting-agent integrations:settings <channel-id>` is the answer that counts (its rules, `maxLength`, schema and helpers).
+One page of tables for the details in [PROVIDER_SETTINGS.md](PROVIDER_SETTINGS.md). It is written from the settings schemas the app publishes, so treat it as a guide: for a real channel, `ihateposting integrations:settings <channel-id>` is the answer that counts (its rules, `maxLength`, schema and helpers).
 
 ### Every platform in one table
 

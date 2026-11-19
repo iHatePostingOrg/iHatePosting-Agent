@@ -1,12 +1,12 @@
 {
-  "name": "ihateposting-agent",
+  "name": "ihateposting",
   "owner": {
     "name": "Parag Hasmukhbhai Gajera",
     "email": "support@ihateposting.com"
   },
   "metadata": {
     "description": "iHatePosting social media automation skill for scheduling posts across 15 platforms",
-    "version": "0.1.1"
+    "version": "1.0.0"
   },
   "plugins": [
     {

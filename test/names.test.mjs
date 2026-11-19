@@ -1,7 +1,8 @@
 // The name of the new listings: the owner's decision of 2026-11-15 ("No preference" to three names offered, the first used everywhere).
 //   display name  iHatePosting   (the same as the live app's listings: owner, 2026-11-15, "Display name : iHatePosting")
-//   the NEW Claude connector's slug  ihateposting-agent   (the live app's connector holds ihateposting)
-//   the plugin, the skill and the Gemini extension keep the name ihateposting; the marketplaces and the npm package are ihateposting-agent (owner, 2026-11-15: "Back to ihateposting")
+//   the NEW Claude connector's slug  ihateposting-agent   (the live app's connector holds ihateposting; a listing's slug, not the npm package)
+//   the plugin, the skill and the Gemini extension keep the name ihateposting (owner, 2026-11-15: "Back to ihateposting"); since 2026-11-19 the marketplaces and the npm package are
+//   ihateposting too (owner: "all should be ihateposting"; the program moved from the npm package ihateposting-agent into ihateposting)
 //   MCP Registry entry  com.ihateposting/mcp (the old name kept for a new version, 0.13.0: owner, 2026-11-16)
 // and no short description tells the new listing from the live app's (owner, 2026-11-15: "dont want this wording, make old one"): the descriptions are the old wording.
 // Offline: it reads files only.
@@ -16,7 +17,8 @@ const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8").replace(/\
 const json = (file) => JSON.parse(read(file));
 
 const DISPLAY = "iHatePosting";
-const SLUG = "ihateposting-agent"; // the marketplaces, the npm package and the new Claude connector's slug
+const SLUG = "ihateposting"; // the marketplaces and the npm package (owner, 2026-11-19)
+const CONNECTOR_SLUG = "ihateposting-agent"; // the new Claude connector's slug and the ClawHub bundle's: listing slugs, permanent once published, not the npm package
 const PLUGIN = "ihateposting"; // the plugin, the skill and the Gemini extension
 const REGISTRY_NAME = "com.ihateposting/mcp";
 const FORBIDDEN = /new iHatePosting app|\bnew app\b|\(app\.ihateposting\.com\)/i;
@@ -34,7 +36,7 @@ describe("the name of the new listings", () => {
     for (const name of [json(CLAUDE_PLUGIN).displayName, ui.displayName, json("server.json").title]) assert.ok(name.length <= 30 && !/\b(mcp|plugin)\b/i.test(name), name);
   });
 
-  it("is `ihateposting` as the name of the plugin in every manifest and every marketplace entry, `ihateposting-agent` as the marketplaces' own name and the package's, and the install line joins the two", () => {
+  it("is `ihateposting` as the name of the plugin in every manifest and every marketplace entry, and as the marketplaces' own name and the package's, and the install line joins the two", () => {
     const named = [
       [CLAUDE_PLUGIN, json(CLAUDE_PLUGIN).name],
       [".claude-plugin/marketplace.json", json(".claude-plugin/marketplace.json").plugins[0].name],
@@ -107,17 +109,17 @@ describe("the name of the new listings", () => {
     const guide = read("PUBLISHING.md");
     assert.match(guide, /^#### The name of the new listings \(the owner's decision of 2026-11-15\)$/m);
     assert.match(guide, /Three names were offered \(iHatePosting Agent, iHatePosting for Agents, iHatePosting App\) and the owner answered "No preference"/);
-    assert.match(guide, /\| Slug of the new Claude connector \(permanent once published\) \| `ihateposting-agent` \|/);
+    assert.match(guide, new RegExp(`\\| Slug of the new Claude connector \\(permanent once published\\) \\| \`${CONNECTOR_SLUG}\` \\|`));
     assert.match(guide, /"Back to ihateposting"/);
     assert.match(guide, /\*\*DeepSeek's npm package, `dsh-ihateposting`\*\*/);
     for (const place of ["Gemini", "cursor.directory", "The Claude plugin portal", "ChatGPT", "skills.sh"]) assert.ok(guide.includes(`**${place}`), `the guide does not say what happens at ${place}`);
     assert.match(guide, /clawhub skill publish \.\/skills\/ihateposting --slug ihateposting\n/);
-    assert.match(guide, /The new listing's slug is `ihateposting-agent`/);
+    assert.match(guide, new RegExp(`The new listing's slug is \`${CONNECTOR_SLUG}\``));
   });
 
   it("leaves the skill's own name and folder alone: a skill's name has to match its folder, and renaming the folder changes a workflow the owner left untouched", () => {
     assert.match(read("SKILL.md"), /^---\nname: ihateposting\n/);
     assert.ok(fs.existsSync(path.join(ROOT, "skills", "ihateposting", "SKILL.md")));
-    assert.equal(fs.existsSync(path.join(ROOT, "skills", SLUG)), false);
+    assert.equal(fs.existsSync(path.join(ROOT, "skills", CONNECTOR_SLUG)), false, "a skill folder named like the connector's slug is back");
   });
 });

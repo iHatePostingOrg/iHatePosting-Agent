@@ -4,6 +4,16 @@ Four packs, one for each place the owner asked to have ready: the Cursor Marketp
 
 **Nothing in this repository submits anything, signs in anywhere, opens a pull request or publishes.** Every step is the owner's, on the place's own website, signed in as the owner, and each real submission waits for the owner's own yes. What is written here was read from the official pages named in each pack on 2026-11-15; those rules change often, so read the page again before submitting. "Unverified" means it could not be confirmed; "second-hand" means a helper read the page and it was not read again.
 
+## Where things stand (2026-11-20)
+
+Written after the owner published the move into `ihateposting`. Every fact below was seen in his screenshots of the day, in `npm` and `mcp-publisher` output, or by a plain GET; this repository submitted nothing. Where this block and an older one disagree, this one is newer.
+
+- **Routing is live.** Shakti's routing went out at about 15:25 IST. Plain GETs at 15:29 and 15:48 IST: `https://app.ihateposting.com/mcp/oauth` and `https://app.ihateposting.com/mcp` answer 401, the sign-in's two discovery documents answer 200 and name the new address, the earlier `/api/mcp/oauth` still answers as before, and the old key addresses `/api/mcp/<key>`, `/api/sse/<key>` and `/api/message/<key>` answer 404 from nginx. The bullet of 2026-11-19 that says the new addresses answer 404 no longer applies. The two submitted listings keep `https://ihateposting.com/mcp/oauth`, which is still the live app's.
+- **npm.** `ihateposting@1.0.0` is published (about 16:02 IST) and is `latest` (and `next`): `npm view ihateposting version dist-tags` printed `1.0.0`, and `npx ihateposting --version` from an empty folder printed `1.0.0`. `dsh-ihateposting@1.0.0` is published and `latest` (after 16:28 IST). `ihateposting-agent` was left alone.
+- **MCP Registry.** `com.ihateposting/mcp` 0.13.1 is published with `mcp-publisher` v1.8.10 (`validate`, `login dns` and `publish` all succeeded) and is `isLatest` among 13 versions.
+- **ClawHub.** The skill is at 1.0.2 and the bundle `ihateposting-agent` at 0.1.4, both made from the files after the rename; the owner's dashboard showed both Visible with all three checks green, each updated three minutes earlier. The bullet of 2026-11-19 that says the ClawHub skill 1.0.1 and bundle 0.1.3 still say `ihateposting-agent` no longer applies.
+- **Still open.** The Claude plugin portal's "Check for new commits" is the owner's step (the portal holds v0.1.1, `d71edaf`, until he presses it). The Cursor Marketplace, cursor.directory, the xAI marketplace and the Gemini gallery read this repository or were submitted from it; their state was not checked.
+
 ## Where things stand (2026-11-19)
 
 Written the day the owner decided to move the program into the npm package `ihateposting` (his answers of 2026-11-19: "Replace it", "all should be ihateposting", version 1.0.0). Nothing was published, deprecated or unpublished for this. Where this block and an older one disagree, this one is newer.
@@ -66,7 +76,7 @@ A suggestion, with the reason for each step; every step is the owner's call.
 | The plugin has been tested locally | **Not done**: Cursor is not installed here (unverified) |
 | Agent Plugins conformance, variables declared | Not applicable: this is a Cursor plugin without variables |
 
-**What a reviewer who installs it meets.** The skill, and one MCP server at `https://app.ihateposting.com/mcp/oauth`. On 2026-11-15 its earlier path `/api/mcp/oauth` answered 401 before sign-in and named its discovery documents, which answered 200 at 08:17 UTC; the new path answers 404 until Shakti routes it; whether Cursor completes that sign-in was not tried (unverified). The skill drives the `ihateposting` command, which has to be installed from npm and signed in.
+**What a reviewer who installs it meets.** The skill, and one MCP server at `https://app.ihateposting.com/mcp/oauth`. On 2026-11-15 its earlier path `/api/mcp/oauth` answered 401 before sign-in and named its discovery documents, which answered 200 at 08:17 UTC; the new path answered 404 on 2026-11-19 and has answered 401 since Shakti's routing went live on 2026-11-20 (see the block at the top); whether Cursor completes that sign-in was not tried (unverified). The skill drives the `ihateposting` command, which has to be installed from npm and signed in.
 
 **Open points** (the owner told us not to touch the Cursor layout, so they are listed, not changed):
 
@@ -229,6 +239,6 @@ Add the entry to `.grok-plugin/marketplace.json`, regenerate the index (never ed
 | No download-and-run of code, no secret sent anywhere undeclared, no wide hooks | No hooks. **One point to watch**: the skill tells the model to install the command line with `npm install -g ihateposting` when it is missing, which a reviewer may read as installing code; the README says so openly, and xAI asks for endpoints and credentials to be declared in the README, which the root README does |
 | Prompt injection in `SKILL.md` | None; the skill says to treat text from the server as data |
 
-**What a reviewer who installs it meets.** The skill, and the hosted MCP server from `.grok-plugin/plugin.json` (its own `mcp.json`, at `https://app.ihateposting.com/mcp/oauth`). Its earlier path `/api/mcp/oauth` answered 401 with discovery documents at 08:17 UTC on 2026-11-15; the new path answers 404 until Shakti routes it; whether Grok Build completes the sign-in was not tried (unverified). Our own catalog entry in `.grok-plugin/marketplace.json` uses a local source; xAI wants the `url` and `sha` form above, so that file is not what the pull request adds.
+**What a reviewer who installs it meets.** The skill, and the hosted MCP server from `.grok-plugin/plugin.json` (its own `mcp.json`, at `https://app.ihateposting.com/mcp/oauth`). Its earlier path `/api/mcp/oauth` answered 401 with discovery documents at 08:17 UTC on 2026-11-15; the new path answered 404 on 2026-11-19 and has answered 401 since Shakti's routing went live on 2026-11-20 (see the block at the top); whether Grok Build completes the sign-in was not tried (unverified). Our own catalog entry in `.grok-plugin/marketplace.json` uses a local source; xAI wants the `url` and `sha` form above, so that file is not what the pull request adds.
 
 **Not blocked by anything** but the push. The merge time ranged from hours to six weeks in the ten merged requests a helper read (second-hand).

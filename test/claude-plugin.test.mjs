@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
-import { ROOT } from "./helpers.mjs";
+import { ROOT, claudeCopyOf } from "./helpers.mjs";
 
 const FOLDER = "plugins/claude-ihateposting";
 const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
@@ -58,11 +58,11 @@ describe("the Claude Code plugin folder", () => {
     for (const key of ["skills", "commands", "agents", "hooks", "outputStyles", "themes", "mcpServers", "lspServers"]) assert.equal(manifest[key], undefined, `the manifest declares ${key}`);
     assert.equal(manifest.license, "MIT");
     assert.ok(files.includes(`${FOLDER}/skills/ihateposting/SKILL.md`));
-    // The skill with the two changes the Claude directory's check needs (owner, 2026-11-16; test/package.test.mjs says why): plain indented `metadata` lines, and no line linking the npm page.
-    const forTheClaudeDirectory = read("SKILL.md")
-      .replace('metadata: {"openclaw":{"emoji":"📬","requires":{"bins":[],"env":["IHATEPOSTING_API_URL"]}}}', 'metadata:\n  openclaw:\n    emoji: "📬"\n    requires:\n      env:\n        - IHATEPOSTING_API_URL')
-      .replace("npm release: https://www.npmjs.com/package/ihateposting\n", "");
+    // The skill with the changes the Claude directory's check needs (owner, 2026-11-16 and "fix it" of 2026-11-21; `claudeCopyOf` in test/helpers.mjs lists them and test/package.test.mjs says why): plain
+    // indented `metadata` lines, no line linking the npm page, and no mention of the key variable.
+    const forTheClaudeDirectory = claudeCopyOf(read("SKILL.md"));
     assert.equal(read(`${FOLDER}/skills/ihateposting/SKILL.md`), forTheClaudeDirectory);
+    assert.ok(!read(`${FOLDER}/skills/ihateposting/SKILL.md`).includes("IHATEPOSTING_API_KEY"), "the skill names the key variable, which the Claude directory holds for a reviewer");
   });
 
   it("holds nothing that claude.ai or Cowork refuse: no bin/ folder, no hooks, no package.json or lock file, no script, no server", () => {

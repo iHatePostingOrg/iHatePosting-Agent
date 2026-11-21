@@ -85,3 +85,32 @@ export function jsonOf(stdout) {
   const at = stdout.search(/^[\[{]/m);
   return at >= 0 ? JSON.parse(stdout.slice(at)) : undefined;
 }
+
+/**
+ * The Claude Code plugin's copy of the skill: the root SKILL.md with the changes the Claude directory's check needs
+ * (plugins/claude-ihateposting/skills/ihateposting/SKILL.md is this text, to the byte). The first two are the owner's decision of 2026-11-16 (plain indented `metadata` lines; no line linking the npm
+ * page). The rest is his "fix it" of 2026-11-21: the check holds a version for a reviewer ("Uses a credential from the user's machine") when a skill names a credential variable beside a remote host,
+ * even with the fake value YOUR_API_KEY, and says the hold clears when no credential is read. So this copy does not name IHATEPOSTING_API_KEY (the program's own "Not authenticated" message and its
+ * --help say how to give it a key); the root and skills/ copies keep it. Every step must find its text exactly once, so a change to the root skill that moves one of them fails here at once.
+ */
+export function claudeCopyOf(root) {
+  const steps = [
+    ['metadata: {"openclaw":{"emoji":"📬","requires":{"bins":[],"env":["IHATEPOSTING_API_URL"]}}}', 'metadata:\n  openclaw:\n    emoji: "📬"\n    requires:\n      env:\n        - IHATEPOSTING_API_URL'],
+    ["npm release: https://www.npmjs.com/package/ihateposting\n", ""],
+    ["If not authenticated, either:\n1. **OAuth2:** `ihateposting auth:login`\n2. **API Key:** `export IHATEPOSTING_API_KEY=YOUR_API_KEY`\n", "If not authenticated, run `ihateposting auth:login`.\n"],
+    ["**Option 2: API Key**\n```bash\nexport IHATEPOSTING_API_KEY=YOUR_API_KEY\n```\n", "**Option 2: API Key**\nThe program's own \"Not authenticated\" message says how to give it a key. The key is made under Settings > Agents / Dev in iHatePosting.\n"],
+    ["Run `ihateposting auth:login` or `export IHATEPOSTING_API_KEY=YOUR_API_KEY` before using CLI", "Run `ihateposting auth:login` before using CLI"],
+    [/^export IHATEPOSTING_API_KEY=YOUR_API_KEY +# Or use API key\n/m, ""],
+    ["Nothing is saved and `IHATEPOSTING_API_KEY` is not set.", "Nothing is saved and no key is set."],
+    ["2. **Key:** `export IHATEPOSTING_API_KEY=YOUR_API_KEY`. The key is under Settings > Agents / Dev in iHatePosting.", "2. **Key:** a key made under Settings > Agents / Dev in iHatePosting. The program's own \"Not authenticated\" message says how to give the program the key."],
+    ["stops until you run `auth:login` or export `IHATEPOSTING_API_KEY`.", "stops until you run `auth:login` or give the program a key (its own message says how)."],
+    ["Variables: `IHATEPOSTING_API_KEY` (the key, used when nothing is saved), `IHATEPOSTING_API_URL`", "Variables: `IHATEPOSTING_API_URL`"],
+  ];
+  let text = root;
+  for (const [from, to] of steps) {
+    const found = typeof from === "string" ? text.split(from).length - 1 : (text.match(new RegExp(from.source, `${from.flags}g`)) ?? []).length;
+    if (found !== 1) throw new Error(`claudeCopyOf: ${found} places hold ${typeof from === "string" ? JSON.stringify(from.slice(0, 70)) : String(from)}, not one`);
+    text = text.replace(from, to);
+  }
+  return text;
+}

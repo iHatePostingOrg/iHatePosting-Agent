@@ -63,9 +63,7 @@ Before doing anything else, check auth status:
 ihateposting auth:status
 ```
 
-If not authenticated, either:
-1. **OAuth2:** `ihateposting auth:login`
-2. **API Key:** `export IHATEPOSTING_API_KEY=YOUR_API_KEY`
+If not authenticated, run `ihateposting auth:login`.
 
 **Do NOT proceed with any other commands until authentication is confirmed.**
 
@@ -132,9 +130,7 @@ ihateposting auth:logout
 Credentials are stored in `~/.ihateposting/credentials.json`. OAuth2 credentials take priority over API key.
 
 **Option 2: API Key**
-```bash
-export IHATEPOSTING_API_KEY=YOUR_API_KEY
-```
+The program's own "Not authenticated" message says how to give it a key. The key is made under Settings > Agents / Dev in iHatePosting.
 
 **Optional custom API URL:**
 ```bash
@@ -850,7 +846,7 @@ ihateposting posts:create \
 
 ## Common Gotchas
 
-1. **Not authenticated** - Run `ihateposting auth:login` or `export IHATEPOSTING_API_KEY=YOUR_API_KEY` before using CLI
+1. **Not authenticated** - Run `ihateposting auth:login` before using CLI
 2. **Invalid integration ID** - Run `integrations:list` to get current IDs
 3. **Settings schema mismatch** - Check `integrations:settings` for required fields
 4. **Media MUST be uploaded to iHatePosting first** - ⚠️ **CRITICAL (Rule 2):** Every value passed to `-m` or to an `image`/media field in JSON mode must be a `.path` returned by `ihateposting upload`. Raw local filenames (`image.jpg`) and external URLs (`https://...`) cannot be relied on — `-m` never uploads anything, and TikTok, Instagram, YouTube and many other providers only accept verified URLs. No exceptions: even a "quick test post" needs the upload step — or a `.path` of a file already uploaded (find it with `media:list -s <name>`).
@@ -872,7 +868,6 @@ ihateposting posts:create \
 ihateposting auth:status                                             # Check if authenticated
 ihateposting auth:login                                              # OAuth2 device flow login
 ihateposting auth:logout                                             # Remove credentials
-export IHATEPOSTING_API_KEY=YOUR_API_KEY                                   # Or use API key
 
 # Discovery (only after auth is confirmed)
 ihateposting integrations:list                           # Get integration IDs
@@ -936,7 +931,7 @@ ihateposting --version
 |-----------|---------------|
 | `✅ Credentials are valid. <n> integration(s) connected.` | Go ahead. |
 | `❌ Credentials are expired or invalid. Please re-authenticate.` | The server refused the token or key. Sign in again, or replace the key. |
-| `❌ Not authenticated.` | Nothing is saved and `IHATEPOSTING_API_KEY` is not set. |
+| `❌ Not authenticated.` | Nothing is saved and no key is set. |
 | `⚠️  Could not verify credentials (HTTP <status>): <words>` or `⚠️  Could not reach API to verify credentials: <why>` | The check itself failed. The credentials may be fine; try again, and look at the address if it keeps happening. |
 
 `auth:status` ends with exit code `0` in every case, so read its text rather than its exit code.
@@ -944,7 +939,7 @@ ihateposting --version
 If nobody is signed in, choose one:
 
 1. **Code sign-in:** `ihateposting auth:login`. It prints a code in a box and a web address, and tries to open the page in a browser. A person types the code there and approves on the next page. The command waits, then saves the sign-in. Because it needs a person at a browser, an unattended agent should ask for one, or use a key.
-2. **Key:** `export IHATEPOSTING_API_KEY=YOUR_API_KEY`. The key is under Settings > Agents / Dev in iHatePosting.
+2. **Key:** a key made under Settings > Agents / Dev in iHatePosting. The program's own "Not authenticated" message says how to give the program the key.
 
 A saved sign-in is used before the key in the environment.
 
@@ -1246,7 +1241,7 @@ iHatePosting's agent pages: https://ihateposting.com/ai-agents
 
 ### Common gotchas
 
-1. **Not signed in.** Every command but the three `auth:` ones stops until you run `auth:login` or export `IHATEPOSTING_API_KEY`.
+1. **Not signed in.** Every command but the three `auth:` ones stops until you run `auth:login` or give the program a key (its own message says how).
 2. **The date is required** for every post that is not sent from a `--json` file, and `-s` means a date here but a status in `posts:status` and a search in `media:list`.
 3. **A setting that does not apply can be dropped without an error.** Read the rules.
 4. **`--settings` is one object for all channels in the call.** Split the calls by platform, or use a body file.
@@ -1261,4 +1256,4 @@ iHatePosting's agent pages: https://ihateposting.com/ai-agents
 
 ### Quick reference
 
-Variables: `IHATEPOSTING_API_KEY` (the key, used when nothing is saved), `IHATEPOSTING_API_URL` (another API address; default `https://app.ihateposting.com/api`) and `IHATEPOSTING_AUTH_SERVER` (another sign-in server for `auth:login`).
+Variables: `IHATEPOSTING_API_URL` (another API address; default `https://app.ihateposting.com/api`) and `IHATEPOSTING_AUTH_SERVER` (another sign-in server for `auth:login`).

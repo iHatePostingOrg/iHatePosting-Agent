@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The Claude Code plugin's copy of the skill (`plugins/claude-ihateposting/skills/ihateposting/SKILL.md`) no longer names the key variable (the owner's "fix it" of 2026-11-21): the Claude directory's check held the plugin for a reviewer for it, with the fake value `YOUR_API_KEY` already in place, and says the hold clears when no credential is read. The program's own "Not authenticated" message and its `--help` still say how to give it a key, and the other two copies of the skill keep the variable. Not in the npm package.
+
 ## [1.0.0] - 2026-11-19
 
 The program moves into the older npm package `ihateposting` (the owner's decisions of 2026-11-19: replace it, "all should be ihateposting", version 1.0.0). The package `ihateposting-agent` (`0.0.0-stage`, 0.1.0 and 0.1.1) is left as it is on npm: not deprecated, not unpublished, and it gets no new version.

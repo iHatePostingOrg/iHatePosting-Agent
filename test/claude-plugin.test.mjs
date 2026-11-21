@@ -59,7 +59,7 @@ describe("the Claude Code plugin folder", () => {
     assert.equal(manifest.license, "MIT");
     assert.ok(files.includes(`${FOLDER}/skills/ihateposting/SKILL.md`));
     // The skill with the changes the Claude directory's check needs (owner, 2026-11-16 and "fix it" of 2026-11-21; `claudeCopyOf` in test/helpers.mjs lists them and test/package.test.mjs says why): plain
-    // indented `metadata` lines, no line linking the npm page, and no mention of the key variable.
+    // indented `metadata` lines, no line linking the npm page, no mention of the key variable, and a batch-scheduling script without shell arrays (the change that cleared the hold).
     const forTheClaudeDirectory = claudeCopyOf(read("SKILL.md"));
     assert.equal(read(`${FOLDER}/skills/ihateposting/SKILL.md`), forTheClaudeDirectory);
     assert.ok(!read(`${FOLDER}/skills/ihateposting/SKILL.md`).includes("IHATEPOSTING_API_KEY"), "the skill names the key variable, which the Claude directory holds for a reviewer");

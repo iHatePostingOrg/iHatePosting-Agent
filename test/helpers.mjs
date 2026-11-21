@@ -89,9 +89,10 @@ export function jsonOf(stdout) {
 /**
  * The Claude Code plugin's copy of the skill: the root SKILL.md with the changes the Claude directory's check needs
  * (plugins/claude-ihateposting/skills/ihateposting/SKILL.md is this text, to the byte). The first two are the owner's decision of 2026-11-16 (plain indented `metadata` lines; no line linking the npm
- * page). The rest is his "fix it" of 2026-11-21: the check holds a version for a reviewer ("Uses a credential from the user's machine") when a skill names a credential variable beside a remote host,
- * even with the fake value YOUR_API_KEY, and says the hold clears when no credential is read. So this copy does not name IHATEPOSTING_API_KEY (the program's own "Not authenticated" message and its
- * --help say how to give it a key); the root and skills/ copies keep it. Every step must find its text exactly once, so a change to the root skill that moves one of them fails here at once.
+ * page). The next eight (his "fix it" of 2026-11-21) take the key variable IHATEPOSTING_API_KEY out of this copy (the program's own "Not authenticated" message and its --help say how to give it a key; the
+ * root and skills/ copies keep it), because the check held the version for a reviewer ("Uses a credential from the user's machine"); that alone did not clear the hold (validation of main @ 2927cd2). The last
+ * step did: it rewrites the batch-scheduling script, whose shell arrays the scan read as environment variables sent on a command (found by validating test variants of the plugin). Whether the key variable has
+ * to stay out is untested. Every step must find its text exactly once, so a change to the root skill that moves one of them fails here at once.
  */
 export function claudeCopyOf(root) {
   const steps = [
@@ -105,12 +106,41 @@ export function claudeCopyOf(root) {
     ["2. **Key:** `export IHATEPOSTING_API_KEY=YOUR_API_KEY`. The key is under Settings > Agents / Dev in iHatePosting.", "2. **Key:** a key made under Settings > Agents / Dev in iHatePosting. The program's own \"Not authenticated\" message says how to give the program the key."],
     ["stops until you run `auth:login` or export `IHATEPOSTING_API_KEY`.", "stops until you run `auth:login` or give the program a key (its own message says how)."],
     ["Variables: `IHATEPOSTING_API_KEY` (the key, used when nothing is saved), `IHATEPOSTING_API_URL`", "Variables: `IHATEPOSTING_API_URL`"],
+    // The one that cleared the hold (owner's "fix it", 2026-11-21; found by validating test variants of the plugin on temporary branches): the batch-scheduling script loops over shell arrays
+    // (`"${!DATES[@]}"`, `"${CONTENT[$i]}"`, `"post-${i}.jpg"`), which the scan read as environment variables sent on a command. The same text without arrays or ${...} passes.
+    [/### Pattern 6: Batch Scheduling\n[\s\S]*?\ndone\n```\n/, () => BATCH_SCHEDULING_WITHOUT_ARRAYS],
   ];
   let text = root;
   for (const [from, to] of steps) {
     const found = typeof from === "string" ? text.split(from).length - 1 : (text.match(new RegExp(from.source, `${from.flags}g`)) ?? []).length;
     if (found !== 1) throw new Error(`claudeCopyOf: ${found} places hold ${typeof from === "string" ? JSON.stringify(from.slice(0, 70)) : String(from)}, not one`);
-    text = text.replace(from, to);
+    text = text.replace(from, typeof to === "function" ? to : () => to);
   }
   return text;
 }
+
+/** "Pattern 6: Batch Scheduling" for the Claude plugin's copy of the skill: the same example, valid bash, with no array and no ${...}. */
+const BATCH_SCHEDULING_WITHOUT_ARRAYS = [
+  "### Pattern 6: Batch Scheduling",
+  "",
+  "```bash",
+  "#!/bin/bash",
+  "",
+  "# Schedule posts for the week: one line for each post, a date and a text",
+  "while IFS='|' read -r DATE TEXT; do",
+  "  # Rule 2: upload each file before passing to -m",
+  "  IMG=$(ihateposting upload \"post-$DATE.jpg\" | tail -n +2 | jq -r '.path')",
+  "  ihateposting posts:create \\",
+  "    -c \"$TEXT\" \\",
+  "    -s \"$DATE\" \\",
+  "    -i \"x-id\" \\",
+  "    -m \"$IMG\"",
+  "  echo \"Scheduled: $TEXT for $DATE\"",
+  "done <<'EOF'",
+  "2030-02-14T09:00:00Z|Monday motivation 💪",
+  "2030-02-15T09:00:00Z|Tuesday tips 💡",
+  "2030-02-16T09:00:00Z|Wednesday wisdom 🧠",
+  "EOF",
+  "```",
+  "",
+].join("\n");

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The Claude Code plugin's copy of the skill (`plugins/claude-ihateposting/skills/ihateposting/SKILL.md`) no longer names the key variable (the owner's "fix it" of 2026-11-21): the Claude directory's check held the plugin for a reviewer for it, with the fake value `YOUR_API_KEY` already in place, and says the hold clears when no credential is read. The program's own "Not authenticated" message and its `--help` still say how to give it a key, and the other two copies of the skill keep the variable. Not in the npm package.
+- The Claude Code plugin's copy of the skill (`plugins/claude-ihateposting/skills/ihateposting/SKILL.md`) no longer names the key variable, and its batch-scheduling example no longer loops over shell arrays (the owner's "fix it" of 2026-11-21). The Claude directory's check held the plugin for a reviewer ("Uses a credential from the user's machine"); leaving the variable out did not clear that, and the rewritten example script did (found by validating test variants of the plugin). The program's own "Not authenticated" message and its `--help` still say how to give it a key, and the other two copies of the skill keep the variable and the array example. Not in the npm package.
 
 ## [1.0.0] - 2026-11-19
 

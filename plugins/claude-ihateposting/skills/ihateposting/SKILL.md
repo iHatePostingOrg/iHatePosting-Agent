@@ -504,29 +504,21 @@ ihateposting posts:create \
 ```bash
 #!/bin/bash
 
-# Schedule posts for the week
-DATES=(
-  "2030-02-14T09:00:00Z"
-  "2030-02-15T09:00:00Z"
-  "2030-02-16T09:00:00Z"
-)
-
-CONTENT=(
-  "Monday motivation 💪"
-  "Tuesday tips 💡"
-  "Wednesday wisdom 🧠"
-)
-
-for i in "${!DATES[@]}"; do
+# Schedule posts for the week: one line for each post, a date and a text
+while IFS='|' read -r DATE TEXT; do
   # Rule 2: upload each file before passing to -m
-  IMG=$(ihateposting upload "post-${i}.jpg" | tail -n +2 | jq -r '.path')
+  IMG=$(ihateposting upload "post-$DATE.jpg" | tail -n +2 | jq -r '.path')
   ihateposting posts:create \
-    -c "${CONTENT[$i]}" \
-    -s "${DATES[$i]}" \
+    -c "$TEXT" \
+    -s "$DATE" \
     -i "x-id" \
     -m "$IMG"
-  echo "Scheduled: ${CONTENT[$i]} for ${DATES[$i]}"
-done
+  echo "Scheduled: $TEXT for $DATE"
+done <<'EOF'
+2030-02-14T09:00:00Z|Monday motivation 💪
+2030-02-15T09:00:00Z|Tuesday tips 💡
+2030-02-16T09:00:00Z|Wednesday wisdom 🧠
+EOF
 ```
 
 ### Pattern 7: Error Handling & Retry

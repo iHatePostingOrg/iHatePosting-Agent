@@ -4,7 +4,7 @@ import { hideBin } from "yargs/helpers";
 import { authLogin, authLogout, authStatus } from "./commands/auth.mjs";
 import { getAnalytics, getPostAnalytics } from "./commands/analytics.mjs";
 import { getIntegrationSettings, listGroups, listIntegrations, triggerIntegrationTool } from "./commands/integrations.mjs";
-import { changePostStatus, connectPost, createPost, deletePost, getMissingContent, listPosts, updatePostSettings } from "./commands/posts.mjs";
+import { changePostStatus, connectPost, createPost, deletePost, getMissingContent, listPosts, updatePostAttachments, updatePostSettings } from "./commands/posts.mjs";
 import { getMediaStatus, listMedia, uploadFile } from "./commands/upload.mjs";
 import { API_KEY_VARIABLE, DEFAULT_AUTH_SERVER, PROGRAM, WEBSITE } from "./constants.mjs";
 
@@ -188,6 +188,32 @@ yargs(hideBin(process.argv))
         .example('$0 posts:settings post-123 --settings \'{"board":"1234567890"}\'', "Set a Pinterest pin's board");
     },
     updatePostSettings,
+  )
+  .command(
+    "posts:attachments <id>",
+    "Replace a post's attachments (only unpublished draft/scheduled posts)",
+    (yargs) => {
+      return yargs
+        .positional("id", {
+          describe: "Post ID",
+          type: "string",
+        })
+        .option("media", {
+          alias: "m",
+          describe:
+            "Comma-separated media URLs that replace all the existing attachments of the post; pass an empty string to remove them all (refused when the post would be left invalid, e.g. with no text)",
+          type: "string",
+          demandOption: true,
+          nargs: 1,
+        })
+        .option("alt", {
+          describe: "Comma-separated alt texts for the media of -m, same order",
+          type: "string",
+        })
+        .example('$0 posts:attachments post-123 -m "https://appmedia.ihateposting.com/a.png,https://appmedia.ihateposting.com/b.png"', "Replace the attachments of a post with two images")
+        .example('$0 posts:attachments post-123 -m ""', "Remove all the attachments of a post");
+    },
+    updatePostAttachments,
   )
   .command(
     "posts:connect <id>",

@@ -221,6 +221,13 @@ ihateposting posts:delete <post-id>
 ihateposting posts:status <post-id> --status draft     # Move back to draft, terminates any running publish workflow
 ihateposting posts:status <post-id> --status schedule  # Promote a draft into the publishing queue (uses the post's stored date)
 
+# Replace a post's attachments (the list replaces ALL the existing attachments of the main post)
+# Only DRAFT/QUEUE (unpublished) posts can be updated. Pass the MAIN post id, not a comment id.
+# Removing all of them is refused when the post would be left invalid (no text, or a scheduled post the platform's rules refuse).
+ihateposting posts:attachments <post-id> -m "https://appmedia.ihateposting.com/a.png,https://appmedia.ihateposting.com/b.png"  # Replace with two images
+ihateposting posts:attachments <post-id> -m "https://appmedia.ihateposting.com/a.png" --alt "A red bicycle"                     # With alt text
+ihateposting posts:attachments <post-id> -m ""                                                                                  # Remove all the attachments
+
 # Update a post's provider-specific settings (merged — only the keys you pass change)
 # Only DRAFT/QUEUE (unpublished) posts can be updated. Pass the MAIN post id, not a comment id.
 # Do NOT include __type — the backend adds it automatically from the integration.
@@ -882,6 +889,7 @@ ihateposting posts:delete <id>                          # Delete post
 ihateposting posts:status <id> --status draft           # Move to draft (stops workflow)
 ihateposting posts:status <id> --status schedule        # Queue draft for publishing
 ihateposting posts:settings <id> --settings '{}'        # Patch a post's settings (merged; DRAFT/QUEUE only)
+ihateposting posts:attachments <id> -m "<url>,<url>"     # Replace a post's attachments (DRAFT/QUEUE only)
 ihateposting upload <file>                              # Upload media
 ihateposting upload <file> --adjust                     # Accepted; no adjusting is done here
 ihateposting media:status <id>                          # Check an --adjust upload
@@ -1033,6 +1041,7 @@ Most commands print one header line and then the answer as indented JSON on stan
 | `posts:delete` | `✅ Post <id> deleted successfully!` | nothing |
 | `posts:status` | `✅ Post <id> status changed to <status>` | the JSON |
 | `posts:settings` | `✅ Post <id> settings updated` | the JSON |
+| `posts:attachments` | `✅ Post <id> attachments updated` | the JSON |
 | `posts:connect` | `✅ Post <id> connected to release <release-id>` | the JSON |
 | `posts:missing` | none | the JSON only |
 | `integrations:list` | `🔌 Connected Integrations:` | the JSON |

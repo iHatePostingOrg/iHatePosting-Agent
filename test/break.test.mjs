@@ -147,6 +147,21 @@ describe("input that is hostile or enormous", () => {
     await server.close();
   });
 
+  it("sends six hundred attachments (a command line has a length limit of its own), each with an id of its own, and a hostile address or alt text exactly as typed, for posts:attachments", async () => {
+    const server = await startFakeApi(() => ({ body: {} }));
+    const many = Array.from({ length: 600 }, (_, i) => `https://appmedia.ihateposting.com/f${i}.png`).join(",");
+    const { code } = await run(["posts:attachments", "p1", "-m", many], { env: env(server.url) });
+    assert.equal(code, 0);
+    const { attachments } = server.requests.at(-1).json;
+    assert.equal(attachments.length, 600);
+    assert.equal(new Set(attachments.map((a) => a.id)).size, 600, "an id repeated");
+    assert.deepEqual(attachments.map((a) => a.path), many.split(","));
+    await run(["posts:attachments", "p1", "-m", "__proto__.png,constructor.png", "--alt", '{"__proto__":{"polluted":true}}\n<b>,\u202e'], { env: env(server.url) });
+    assert.deepEqual(server.requests.at(-1).json.attachments.map(({ id: _id, ...rest }) => rest), [{ path: "__proto__.png", alt: '{"__proto__":{"polluted":true}}\n<b>' }, { path: "constructor.png", alt: "\u202e" }]);
+    assert.equal({}.polluted, undefined);
+    await server.close();
+  });
+
   it("reads `__proto__` and `constructor` in --settings and --data as plain keys that change nothing, and sends them as they are", async () => {
     const server = await startFakeApi(() => ({ body: {} }));
     await run(["posts:settings", "p1", "--settings", '{"__proto__":{"polluted":"yes"},"constructor":{"x":1}}'], { env: env(server.url) });

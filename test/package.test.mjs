@@ -146,7 +146,7 @@ describe("the skill", () => {
 
   it("names every command the program has, and no command it does not have", async () => {
     const commands = await commandsOfTheProgram();
-    assert.equal(commands.length, 19, `the help lists ${commands.join(", ")}`);
+    assert.equal(commands.length, 20, `the help lists ${commands.join(", ")}`);
     const text = read("SKILL.md");
     for (const name of commands) assert.ok(text.includes(`ihateposting ${name}`), `${name} is not in the skill`);
     // Every command but `upload` is written `group:name`; a bare word after "ihateposting" is prose (the "ihateposting cli github:" line, the plugin's name), not a command.

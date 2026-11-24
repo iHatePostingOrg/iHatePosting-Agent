@@ -53,6 +53,11 @@ const faults = [
   ["the delay between comments is not sent", "src/commands/posts.mjs", [["delay: args?.delay || 0,", "delay: 0,"]]],
   ["a body file gets the CLI mark added", "src/commands/posts.mjs", [["postData = JSON.parse(jsonContent);", 'postData = { creationMethod: "CLI", ...JSON.parse(jsonContent) };']]],
   ["the posts shown start a week ago", "src/commands/posts.mjs", [["defaultStartDate.getDate() - 30", "defaultStartDate.getDate() - 7"]]],
+  ["an empty entry in -m of posts:attachments is sent as an attachment", "src/commands/posts.mjs", [["if (medias.some((url) => !url)) {", "if (false) {"]]],
+  ["a repeated -m of posts:attachments is taken", "src/commands/posts.mjs", [['if (typeof args.media !== "string") {', "if (false) {"]]],
+  ["the first alt text goes on every attachment", "src/commands/posts.mjs", [["...(alts[i]?.trim() ? { alt: alts[i].trim() } : {}),", "...(alts[0]?.trim() ? { alt: alts[0].trim() } : {}),"]]],
+  ["the attachments are sent to the settings route", "src/api.mjs", [["/public/v1/posts/${postId}/attachments", "/public/v1/posts/${postId}/settings"]]],
+  ["the attachments' words are not trimmed", "src/commands/posts.mjs", [['args.media.split(",").map((url) => url.trim())', 'args.media.split(",")']]],
   // The media.
   ["a file is sent under its whole path", "src/commands/upload.mjs", [['args.file.split("/").pop() || "file"', "args.file"]]],
   // The wiring.

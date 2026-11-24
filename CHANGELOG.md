@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `posts:attachments <id> -m "<url>,<url>"` - Replace the attachments of an unpublished (draft or scheduled) post. The list replaces all the existing attachments of the main post, `-m ""` removes them all, and `--alt` sets alt texts in the same order. The content, settings and publish date stay as they are. It takes `-m` once: a bare `-m`, an empty entry in the list and a repeated `-m` or `--alt` are refused before the request, so a typo or an unset shell variable cannot clear a post's attachments or shift alt texts. It calls `PUT /public/v1/posts/:id/attachments` of the app (the app has had that route since 2026-11-24; until the app is deployed with it the command answers 404).
+
 ### Changed
+
+- The DeepSeek plugin's tool table and skill text list the tools the server gained: `integrationConnectTool` (a link to connect a new channel), `integrationAnalyticsTool`, `postAnalyticsTool` and `postAttachmentsTool`; the skill no longer says the server cannot connect a channel. The ChatGPT plugin pack's get-started skill and its listing text say the same (not yet submitted; to be submitted only after the app is deployed with the tool).
 
 - The Claude Code plugin's copy of the skill (`plugins/claude-ihateposting/skills/ihateposting/SKILL.md`) no longer names the key variable, and its batch-scheduling example no longer loops over shell arrays (the owner's "fix it" of 2026-11-21). The Claude directory's check held the plugin for a reviewer ("Uses a credential from the user's machine"); leaving the variable out did not clear that, and the rewritten example script did (found by validating test variants of the plugin). The program's own "Not authenticated" message and its `--help` still say how to give it a key, and the other two copies of the skill keep the variable and the array example. Not in the npm package.
 

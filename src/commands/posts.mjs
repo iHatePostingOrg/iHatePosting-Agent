@@ -241,6 +241,54 @@ export async function updatePostSettings(args) {
   }
 }
 
+/** posts:attachments (the reference's, its v2.0.29): replaces the attachments of the main post of an unpublished post. -m is one comma-separated
+ *  list that REPLACES them all; only an explicit empty -m removes them all, so a bare -m, an empty entry in the list and a repeated -m or --alt
+ *  (which yargs hands over as lists) are refused before the request: a typo or an unset shell variable cannot clear a post's attachments or shift
+ *  alt texts. */
+export async function updatePostAttachments(args) {
+  const config = getConfig();
+  const api = new IHatePostingAPI(config);
+
+  if (!args.id) {
+    console.error("❌ Post ID is required");
+    process.exit(1);
+  }
+
+  if (typeof args.media !== "string") {
+    console.error("❌ Pass --media once, as a comma-separated list (an empty string removes all attachments)");
+    process.exit(1);
+  }
+
+  if (args.alt !== undefined && typeof args.alt !== "string") {
+    console.error("❌ Pass --alt once, as a comma-separated list in the same order as --media");
+    process.exit(1);
+  }
+
+  const medias = args.media === "" ? [] : args.media.split(",").map((url) => url.trim());
+
+  if (medias.some((url) => !url)) {
+    console.error('❌ --media has an empty entry. Pass -m "" to remove all attachments');
+    process.exit(1);
+  }
+
+  const alts = args.alt ? args.alt.split(",") : [];
+  const attachments = medias.map((path, i) => ({
+    id: Math.random().toString(36).substring(7),
+    path,
+    ...(alts[i]?.trim() ? { alt: alts[i].trim() } : {}),
+  }));
+
+  try {
+    const result = await api.updatePostAttachments(args.id, attachments);
+    console.log(`✅ Post ${args.id} attachments updated`);
+    console.log(JSON.stringify(result, null, 2));
+    return result;
+  } catch (error) {
+    console.error("❌ Failed to update post attachments:", error.message);
+    process.exit(1);
+  }
+}
+
 export async function deletePost(args) {
   const config = getConfig();
   const api = new IHatePostingAPI(config);

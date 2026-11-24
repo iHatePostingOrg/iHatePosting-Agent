@@ -23,8 +23,8 @@ export const DEFAULT_OUT = path.join(ROOT, "dist", "ihateposting-chatgpt-plugin.
 
 /** OpenAI's limits for an uploaded ZIP (submission-errors page). */
 export const LIMITS = { zipBytes: 100 * 1000 * 1000, entries: 5000, unzippedBytes: 512 * 1024 * 1024, memberBytes: 100 * 1024 * 1024, segments: 20 };
-/** The tools the hosted server offers (apps/backend/src/mcp/mcp-tools.ts of the app): the review cases may name only these. */
-export const KNOWN_TOOLS = ["integrationList", "groupList", "integrationSchema", "triggerTool", "integrationSchedulePostTool", "postsListTool", "postSettingsTool", "deletePostTool", "uploadFromUrlTool", "mediaListTool", "mediaStatusTool", "uploadWidgetTool", "uploadWidgetTicketTool", "uploadWidgetStatusTool"];
+/** The tools the hosted server offers (apps/backend/src/mcp/mcp-tools.ts of the app: eighteen since 2026-11-24, the last four added are not live until the app is deployed with them): the review cases may name only these. */
+export const KNOWN_TOOLS = ["integrationList", "groupList", "integrationConnectTool", "integrationSchema", "triggerTool", "integrationSchedulePostTool", "postsListTool", "postSettingsTool", "postAttachmentsTool", "deletePostTool", "integrationAnalyticsTool", "postAnalyticsTool", "uploadFromUrlTool", "mediaListTool", "mediaStatusTool", "uploadWidgetTool", "uploadWidgetTicketTool", "uploadWidgetStatusTool"];
 const PLUGIN_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json";
 const MCP_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json";
 const INCLUDED = ["plugin.json", "mcp.json", "skills", "assets"];

@@ -52,12 +52,15 @@ The model sees the iHatePosting MCP tools under the `mcp__ihateposting__` namesp
 |---|---|
 | `mcp__ihateposting__integrationList` | List connected channels (optionally filtered by group) |
 | `mcp__ihateposting__groupList` | List customer groups |
+| `mcp__ihateposting__integrationConnectTool` | A link, good for one hour, that the person opens to connect a new channel (not Bluesky or Telegram, which are added inside iHatePosting) |
 | `mcp__ihateposting__integrationSchema` | Posting rules, character limits, and required settings for a platform |
 | `mcp__ihateposting__triggerTool` | Platform helpers (list Discord channels, list Pinterest boards, look up LinkedIn pages) |
 | `mcp__ihateposting__integrationSchedulePostTool` | Schedule, draft, or immediately publish posts |
 | `mcp__ihateposting__postsListTool` | List posts between two dates |
 | `mcp__ihateposting__postSettingsTool` | Update settings of an unpublished post |
+| `mcp__ihateposting__postAttachmentsTool` | Replace the attachments of an unpublished post |
 | `mcp__ihateposting__deletePostTool` | Delete a post |
+| `mcp__ihateposting__integrationAnalyticsTool` / `postAnalyticsTool` | The analytics of a channel, and of a published post, for the last days |
 | `mcp__ihateposting__uploadFromUrlTool` / `mediaListTool` / `mediaStatusTool` | Put a picture or video into the media library from a public web address, find a file that is already there, check that it is ready |
 | `mcp__ihateposting__uploadWidgetTool` / `uploadWidgetStatusTool` | An upload panel for files on the person's own computer (only in a client that shows panels), and the list of what was added |
 

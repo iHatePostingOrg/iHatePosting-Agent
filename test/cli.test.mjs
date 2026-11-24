@@ -158,6 +158,57 @@ describe("every command asks the API what it says and prints the header line and
     assert.equal(missing.stdout, `${JSON.stringify({ missing: [] }, null, 2)}\n`, "posts:missing prints the JSON alone, as the reference's does");
   });
 
+  it("replaces a post's attachments as the reference's posts:attachments does: one comma-separated -m is the whole new list, an id for each, alt texts by position, -m \"\" removes them all", async () => {
+    answering({ postId: "p1", publishDate: "2030-01-01T10:00:00" });
+    const two = await run(["posts:attachments", "p1", "-m", "https://appmedia.ihateposting.com/a.png,https://appmedia.ihateposting.com/b.png"], { env: env() });
+    assert.equal(two.code, 0, two.stderr);
+    assert.deepEqual([last().method, last().path], ["PUT", "/public/v1/posts/p1/attachments"]);
+    assert.deepEqual(Object.keys(last().json), ["attachments"]);
+    assert.deepEqual(last().json.attachments.map((a) => a.path), ["https://appmedia.ihateposting.com/a.png", "https://appmedia.ihateposting.com/b.png"]);
+    assert.ok(last().json.attachments.every((a) => typeof a.id === "string" && a.id.length >= 3 && !("alt" in a)));
+    assert.notEqual(last().json.attachments[0].id, last().json.attachments[1].id);
+    assert.equal(lines(two.stdout)[0], "✅ Post p1 attachments updated");
+    assert.equal(two.stdout, `✅ Post p1 attachments updated\n${JSON.stringify({ postId: "p1", publishDate: "2030-01-01T10:00:00" }, null, 2)}\n`);
+    // Spaces around an address are dropped; alt texts go by position, an empty one sets none, and an extra one is ignored.
+    await run(["posts:attachments", "p1", "-m", " a.png , b.png ", "--alt", " A red bicycle , "], { env: env() });
+    assert.deepEqual(last().json.attachments.map(({ id: _id, ...rest }) => rest), [{ path: "a.png", alt: "A red bicycle" }, { path: "b.png" }]);
+    await run(["posts:attachments", "p1", "-m", "a.png", "--alt", "one,two,three"], { env: env() });
+    assert.deepEqual(last().json.attachments.map(({ id: _id, ...rest }) => rest), [{ path: "a.png", alt: "one" }]);
+    await run(["posts:attachments", "p1", "-m", "a.png,b.png", "--alt", ",second"], { env: env() });
+    assert.deepEqual(last().json.attachments.map(({ id: _id, ...rest }) => rest), [{ path: "a.png" }, { path: "b.png", alt: "second" }]);
+    const removed = await run(["posts:attachments", "p1", "-m", ""], { env: env() });
+    assert.equal(removed.code, 0, removed.stderr);
+    assert.deepEqual(last().json, { attachments: [] });
+  });
+
+  it("refuses before any request a -m that could clear a post by mistake (a bare -m, an empty entry, a repeated -m or --alt), and a missing -m, with the reference's words and exit 1", async () => {
+    for (const [argv, said] of [
+      [["posts:attachments", "p1"], "Missing required argument: media"],
+      [["posts:attachments", "p1", "-m"], "Not enough arguments following: m"],
+      [["posts:attachments", "p1", "-m", "a.png,,b.png"], '❌ --media has an empty entry. Pass -m "" to remove all attachments'],
+      [["posts:attachments", "p1", "-m", "a.png,"], '❌ --media has an empty entry. Pass -m "" to remove all attachments'],
+      [["posts:attachments", "p1", "-m", " , "], '❌ --media has an empty entry. Pass -m "" to remove all attachments'],
+      [["posts:attachments", "p1", "-m", "a.png", "-m", "b.png"], "❌ Pass --media once, as a comma-separated list (an empty string removes all attachments)"],
+      [["posts:attachments", "p1", "-m", "a.png", "--alt", "x", "--alt", "y"], "❌ Pass --alt once, as a comma-separated list in the same order as --media"],
+      [["posts:attachments", "-m", "a.png"], "Not enough non-option arguments: got 0, need at least 1"],
+    ]) {
+      const before = api.requests.length;
+      const { code, stdout, stderr } = await run(argv, { env: env() });
+      assert.equal(code, 1, argv.join(" "));
+      assert.equal(stdout, "");
+      assert.ok(stderr.includes(said), `${argv.join(" ")} -> ${stderr.slice(-200)}`);
+      assert.equal(api.requests.length, before, `${argv.join(" ")} sent a request`);
+    }
+  });
+
+  it("says what the API said when it refuses (a post that went out, a file that is not one), as one failure with exit 1", async () => {
+    answering({ message: "Only scheduled posts that were not published yet (or drafts) can be updated", error: "Bad Request", statusCode: 400 }, 400);
+    const { code, stdout, stderr } = await run(["posts:attachments", "p1", "-m", "a.png"], { env: env() });
+    assert.equal(code, 1);
+    assert.equal(stdout, "");
+    assert.match(stderr, /^❌ Failed to update post attachments: Request failed: API Error \(400\): .*Only scheduled posts that were not published yet/);
+  });
+
   it("refuses a status that is not draft or schedule, and a command that lacks its word or its required option, with yargs' usage and exit 1", async () => {
     for (const [argv, said] of [
       [["posts:status", "p1", "--status", "published"], 'Invalid values:\n  Argument: status, Given: "published", Choices: "draft", "schedule"'],
@@ -361,7 +412,7 @@ describe("help, version and what is not a command", () => {
     assert.equal(stderr, "");
     assert.ok(stdout.startsWith("ihateposting <command> [options]\n\nCommands:\n"));
     const names = [...stdout.matchAll(/^  ihateposting (\S+)/gm)].map((m) => m[1]);
-    assert.deepEqual(names, ["posts:create", "posts:list", "posts:delete", "posts:missing", "posts:status", "posts:settings", "posts:connect", "integrations:list", "integrations:groups", "integrations:settings", "integrations:trigger", "analytics:platform", "analytics:post", "upload", "media:status", "media:list", "auth:login", "auth:logout", "auth:status"]);
+    assert.deepEqual(names, ["posts:create", "posts:list", "posts:delete", "posts:missing", "posts:status", "posts:settings", "posts:attachments", "posts:connect", "integrations:list", "integrations:groups", "integrations:settings", "integrations:trigger", "analytics:platform", "analytics:post", "upload", "media:status", "media:list", "auth:login", "auth:logout", "auth:status"]);
     assert.ok(!/clipping|agent-media|pos(?:ti)z/i.test(stdout));
     assert.match(stdout, /Options:\n  -h, --help     Show help +\[boolean\]\n  -v, --version  Show version number +\[boolean\]\n\nFor more information, visit: https:\/\/ihateposting\.com\n\nAuthentication:\n  OAuth2: ihateposting auth:login\n  API Key: export IHATEPOSTING_API_KEY=your_api_key\n$/);
     assert.equal((await run(["-h"], {})).stdout, stdout);

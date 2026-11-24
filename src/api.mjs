@@ -116,6 +116,10 @@ export class IHatePostingAPI {
     return this.request(`/public/v1/posts/${postId}/settings`, { method: "PUT", body: JSON.stringify({ settings }) });
   }
 
+  async updatePostAttachments(postId, attachments) {
+    return this.request(`/public/v1/posts/${postId}/attachments`, { method: "PUT", body: JSON.stringify({ attachments }) });
+  }
+
   async getAnalytics(integrationId, date) {
     return this.request(`/public/v1/analytics/${integrationId}?date=${encodeURIComponent(date)}`, { method: "GET" });
   }

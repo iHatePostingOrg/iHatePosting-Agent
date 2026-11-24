@@ -18,7 +18,7 @@ const FAKE_KEY = "test-key-0123456789-not-real";
 const OTHER_KEY = "other-key-9876543210-not-real";
 const DEFAULT_MCP = "https://app.ihateposting.com/mcp";
 /** The tools the hosted server has (apps/backend/src/mcp/mcp-tools.ts of the app). */
-const SERVER_TOOLS = ["integrationList", "groupList", "integrationSchema", "triggerTool", "integrationSchedulePostTool", "postsListTool", "postSettingsTool", "deletePostTool", "uploadFromUrlTool", "mediaListTool", "mediaStatusTool", "uploadWidgetTool", "uploadWidgetTicketTool", "uploadWidgetStatusTool"];
+const SERVER_TOOLS = ["integrationList", "groupList", "integrationConnectTool", "integrationSchema", "triggerTool", "integrationSchedulePostTool", "postsListTool", "postSettingsTool", "postAttachmentsTool", "deletePostTool", "integrationAnalyticsTool", "postAnalyticsTool", "uploadFromUrlTool", "mediaListTool", "mediaStatusTool", "uploadWidgetTool", "uploadWidgetTicketTool", "uploadWidgetStatusTool"];
 
 const canRegister = typeof register === "function";
 if (canRegister) register("./stand-in-hooks.mjs", import.meta.url);
@@ -421,7 +421,7 @@ describe("the skill (lib/skill.js)", async () => {
   });
 
   it("gives the order of work, the date and the text rules, drafts by default, a confirmation before a delete, and what the server cannot do", () => {
-    for (const part of ["UTC", "draft", "<p>", "`<u>` and `<strong>` in one element", "ask them to confirm", "cannot be undone", "cannot connect a new channel", "AI", "show it or repeat it"]) assert.ok(SKILL_CONTENT.includes(part), `the skill lacks "${part}"`);
+    for (const part of ["UTC", "draft", "<p>", "`<u>` and `<strong>` in one element", "ask them to confirm", "cannot be undone", "link to connect a new channel", "AI", "show it or repeat it"]) assert.ok(SKILL_CONTENT.includes(part), `the skill lacks "${part}"`);
     assert.match(SKILL_CONTENT, /Use `draft` unless the person clearly asked to publish/);
     assert.ok(SKILL_CONTENT.indexOf("integrationList") < SKILL_CONTENT.indexOf("integrationSchema") && SKILL_CONTENT.indexOf("integrationSchema") < SKILL_CONTENT.indexOf("integrationSchedulePostTool"));
   });

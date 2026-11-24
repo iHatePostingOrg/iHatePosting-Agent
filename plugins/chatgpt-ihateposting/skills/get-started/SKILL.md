@@ -10,7 +10,7 @@ iHatePosting publishes to the social channels the person has already connected i
 ## First steps
 
 1. Call `integrationList` and show the person their channels: the platform and the name of each, and which are switched off. If a customer or group name was mentioned, call `groupList` first and pass the group's id to `integrationList`.
-2. If the list is empty, say so plainly: the person connects channels inside iHatePosting (this plugin cannot add one), and can come back when at least one is connected.
+2. If the list is empty, say so plainly and offer a link to connect one: call `integrationConnectTool` with the platform, and the person opens the link in a browser and approves the access on the platform (Bluesky and Telegram are added inside iHatePosting). They can come back when at least one is connected.
 3. Offer three starting points in one short line each: draft a post, schedule a post for a date, or look at what is already scheduled.
 
 ## What the plugin can do

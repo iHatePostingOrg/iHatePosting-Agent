@@ -120,6 +120,20 @@ The owner's decisions of 2026-11-19 (replace it, `ihateposting` only, version 1.
 
 If something is wrong after step 4: a published version cannot be changed or published again, so publish the fix as 1.0.1 and mark the bad one with `npm deprecate ihateposting@1.0.0 "use 1.0.1"`. To put the old command line back as `latest` meanwhile, `npm dist-tag add ihateposting@0.6.0 latest` moves the tag (npm's `dist-tag` page: "add: Tags the specified version of the package with the specified tag").
 
+## Publishing 1.1.0: `posts:attachments` and the four tools the server gained (2026-11-24)
+
+**Status (2026-11-24, after the owner's steps; checked by plain reads of npm and ClawHub, never run by whoever wrote this).** Everything below is live.
+
+- **Before publishing.** Shakti deployed the app with the new route and tools. A request without a key answers 401 `{"msg":"No API Key found"}` at `https://app.ihateposting.com/api/public/v1/posts/x/attachments` and at `.../api/public/v1/integrations/connect`, where a route that does not exist answers 404 `Cannot GET`. The public API sits under `/api` (the program's default address is `https://app.ihateposting.com/api`); the same request without `/api` is answered 404 by the website, for every route, and says nothing about the deploy.
+- **One version everywhere.** `test/package.test.mjs` keeps the package, the CHANGELOG's newest entry and every plugin manifest (Claude, Cursor, Grok, Gemini, the DeepSeek package) at one number, so all of them moved from 1.0.0 to 1.1.0 in `a61698a`. The ChatGPT pack keeps its own version (1.0.0) and has not been submitted.
+- **`ihateposting@1.1.0`**: published the staged way (`npm publish --access public --tag next`, then `npm dist-tag add ihateposting@1.1.0 latest`). `npm view ihateposting version dist-tags` then printed `1.1.0` with `latest` and `next` both at 1.1.0 (16 files, 61.4 kB packed), and the tarball downloaded from npm holds `posts:attachments` in `src/index.mjs`, `src/commands/posts.mjs` and the README.
+- **`dsh-ihateposting@1.1.0`**: published with `npm publish --access public` from `plugins/dsh-ihateposting` (44 tests passed; the dry run listed the six files). The command printed `+ dsh-ihateposting@1.1.0`, but npm answered 404 for that version, even without its cache, for several minutes afterwards, as its notice said it might; it was `latest` at 1.1.0 later the same day.
+- **ClawHub skill 1.0.3** (moderation CLEAN, updated 2026-11-24 17:51 UTC): made in a new folder kept outside the repositories next to the old ones, from `skills/ihateposting/SKILL.md` with the same one changed `metadata` line as 1.0.1 and 1.0.2 (the key is declared as well as the address). Compared with the repository's file only that line differs; compared with 1.0.2, only the `posts:attachments` lines are new.
+- **ClawHub bundle 0.1.5** (`ihateposting-agent`, scan clean, updated 2026-11-24 17:52 UTC): made in a new folder from the 0.1.4 folder and the Claude plugin. **The owner chose the Claude plugin's current skill text** (no key variable and no shell arrays, as in the Claude directory's copy) over keeping 0.1.4's text, with the key line still in the front matter as in every earlier bundle version; the README is the 0.1.4 file, and the manifest and `package.json` differ from 0.1.4's only in the version. Whether ClawHub or OpenClaw treats a key that is declared but never named in the text as a problem is unverified (the scan said clean).
+- **Nothing for the MCP Registry**: `server.json` names addresses, not tools.
+- **Still open, the owner's**: pressing "Check for new commits" on the Claude plugin portal (what the reviewer does with a new version is unknown), and the ChatGPT pack, which needs a new submission only when the owner decides on one.
+- **Unverified**: the new command and the link tool against a real platform (every test used fakes), and how any directory's reviewer treats the added tools.
+
 ## Publishing with a Different Package Name
 
 If you want to publish as a different npm package name (e.g., "your-other-name"), for example because "ihateposting" were taken:

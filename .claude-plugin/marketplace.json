@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "iHatePosting social media automation skill for scheduling posts across 15 platforms",
-    "version": "1.0.0"
+    "version": "1.1.0"
   },
   "plugins": [
     {

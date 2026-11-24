@@ -1,6 +1,6 @@
 {
   "name": "dsh-ihateposting",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "DeepSeek Harness plugin that connects the agent to iHatePosting over MCP: list connected channels, fetch platform posting rules, and schedule, draft, or publish social media posts across 15 platforms.",
   "type": "module",
   "main": "./lib/index.js",

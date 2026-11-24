@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-24
+
 ### Added
 
-- `posts:attachments <id> -m "<url>,<url>"` - Replace the attachments of an unpublished (draft or scheduled) post. The list replaces all the existing attachments of the main post, `-m ""` removes them all, and `--alt` sets alt texts in the same order. The content, settings and publish date stay as they are. It takes `-m` once: a bare `-m`, an empty entry in the list and a repeated `-m` or `--alt` are refused before the request, so a typo or an unset shell variable cannot clear a post's attachments or shift alt texts. It calls `PUT /public/v1/posts/:id/attachments` of the app (the app has had that route since 2026-11-24; until the app is deployed with it the command answers 404).
+- `posts:attachments <id> -m "<url>,<url>"` - Replace the attachments of an unpublished (draft or scheduled) post. The list replaces all the existing attachments of the main post, `-m ""` removes them all, and `--alt` sets alt texts in the same order. The content, settings and publish date stay as they are. It takes `-m` once: a bare `-m`, an empty entry in the list and a repeated `-m` or `--alt` are refused before the request, so a typo or an unset shell variable cannot clear a post's attachments or shift alt texts. It calls `PUT /public/v1/posts/:id/attachments` of the app; an app that does not have that route yet answers 404.
 
 ### Changed
 
